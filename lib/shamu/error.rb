@@ -1,6 +1,6 @@
 require 'i18n'
 
-module Schamu
+module Shamu
   class Error < StandardError
 
     private

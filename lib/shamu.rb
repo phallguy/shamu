@@ -7,4 +7,5 @@ module Scorpion
   require 'shamu/version'
   require 'shamu/error'
 
+  require 'shamu/service'
 end
