@@ -1,0 +1,7 @@
+--protected
+--no-private
+--no-cache
+--hide-void-return
+--output-dir /tmp/shamu_docs
+--db /tmp/shamu_yardoc
+--markup markdown
