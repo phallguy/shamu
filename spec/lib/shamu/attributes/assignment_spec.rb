@@ -63,7 +63,7 @@ describe Shamu::Attributes::Assignment do
       value = double
       expect( value ).to receive( :to_i ).and_return( 5 )
 
-      instance = klass.new()
+      instance = klass.new
       instance.count = value
 
       expect( instance.count ).to eq 5
@@ -71,7 +71,7 @@ describe Shamu::Attributes::Assignment do
 
     it "coerces using given method proc" do
       klass = Class.new( base_klass ) do
-        attribute :label, coerce: ->(v){ 'coerced' }
+        attribute :label, coerce: ->(_){ 'coerced' }
       end
 
       instance = klass.new( label: 'original' )

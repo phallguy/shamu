@@ -1,62 +1,210 @@
-Style/LineLength:
+Lint/AmbiguousRegexpLiteral:
+  Enabled: false
+
+Metrics/LineLength:
   Max: 120
 
-Style/AccessModifierIndentation:
-  EnforceStyle: indent
+# Offense count: 7
+Style/Documentation:
+  Exclude:
+    - 'spec/**/*'
+    - 'test/**/*'
+    - 'lib/shamu.rb'
+    - 'lib/shamu/attributes.rb'
+    - 'lib/shamu/attributes/assignment.rb'
+    - 'lib/shamu/attributes/fluid_assignment.rb'
+    - 'lib/shamu/entity.rb'
+    - 'lib/shamu/error.rb'
 
+# Offense count: 6
+# Cop supports --auto-correct.
+Style/EmptyLines:
+  Exclude:
+    - 'lib/shamu/attributes.rb'
+    - 'lib/shamu/service.rb'
+    - 'shamu.gemspec'
+    - 'spec/lib/shamu/attributes/fluid_assignment_spec.rb'
+    - 'spec/lib/shamu_spec.rb'
+
+# Offense count: 11
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, SupportedStyles.
+# SupportedStyles: empty_lines, no_empty_lines
+Style/EmptyLinesAroundBlockBody:
+  Exclude:
+    - 'Gemfile'
+    - 'spec/lib/shamu/attributes/assignment_spec.rb'
+    - 'spec/lib/shamu/attributes/fluid_assignment_spec.rb'
+    - 'spec/lib/shamu/attributes_spec.rb'
+    - 'spec/lib/shamu/service_spec.rb'
+    - 'spec/lib/shamu_spec.rb'
+    - 'spec/spec_helper.rb'
+
+# Offense count: 4
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, SupportedStyles.
+# SupportedStyles: empty_lines, no_empty_lines
+Style/EmptyLinesAroundClassBody:
+  Exclude:
+    - 'lib/shamu/error.rb'
+    - 'lib/shamu/service.rb'
+
+# Offense count: 16
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, SupportedStyles.
+# SupportedStyles: empty_lines, no_empty_lines
+Style/EmptyLinesAroundModuleBody:
+  Exclude:
+    - 'lib/shamu.rb'
+    - 'lib/shamu/attributes.rb'
+    - 'lib/shamu/attributes/assignment.rb'
+    - 'lib/shamu/attributes/fluid_assignment.rb'
+    - 'lib/shamu/entity.rb'
+    - 'lib/shamu/service.rb'
+
+# Offense count: 1
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, SupportedStyles.
+# SupportedStyles: when_needed, always
+Style/FrozenStringLiteralComment:
+  Exclude:
+    - 'lib/shamu/version.rb'
+
+# Offense count: 1
+# Configuration parameters: MinBodyLength.
+Style/GuardClause:
+  Exclude:
+    - 'lib/shamu/attributes.rb'
+
+# Offense count: 1
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, SupportedStyles, UseHashRocketsWithSymbolValues.
+# SupportedStyles: ruby19, ruby19_no_mixed_keys, hash_rockets
+Style/HashSyntax:
+  Enabled: false
+
+# Offense count: 9
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, SupportedStyles.
+# SupportedStyles: normal, rails
 Style/IndentationConsistency:
-  Enabled: false
+  Exclude:
+    - 'lib/shamu/attributes.rb'
+    - 'lib/shamu/attributes/assignment.rb'
 
-Style/TrailingBlankLines:
-  Enabled: false
+# Offense count: 1
+Style/NestedParenthesizedCalls:
+  Exclude:
+    - 'spec/lib/shamu/attributes_spec.rb'
 
-Style/EmptyLinesAroundBody:
-  Enabled: false
+# Offense count: 1
+# Cop supports --auto-correct.
+# Configuration parameters: PreferredDelimiters.
+Style/PercentLiteralDelimiters:
+  Exclude:
+    - 'shamu.gemspec'
 
-Style/StringLiterals:
-  Enabled: false
+# Offense count: 2
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, SupportedStyles, AllowInnerSlashes.
+# SupportedStyles: slashes, percent_r, mixed
+Style/RegexpLiteral:
+  Exclude:
+    - 'Guardfile'
 
-Style/SpaceInsideParens:
-  Enabled: false
+# Offense count: 2
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, SupportedStyles.
+# SupportedStyles: only_raise, only_fail, semantic
+Style/SignalException:
+  Exclude:
+    - 'lib/shamu/attributes/assignment.rb'
+    - 'lib/shamu/attributes/fluid_assignment.rb'
 
+# Offense count: 3
+# Cop supports --auto-correct.
+Style/SpaceAfterComma:
+  Exclude:
+    - 'lib/shamu/attributes.rb'
+    - 'lib/shamu/error.rb'
+
+# Offense count: 3
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, SupportedStyles.
+# SupportedStyles: space, no_space
 Style/SpaceBeforeBlockBraces:
   Enabled: false
 
-Style/SpaceInsideBlockBraces:
-  Enabled: false
-
+# Offense count: 10
+# Cop supports --auto-correct.
 Style/SpaceInsideBrackets:
+  Exclude:
+    - 'Guardfile'
+    - 'lib/shamu.rb'
+    - 'lib/shamu/attributes.rb'
+    - 'spec/spec_helper.rb'
+
+# Offense count: 200
+# Cop supports --auto-correct.
+Style/SpaceInsideParens:
+  Exclude:
+    - 'Guardfile'
+    - 'lib/shamu.rb'
+    - 'lib/shamu/attributes.rb'
+    - 'lib/shamu/attributes/assignment.rb'
+    - 'lib/shamu/attributes/fluid_assignment.rb'
+    - 'lib/shamu/error.rb'
+    - 'spec/lib/shamu/attributes/assignment_spec.rb'
+    - 'spec/lib/shamu/attributes/fluid_assignment_spec.rb'
+    - 'spec/lib/shamu/attributes_spec.rb'
+    - 'spec/spec_helper.rb'
+
+# Offense count: 22
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, SupportedStyles.
+# SupportedStyles: space, no_space
+Style/SpaceInsideStringInterpolation:
+  Exclude:
+    - 'lib/shamu/attributes.rb'
+    - 'lib/shamu/attributes/assignment.rb'
+
+# Offense count: 62
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, SupportedStyles, ConsistentQuotesInMultiline.
+# SupportedStyles: single_quotes, double_quotes
+Style/StringLiterals:
   Enabled: false
 
-Style/SingleLineBlockParams:
-  Enabled: false
+# Offense count: 15
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, SupportedStyles.
+# SupportedStyles: final_newline, final_blank_line
+Style/TrailingBlankLines:
+  Exclude:
+    - 'Gemfile'
+    - 'Guardfile'
+    - 'Rakefile'
+    - 'lib/shamu/attributes.rb'
+    - 'lib/shamu/attributes/assignment.rb'
+    - 'lib/shamu/attributes/fluid_assignment.rb'
+    - 'lib/shamu/entity.rb'
+    - 'lib/shamu/error.rb'
+    - 'lib/shamu/service.rb'
+    - 'lib/shamu/version.rb'
+    - 'spec/lib/shamu/attributes/assignment_spec.rb'
+    - 'spec/lib/shamu/attributes/fluid_assignment_spec.rb'
+    - 'spec/lib/shamu/service_spec.rb'
+    - 'spec/lib/shamu_spec.rb'
+    - 'spec/spec_helper.rb'
 
-Style/SingleSpaceBeforeFirstArg:
-  Enabled: false
+# Offense count: 1
+# Cop supports --auto-correct.
+Style/UnneededInterpolation:
+  Exclude:
+    - 'shamu.gemspec'
 
-Style/TrailingComma:
-  Enabled: false
-
-Style/SpaceAfterComma:
-  Enabled: false
-
-Style/ClassAndModuleChildren:
-  EnforcedStyle: nested
-
-Style/PercentLiteralDelimiters:
-  PreferredDelimiters:
-    '%':  '{}'
-    '%i': '{}'
-    '%q': '{}'
-    '%Q': '{}'
-    '%r': '{}'
-    '%s': '{}'
-    '%w': '{}'
-    '%W': '{}'
-    '%x': '{}'
-
-Lint/AssignmentInCondition:
-  Enabled: false
-
-Lint/AmbiguousRegexpLiteral:
-  Enabled: false
+# Offense count: 1
+# Cop supports --auto-correct.
+Style/UnneededPercentQ:
+  Exclude:
+    - 'shamu.gemspec'

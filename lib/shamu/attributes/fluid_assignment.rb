@@ -23,8 +23,6 @@ module Shamu
         super
       end
 
-      private
-
       module DSL
 
         # Define a new attribute for the class.
@@ -36,8 +34,6 @@ module Shamu
         def attribute( name, **, &block )
           super
         end
-
-        private
 
       end
 

@@ -41,7 +41,7 @@ describe Shamu::Attributes do
 
   context "with block" do
     let( :klass ) do
-      klass = Class.new do
+      Class.new do
         include Shamu::Attributes
 
         attribute :time do

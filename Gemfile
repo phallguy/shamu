@@ -6,6 +6,7 @@ gemspec
 group :test do
 
   gem 'guard', '~> 2.12.8'
+  gem 'guard-rubocop'
   gem 'spring'
   gem 'byebug'
   gem 'pry-byebug'

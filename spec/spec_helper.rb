@@ -27,9 +27,4 @@ RSpec.configure do |config|
   config.before(:each)  { GC.disable }
   config.after(:each)   { GC.enable }
 
-  config.before( :each, type: :model ) do
-    [ Todo, Author ].each do |model|
-      model.destroy_all
-    end
-  end
 end

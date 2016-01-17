@@ -36,9 +36,9 @@ module Shamu
       # @return [self]
       def assign_attributes( attributes )
         self.class.attributes.each do |key,options|
-          if attributes.has_key?( key )
+          if attributes.key?( key )
             value = attributes[ key ]
-          elsif options.has_key?( :default )
+          elsif options.key?( :default )
             value = options[ :default ]
           else
             next
@@ -74,7 +74,7 @@ module Shamu
         define_attribute_reader( name )
         define_attribute_assignment( name, **args )
 
-        if args.has_key?( :on )
+        if args.key?( :on )
           define_delegate_fetcher( name, args[:on] )
         else
           define_virtual_fetcher( name, &block )
@@ -115,7 +115,7 @@ module Shamu
           RUBY
         end
 
-        def define_attribute_assignment( name, **args )
+        def define_attribute_assignment( name, ** )
           class_eval <<-RUBY, __FILE__, __LINE__ + 1
             def assign_#{ name }( value )
               @#{ name } = value

@@ -1,3 +1,8 @@
+guard :rubocop, all_on_start: false, cli: [ "--display-cop-names" ] do
+  watch( /lib\/.*\.rb$/ )
+  watch( /spec\/.*\.rb$/ )
+end
+
 guard :rspec, cmd: "bundle exec rspec" do
   require "guard/rspec/dsl"
   dsl = Guard::RSpec::Dsl.new(self)
