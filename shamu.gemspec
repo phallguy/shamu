@@ -5,10 +5,10 @@ require 'shamu/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "shamu"
-  spec.version       = "#{Scorpion::VERSION}"
-  spec.authors       = ["Paul Alexander"]
-  spec.email         = ["me@phallguy.com"]
-  spec.summary       = %q{Have a whale of a good time adding Service Oriented Architecture to your ruby projects.}
+  spec.version       = Shamu::VERSION
+  spec.authors       = [ "Paul Alexander" ]
+  spec.email         = [ "me@phallguy.com" ]
+  spec.summary       = "Have a whale of a good time adding Service Oriented Architecture to your ruby projects."
   spec.homepage      = "https://github.com/phallguy/shamu"
   spec.license       = "MIT"
 

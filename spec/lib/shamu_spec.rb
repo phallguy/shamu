@@ -1,5 +1,5 @@
 require 'spec_helper'
-describe Scorpion do
+describe Shamu do
 
 
 end

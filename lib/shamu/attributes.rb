@@ -35,7 +35,7 @@ module Shamu
       #
       # @return [self]
       def assign_attributes( attributes )
-        self.class.attributes.each do |key,options|
+        self.class.attributes.each do |key, options|
           if attributes.key?( key )
             value = attributes[ key ]
           elsif options.key?( :default )
@@ -48,6 +48,7 @@ module Shamu
         end
       end
 
+    # A DSL for declargin attributes for a class.
     module DSL
 
       # @return [Hash] of attributes and their options defined on the class.

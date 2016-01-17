@@ -1,5 +1,7 @@
 module Shamu
   module Attributes
+
+    # Provide a means for defining writable attributes.
     module Assignment
 
       def self.included( base )
@@ -8,6 +10,7 @@ module Shamu
         super
       end
 
+      # A DSL for defining writable attributes.
       module DSL
 
         # Define a new attribute for the class.
@@ -67,31 +70,30 @@ module Shamu
           end
 
           def define_attribute_coercion( name, coerce )
-            if coerce == :smart
-              coerce =
-                case name
-                when /_at$/, /_on$/ then :to_datetime
-                when /_ids?$/       then :to_i
-                end
-            end
+            coerce = cource_method( name, coerce )
 
-            if coerce.is_a? Symbol
+            if !coerce || coerce.is_a?( Symbol )
               class_eval <<-RUBY, __FILE__, __LINE__ + 1
                 def coerce_#{ name }( value )
-                  value.#{ coerce }
+                  value#{ coerce && ".#{ coerce }" }
                 end
               RUBY
             elsif coerce
               define_method :"coerce_#{ name }", coerce
-            else
-              class_eval <<-RUBY, __FILE__, __LINE__ + 1
-                def coerce_#{ name }( value )
-                  value
-                end
-              RUBY
             end
 
             private :"coerce_#{ name }"
+          end
+
+          def cource_method( name, coerce )
+            if coerce == :smart
+              case name
+              when /_at$/, /_on$/ then :to_datetime
+              when /_ids?$/       then :to_i
+              end
+            else
+              coerce
+            end
           end
 
           def define_attribute_writer( name )

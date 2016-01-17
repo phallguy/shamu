@@ -29,7 +29,7 @@ describe Shamu::Attributes do
 
     it "fetches value only once" do
       contact = double
-      expect( contact ).to receive( :info ){ Time.now.to_f }
+      expect( contact ).to receive( :info ) { Time.now.to_f }
 
       instance = klass.new( contact: contact )
       time = instance.info
@@ -79,7 +79,7 @@ describe Shamu::Attributes do
   it "uses instance variables" do
     instance = klass.new( name: "Example" )
 
-    expect( instance.instance_variable_get :@name ).to eq "Example"
+    expect( instance.instance_variable_get( :@name ) ).to eq "Example"
   end
 
   describe "inheritance" do

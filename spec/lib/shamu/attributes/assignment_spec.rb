@@ -71,7 +71,7 @@ describe Shamu::Attributes::Assignment do
 
     it "coerces using given method proc" do
       klass = Class.new( base_klass ) do
-        attribute :label, coerce: ->(_){ 'coerced' }
+        attribute :label, coerce: ->(_) { 'coerced' }
       end
 
       instance = klass.new( label: 'original' )
@@ -88,7 +88,7 @@ describe Shamu::Attributes::Assignment do
           attribute :tag_ids
         end
       end
-      let( :instance ){ klass.new }
+      let( :instance ) { klass.new }
 
       it "coerces nnn_at to timestamps" do
         value = double

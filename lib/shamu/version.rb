@@ -1,4 +1,5 @@
-module Scorpion
+# frozen_string_literal: true
+module Shamu
   # The primary version number
   VERSION_NUMBER  = "0.0.1".freeze
 

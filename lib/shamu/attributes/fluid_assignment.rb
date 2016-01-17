@@ -23,6 +23,7 @@ module Shamu
         super
       end
 
+      # DSL for declaring fluid assignment.
       module DSL
 
         # Define a new attribute for the class.
