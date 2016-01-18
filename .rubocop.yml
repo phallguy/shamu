@@ -1,6 +1,9 @@
 Lint/AmbiguousRegexpLiteral:
   Enabled: false
 
+Lint/AssignmentInCondition:
+  Enabled: false
+
 Metrics/LineLength:
   Max: 120
 

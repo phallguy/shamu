@@ -44,8 +44,21 @@ module Shamu
             next
           end
 
+          if build = options[:build]
+            value = build_value( build, value )
+          end
+
           send :"assign_#{ key }", value
         end
+      end
+
+      def build_value( build, value )
+        if build.is_a?( Class )
+          klass = build
+          build = ->(v) { klass.new( v ) }
+        end
+
+        build.call( value )
       end
 
     # A DSL for declargin attributes for a class.
@@ -68,6 +81,8 @@ module Shamu
       # @param [Symbol] on another method on the class to delegate the attribute
       #     to.
       # @param [Object] default value if not set.
+      # @param [Class,#call] build method used to build a nested object on
+      #     assignement of a hash with nested keys.
       # @return [void]
       def attribute( name, **args, &block )
         attributes[name.to_sym] = args

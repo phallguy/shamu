@@ -26,15 +26,21 @@ module Shamu
       # DSL for declaring fluid assignment.
       module DSL
 
-        # Define a new attribute for the class.
-        #
-        # @param [Symbol] name of the attribute
-        # @param (see Projection::DSL#attribute)
-        #
-        # @return [void]
-        def attribute( name, **, &block )
-          super
-        end
+        private
+
+          def define_attribute_reader( name )
+            class_eval <<-RUBY, __FILE__, __LINE__ + 1
+              def #{ name }( *args )
+                if args.length > 0
+                  assign_#{ name }( *args )
+                  self
+                else
+                  return @#{ name } if defined? @#{ name }
+                  @#{ name } = fetch_#{ name }
+                end
+              end
+            RUBY
+          end
 
       end
 

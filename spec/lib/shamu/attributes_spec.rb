@@ -14,7 +14,6 @@ describe Shamu::Attributes do
   end
 
   describe "delegate" do
-
     it "delegates to another method" do
       contact = double
       expect( contact ).to receive( :info )
@@ -36,7 +35,6 @@ describe Shamu::Attributes do
       sleep 0.1
       expect( instance.info ).to eq time
     end
-
   end
 
   context "with block" do
@@ -105,5 +103,53 @@ describe Shamu::Attributes do
     it "does not modify parent attributes" do
       expect( parent.attributes ).not_to have_key :email
     end
+  end
+
+  describe "#assign_attributes" do
+    let( :klass ) do
+      nested = nested_klass
+      Class.new do
+        include Shamu::Attributes
+
+        attribute :name
+        attribute :contact, build: nested
+      end
+    end
+
+    let( :nested_klass ) do
+      Class.new do
+        include Shamu::Attributes
+
+        attribute :email
+      end
+    end
+
+    it "invokes assign_nnn for each value" do
+      expect_any_instance_of( klass ).to receive( :assign_name )
+
+      klass.new( name: 'something' )
+    end
+
+    it "assigns nested attributes" do
+      instance = klass.new( contact: { email: "batman@gotham.com" } )
+
+      expect( instance.contact.email ).to eq "batman@gotham.com"
+    end
+
+    it "builds using custom builder" do
+      builder = double
+      expect( builder ).to receive( :call ).with( kind_of( Hash ) ) do |attrs|
+        nested_klass.new( attrs )
+      end
+
+      klass = Class.new do
+        include Shamu::Attributes
+
+        attribute :nested, build: builder
+      end
+
+      klass.new( nested: {} )
+    end
+
   end
 end
