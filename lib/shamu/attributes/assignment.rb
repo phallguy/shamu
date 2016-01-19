@@ -5,7 +5,7 @@ module Shamu
     module Assignment
 
       def self.included( base )
-        raise "Must include Shamu::Attributes first." unless base < Shamu::Attributes
+        base.include( Shamu::Attributes )
         base.extend( Assignment::DSL )
         super
       end

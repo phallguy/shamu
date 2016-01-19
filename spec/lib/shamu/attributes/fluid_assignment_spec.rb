@@ -12,14 +12,6 @@ describe Shamu::Attributes::FluidAssignment do
     end
   end
 
-  it "requires Attributes::Assignment first" do
-    expect do
-      Class.new do
-        include Shamu::Attributes::FluidAssignment
-      end
-    end.to raise_error /Assignment/
-  end
-
   it "returns the current value with no arguments" do
     instance = klass.new( value: "one" )
 

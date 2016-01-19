@@ -15,12 +15,34 @@ module Shamu
         super
       end
 
+      # Validate the attributes and expose any errors via {#errors}.
+      def validate
+        fail NotImplementedError, "include a validation framework such as Shamu::Attributes::ActiveModelValidation"
+      end
+
+      # @!method errors
+      # @return the list of errors on the object defined by the chosen
+      #     validation framework.
+      def errors
+        fail NotImplementedError, "include a validation framework such as Shamu::Attributes::ActiveModelValidation"
+      end
+
+      # @return [Boolean] if the object is free from validation errors. Must
+      #   call {#validate} before checking.
+      def valid?
+        errors.blank?
+      end
+
       # Extend the {Attributes::DSL} to support validation on defined attributes.
       module DSL
 
         # Adds validation options to {Attributes::DSL#attribute}. Any option not
         # recognized by one of the Attributes mixins will be used as validation
         # arguments for the given attribute.
+        #
+        # @overload attribute( name, build, **options )
+        # @param (see Attributes::Assignment::DSL#attribute)
+        # @return (see Attributes::Assignment::DSL#attribute)
         #
         # @example
         #   attribute :email, presence: true
@@ -31,13 +53,23 @@ module Shamu
         def attribute( name, *args, **options, &block )
           super
 
-          validation_options = options.except( *attribute_option_keys )
+          validation_options = options.each_with_object({}) do |(key, value), opts|
+            opts[key] = value unless attribute_option_keys.include?( key )
+          end
           validates name, validation_options if validation_options.any?
         end
 
         # Define validation rules for an attribute.
-        def validates( _name, **_options )
-          fail NotImplementedError, "include a validation framework such as Shame::Attributes::ActiveModelValidation"
+        #
+        # See the validation framework specific mixin for details on validation
+        # rules.
+        #
+        # @overload validates( name, **validations )
+        # @param [Symbol] name of the attribute to validate.
+        # @param [Hash] validations to apply.
+        # @return [void]
+        def validates( _name, **_validations )
+          fail NotImplementedError, "include a validation framework such as Shamu::Attributes::ActiveModelValidation"
         end
       end
     end

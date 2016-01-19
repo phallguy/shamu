@@ -5,13 +5,17 @@ gemspec
 
 gem "activemodel", "~> 4.2.5"
 
+platforms :mri do
+  gem "byebug"
+  gem "pry-byebug"
+end
+
+
 group :test do
 
   gem "guard", "~> 2.12.8"
   gem "guard-rubocop"
   gem "spring"
-  gem "byebug"
-  gem "pry-byebug"
   gem "guard-rspec"
   gem "fuubar"
   gem "yard"

@@ -18,7 +18,7 @@ module Shamu
     module FluidAssignment
 
       def self.included( base )
-        raise "Must include Shamu::Attributes::Assignment first." unless base < Shamu::Attributes::Assignment
+        base.include( Attributes::Assignment )
         base.extend( FluidAssignment::DSL )
         super
       end

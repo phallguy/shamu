@@ -11,14 +11,6 @@ describe Shamu::Attributes::Assignment do
     end
   end
 
-  it "requires Attributes::Projection first" do
-    expect do
-      Class.new do
-        include Shamu::Attributes::Assignment
-      end
-    end.to raise_error /Attributes/
-  end
-
   describe "arrays" do
     let( :klass ) do
       Class.new( base_klass ) do

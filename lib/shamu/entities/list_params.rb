@@ -7,6 +7,7 @@ module Shamu
       include Attributes
       include Attributes::Assignment
       include Attributes::FluidAssignment
+      include Attributes::Validation
 
       # # Coerces a hash or params object to a proper ListParams object.
       # def self.coerce( params )

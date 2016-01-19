@@ -98,7 +98,7 @@ module Shamu
       # @overload attribute(name, on:, default:, build: )
       # @overload attribute(name, build, on:, default:)
       #
-      # @param [Symbol] name of the attribute
+      # @param [Symbol] name of the attribute.
       # @param [Symbol] on another method on the class to delegate the attribute
       #     to.
       # @param [Object] default value if not set.
