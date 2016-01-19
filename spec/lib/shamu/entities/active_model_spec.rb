@@ -1,6 +1,6 @@
-require 'spec_helper'
-require 'shamu/entities'
-require 'shamu/entities/active_model'
+require "spec_helper"
+require "shamu/entities"
+require "shamu/entities/active_model"
 
 class ModelEntity < Shamu::Entities::Entity
   include Shamu::Entities::ActiveModel

@@ -4,6 +4,12 @@ module Shamu
   # external API, ActiveRecord model, cached data, etc.) providing simple
   # transformations.
   #
+  # To add additional attribute functionality see
+  #
+  # - {Attributes::Assignment}
+  # - {Attributes::FluidAssignment}
+  # - {Attributes::Validation}
+  #
   # @example
   #
   #   class Person
@@ -12,8 +18,9 @@ module Shamu
   #     attribute :name
   #   end
   module Attributes
-    require 'shamu/attributes/assignment'
-    require 'shamu/attributes/fluid_assignment'
+    require "shamu/attributes/assignment"
+    require "shamu/attributes/fluid_assignment"
+    require "shamu/attributes/validation"
 
     def self.included( base )
       base.extend( Attributes::DSL )
@@ -118,6 +125,12 @@ module Shamu
       end
 
       private
+
+        # @return [Array<Symbol>] keys used by the {.attribute} method options
+        #   argument. Used by {Attributes::Validation} to filter option keys.
+        def attribute_option_keys
+          [ :on, :build, :default ]
+        end
 
         def create_attribute( name, *args, **options )
           options = options.dup

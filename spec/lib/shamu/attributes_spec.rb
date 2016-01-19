@@ -1,5 +1,5 @@
-require 'spec_helper'
-require 'shamu/attributes'
+require "spec_helper"
+require "shamu/attributes"
 
 describe Shamu::Attributes do
   let( :klass ) do
@@ -160,7 +160,7 @@ describe Shamu::Attributes do
     it "invokes assign_nnn for each value" do
       expect_any_instance_of( klass ).to receive( :assign_name )
 
-      klass.new( name: 'something' )
+      klass.new( name: "something" )
     end
 
     it "assigns nested attributes" do

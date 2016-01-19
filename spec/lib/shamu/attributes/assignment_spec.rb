@@ -1,5 +1,5 @@
-require 'spec_helper'
-require 'shamu/attributes'
+require "spec_helper"
+require "shamu/attributes"
 
 describe Shamu::Attributes::Assignment do
   let( :base_klass ) do
@@ -27,13 +27,13 @@ describe Shamu::Attributes::Assignment do
     end
 
     it "converts a single value to an array" do
-      instance = klass.new( tags: 'apple' )
-      expect( instance.tags ).to eq ['apple']
+      instance = klass.new( tags: "apple" )
+      expect( instance.tags ).to eq ["apple"]
     end
 
     it "coerces each item in the array" do
       instance = klass.new( tags: [:orange] )
-      expect( instance.tags ).to eq ['orange']
+      expect( instance.tags ).to eq ["orange"]
     end
   end
 
@@ -71,11 +71,11 @@ describe Shamu::Attributes::Assignment do
 
     it "coerces using given method proc" do
       klass = Class.new( base_klass ) do
-        attribute :label, coerce: ->(_) { 'coerced' }
+        attribute :label, coerce: ->(_) { "coerced" }
       end
 
-      instance = klass.new( label: 'original' )
-      expect( instance.label ).to eq 'coerced'
+      instance = klass.new( label: "original" )
+      expect( instance.label ).to eq "coerced"
     end
 
     describe "smart" do

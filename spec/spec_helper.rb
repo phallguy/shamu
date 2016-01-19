@@ -1,14 +1,14 @@
-require 'simplecov'
-if ENV['COVERAGE']
+require "simplecov"
+if ENV[ "COVERAGE" ]
   require "codeclimate-test-reporter"
   CodeClimate::TestReporter.start
 else
   SimpleCov.start
 end
-require 'pry'
-require 'bundler/setup'
+require "pry"
+require "bundler/setup"
 
-require 'shamu'
+require "shamu"
 
 root_path = File.expand_path( "../..", __FILE__ )
 

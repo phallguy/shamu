@@ -53,7 +53,7 @@ Style/SpaceInsideStringInterpolation:
   Enabled: false
 
 Style/StringLiterals:
-  Enabled: false
+  EnforcedStyle: double_quotes
 
 Style/TrailingBlankLines:
   Enabled: false

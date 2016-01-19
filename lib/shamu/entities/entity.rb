@@ -1,4 +1,4 @@
-require 'shamu/attributes'
+require "shamu/attributes"
 
 module Shamu
   module Entities

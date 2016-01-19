@@ -1,5 +1,5 @@
-require 'spec_helper'
-require 'shamu/attributes'
+require "spec_helper"
+require "shamu/attributes"
 
 describe Shamu::Attributes::FluidAssignment do
   let( :klass ) do

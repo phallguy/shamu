@@ -21,7 +21,6 @@ module Shamu
         #     the attribute.
         # @param [Boolean] array true if the expected value should be an array.
         #
-        #
         # @return [void]
         #
         # @example
@@ -35,13 +34,17 @@ module Shamu
         #     attribute :label, coerce: ->(value){ value.upcase.to_sym }
         #     attribute :tags, coerce: :to_s, array: true
         #   end
-        def attribute( name, **args, &block )
+        def attribute( name, *args, **options, &block )
           super
-          define_attribute_assignment( name, **args )
+          define_attribute_assignment( name, **options )
           define_attribute_writer( name )
         end
 
         private
+
+          def attribute_option_keys
+            super + [ :coerce, :array ]
+          end
 
           def define_attribute_assignment( name, coerce: :smart, array: false, ** )
             super

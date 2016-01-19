@@ -1,4 +1,4 @@
-require 'active_model'
+require "active_model"
 
 module Shamu
   module Entities
@@ -26,11 +26,11 @@ module Shamu
         #   model specific names for this entity.
         def model_name
           @model_name ||= begin
-            base_name = name.sub /(::)?Entity$/, ''
-            parts     = base_name.split '::'
+            base_name = name.sub /(::)?Entity$/, ""
+            parts     = base_name.split "::"
             parts.shift if parts.length > 1
             parts[-1] = parts[-1].singularize
-            base_name = parts.join '::'
+            base_name = parts.join "::"
 
             ::ActiveModel::Name.new( self, nil, base_name )
           end

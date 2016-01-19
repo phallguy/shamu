@@ -1,5 +1,5 @@
-require 'spec_helper'
-require 'shamu/entities'
+require "spec_helper"
+require "shamu/entities"
 
 describe Shamu::Entities::Entity do
   let( :klass ) do
