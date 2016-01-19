@@ -12,6 +12,12 @@ module Shamu
     #
     # See {Shamu::Entities} for more on using entities.
     #
+    # ## Helper Methods
+    #
+    # Entities can define helper methods to perform simple calculations or
+    # projections of it's data. They only rely on state available by other
+    # attribute projections. This makes the entity cacheable and serializable.
+    #
     # ### Why class instead of module?
     #
     # The Entity class is ridiculously simple. It just mixes in a few modules
@@ -50,6 +56,11 @@ module Shamu
     #
     #     # Project a JSON object using another entity class
     #     attribute :address, AddressEntity, on: :contact
+    #
+    #     # Helper method
+    #     def new_user?
+    #       signed_up_on > 3.days.ago
+    #     end
     #   end
     #
     class Entity

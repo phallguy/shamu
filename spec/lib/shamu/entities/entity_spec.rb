@@ -55,5 +55,12 @@ describe Shamu::Entities::Entity do
 
       instance.to_attributes
     end
+
+    it "can be used to clone the entity" do
+      instance = klass.new( name: "Peter", email: "parker@marvel.com" )
+      clone    = klass.new( instance )
+
+      expect( clone.name ).to eq "Peter"
+    end
   end
 end

@@ -1,8 +1,8 @@
 module Shamu
   module Entities
 
-    # List params define the shape and filters desired by the client of a {List}
-    # returned from a {Services::Service}.
+    # Parameters offered to a {Services::Service} to prepare a list of {Entity
+    # entities}.
     class ListParams
       include Attributes
       include Attributes::Assignment

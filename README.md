@@ -10,6 +10,13 @@ Have a whale of a good time adding Service Oriented Architecture to your ruby pr
 
 (Also check out [shog](http://github.com/phallguy/shog) for better rails logs)
 
+# SOA
+
+# Components
+
+- {Shamu::Entities}
+- {Shamu::Services}
+
 # Dependency Injection
 
 ....
