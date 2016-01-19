@@ -3,6 +3,8 @@ source 'https://rubygems.org'
 # Specify your gem's dependencies in shamu.gemspec
 gemspec
 
+gem 'activemodel', '~> 4.2.5'
+
 group :test do
 
   gem 'guard', '~> 2.12.8'

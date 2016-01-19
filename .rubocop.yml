@@ -10,6 +10,12 @@ Metrics/LineLength:
 Metrics/MethodLength:
   Max: 15
 
+Metrics/AbcSize:
+  Max: 20
+
+Metrics/CyclomaticComplexity:
+  Max: 10
+
 Style/EmptyLines:
   Enabled: false
 
@@ -52,5 +58,11 @@ Style/StringLiterals:
 Style/TrailingBlankLines:
   Enabled: false
 
+Style/TrailingCommaInLiteral:
+  Enabled: false
+
 Style/UnneededInterpolation:
+  Enabled: false
+
+Style/CaseEquality:
   Enabled: false

@@ -13,6 +13,26 @@ describe Shamu::Attributes do
     end
   end
 
+  it "uses instance variables" do
+    instance = klass.new( name: "Example" )
+
+    expect( instance.instance_variable_get( :@name ) ).to eq "Example"
+  end
+
+  it "uses second optional arg as builder if present" do
+    builder = double
+    expect( builder ).to receive( :call )
+
+    klass = Class.new do
+      include Shamu::Attributes
+
+      attribute :address, builder
+    end
+
+    klass.new( address: {} )
+  end
+
+
   describe "delegate" do
     it "delegates to another method" do
       contact = double
@@ -34,6 +54,25 @@ describe Shamu::Attributes do
       time = instance.info
       sleep 0.1
       expect( instance.info ).to eq time
+    end
+
+    it "uses builder on result" do
+      builder = double
+      expect( builder ).to receive( :call ) { |v| v }
+
+      klass = Class.new do
+        include Shamu::Attributes
+
+        attribute :contact
+        attribute :address, builder, on: :contact
+      end
+
+      contact = double
+      attrs = double
+      expect( contact ).to receive( :address ).and_return( attrs )
+
+      instance = klass.new( contact: contact )
+      instance.address
     end
   end
 
@@ -72,12 +111,6 @@ describe Shamu::Attributes do
     it "doesn't use any default if not defined" do
       expect( klass.new( {} ).name ).to be_nil
     end
-  end
-
-  it "uses instance variables" do
-    instance = klass.new( name: "Example" )
-
-    expect( instance.instance_variable_get( :@name ) ).to eq "Example"
   end
 
   describe "inheritance" do
@@ -149,6 +182,26 @@ describe Shamu::Attributes do
       end
 
       klass.new( nested: {} )
+    end
+
+    it "coerces objects that respond to to_attributes" do
+      attrs = double
+      expect( attrs ).to receive( :to_attributes ).and_return( {} )
+
+      klass.new( attrs )
+    end
+
+    it "coerces objects that respond to to_h" do
+      attrs = double
+      expect( attrs ).to receive( :to_h ).and_return( {} )
+
+      klass.new( attrs )
+    end
+
+    it "handles nil" do
+      expect do
+        klass.new( nil )
+      end.not_to raise_error
     end
 
   end

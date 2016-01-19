@@ -10,3 +10,16 @@ Have a whale of a good time adding Service Oriented Architecture to your ruby pr
 
 (Also check out [shog](http://github.com/phallguy/shog) for better rails logs)
 
+# Dependency Injection
+
+....
+[Scorpion](http://github.com/phallguy/scorpion)
+
+# Using with ActiveRecord
+
+Shamu does not come with a hard dependency on ActiveRecord - it should work with
+any persistence you've chosen to use in your project. It does come with some
+convenience mixins to make it easier to work with AR.
+
+- **{Shamu::Entities::ActiveModel}** makes an entity work like a readonly model
+  that can be used with url helpers, forms, friendly ids, etc.
