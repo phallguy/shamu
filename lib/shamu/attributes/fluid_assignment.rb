@@ -28,7 +28,7 @@ module Shamu
 
         private
 
-          def define_attribute_reader( name )
+          def define_attribute_reader( name, ** )
             class_eval <<-RUBY, __FILE__, __LINE__ + 1
               def #{ name }( *args )
                 if args.length > 0

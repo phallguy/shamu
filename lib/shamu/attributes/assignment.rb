@@ -50,8 +50,8 @@ module Shamu
             super
 
             class_eval <<-RUBY, __FILE__, __LINE__ + 1
-              def assign_#{ name }( value )
-                @#{ name } = coerce_#{ name }#{ array ? '_array' : '' }( value )
+              def assign_#{ name }( *values )
+                @#{ name } = coerce_#{ name }#{ array ? '_array' : '' }( *values )
               end
             RUBY
             private :"assign_#{ name }"

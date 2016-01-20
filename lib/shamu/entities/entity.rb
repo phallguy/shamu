@@ -66,30 +66,10 @@ module Shamu
     class Entity
       include Shamu::Attributes
 
-      # Project the current state of the entity to a hash of attributes that can
-      # be used either for caching or for hydrating another entity.
-      #
-      # Model attributes are not included.
-      #
-      # @param [Array, Regex] only include matching attributes
-      # @param [Array, Regex] except matching attributes
-      # @return [Hash] of attributes
-      def to_attributes( only: nil, except: nil )
-        self.class.attributes.each_with_object({}) do |(name, options), attrs|
-          next if ( only && !match_attribute?( only, name ) ) || ( except && match_attribute?( except, name ) )
-          next if options[:model]
-          value = send( name )
-          value = value.to_attributes if value.respond_to?( :to_attributes )
-          attrs[name] = value
-        end
-      end
-
       private
 
-        def match_attribute?( pattern, name )
-          Array( pattern ).any? do |matcher|
-            matcher === name
-          end
+        def serialize_attribute?( name, options )
+          super && !options[:model]
         end
 
       class << self

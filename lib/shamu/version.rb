@@ -7,5 +7,5 @@ module Shamu
   VERSION_SUFFIX  = "".freeze
 
   # Published version number
-  VERSION         = "#{VERSION_NUMBER}#{VERSION_SUFFIX}".freeze
+  VERSION         = "#{ VERSION_NUMBER }#{ VERSION_SUFFIX }".freeze
 end

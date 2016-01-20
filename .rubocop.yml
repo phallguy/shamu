@@ -46,6 +46,9 @@ Style/RegexpLiteral:
 Style/SignalException:
   Enabled: false
 
+Style/SpaceAroundBlockParameters:
+  Enabled: false
+
 Style/SpaceInsideBrackets:
   Enabled: false
 
@@ -53,7 +56,7 @@ Style/SpaceInsideParens:
   Enabled: false
 
 Style/SpaceInsideStringInterpolation:
-  Enabled: false
+  EnforcedStyle: space
 
 Style/StringLiterals:
   EnforcedStyle: double_quotes
