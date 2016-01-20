@@ -1,6 +1,7 @@
 module Shamu
 
-  # A set of errors.
+  # A set of errors. Provides just enough to record errors using
+  # ActiveModel::Validations and report them inline using FormHelper.
   class Errors
     include Enumerable
 
@@ -34,30 +35,18 @@ module Shamu
 
     # @return [Boolean] true if there is an error reported for the given attribute
     def include?( attribute )
-      !messages[attribute].blank?
+      !messages[attribute].empty?
     end
 
-    # aliases include?
-    alias has_key? include?
-
-    # aliases include?
-    alias key? include?
-
-    # @return [Boolean] true if there are not reported errors.
+    # @return [Boolean] true if there are no reported errors.
     def empty?
       messages.empty?
     end
 
-    # Iterate through each reported error.
-    #
-    # @yieldparam [Symbol] attribute
-    # @yieldparam [String] message
-    def each( &_block )
-      messages.each do |attribute, msgs|
-        msgs.each do |message|
-          yield attribute, message
-        end
-      end
+    # @return [Array<String>] error messages recorded for the given attribute.
+    def []( attribute )
+      messages[attribute]
     end
+
   end
 end

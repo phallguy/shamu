@@ -14,6 +14,7 @@ end
 group :test do
 
   gem "guard", "~> 2.12.8"
+  gem "rubocop"
   gem "guard-rubocop"
   gem "spring"
   gem "guard-rspec"

@@ -16,6 +16,9 @@ Metrics/AbcSize:
 Metrics/CyclomaticComplexity:
   Max: 10
 
+Style/Alias:
+  Enabled: false
+
 Style/EmptyLines:
   Enabled: false
 
