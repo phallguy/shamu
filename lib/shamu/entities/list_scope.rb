@@ -7,7 +7,7 @@ module Shamu
     # @example
     #   class UsersListScope < Shamu::Entities::ListScope
     #
-    #     # Include standard paging options (page, page_size) from ListScopes::Paging
+    #     # Include standard paging options (page, per_page) from ListScopes::Paging
     #     paging
     #
     #     # Allow client to request that users be limited to those in one of the
@@ -83,11 +83,11 @@ module Shamu
         # to the list scope:
         #
         # - **page** (Integer) the current page number. 1 based.
-        # - **page_size** (Integer) size of the page.
-        # - **default_page_size** (Integer) page size to use if not provided.
+        # - **per_page** (Integer) size of the page.
+        # - **default_per_page** (Integer) page size to use if not provided.
         #
         # @param [Symbol] name of the page attribute. Default :page.
-        # @param [Integer] page_size the default page size.
+        # @param [Integer] per_page the default page size.
         # @return [void]
         #
         # @example
@@ -97,11 +97,11 @@ module Shamu
         #
         #   scope = UsersListScope.coerce!( params )
         #   scope.page      # => 1
-        #   scope.page_size # => 25
-        def paging( name: :page, page_size: 25 )
+        #   scope.per_page # => 25
+        def paging( name: :page, per_page: 25 )
           attribute name, coerce: :to_i, default: 1
           attribute :"#{ name }_size", coerce: :to_i, default: ->() { send :"default_#{ name }_size" }
-          attribute :"default_#{ name }_size", coerce: :to_i, default: page_size, serialize: false
+          attribute :"default_#{ name }_size", coerce: :to_i, default: per_page, serialize: false
         end
 
         # Include paging parsing and attributes exposed as a nested page object.
@@ -112,7 +112,7 @@ module Shamu
         # - **page.default_size** (Integer) page size to use if not provided.
         #
         # @param [Symbol] name of the page attribute. Default :page.
-        # @param [Integer] page_size the default page size.
+        # @param [Integer] per_page the default page size.
         # @return [void]
         #
         # @example
@@ -123,13 +123,13 @@ module Shamu
         #   scope = UsersListScope.coerce!( page: { number: 5, size: 50 } )
         #   scope.page.number # => 5
         #   scope.page.size   # => 50
-        def scoped_paging( name: :page, page_size: 25 )
+        def scoped_paging( name: :page, per_page: 25 )
           klass = Class.new do
             include Shamu::Attributes
 
             attribute :number, coerce: :to_i, default: 1
             attribute :size, coerce: :to_i, default: ->() { default_size }
-            attribute :default_size, coerce: :to_i, default: page_size, serialize: false
+            attribute :default_size, coerce: :to_i, default: per_page, serialize: false
           end
 
           attribute name, build: klass, default: klass.new

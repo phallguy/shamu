@@ -4,6 +4,9 @@ source "https://rubygems.org"
 gemspec
 
 gem "activemodel", "~> 4.2.5"
+gem "activerecord", "~> 4.2.5"
+gem "sqlite3", "~> 1.3.11"
+gem "kaminari", "~> 0.16.3", require: false
 
 platforms :mri do
   gem "byebug"
