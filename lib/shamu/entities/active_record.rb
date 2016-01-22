@@ -34,10 +34,11 @@ module Shamu
       # @return [ActiveRecord::Relation]
       def by_list_scope( scope )
         criteria = all
-        criteria = apply_paging_scope( criteria, scope ) if scope.respond_to?( :page )
-        criteria = apply_dates_scope( criteria, scope ) if scope.respond_to?( :since )
         criteria = apply_custom_list_scope( criteria, scope )
-        criteria = apply_sorting_scope( criteria, scope ) if scope.respond_to?( :sort_by )
+        criteria = apply_paging_scope( criteria, scope )        if scope.respond_to?( :paged? )
+        criteria = apply_scoped_paging_scope( criteria, scope ) if scope.respond_to?( :scoped_page? )
+        criteria = apply_dates_scope( criteria, scope )         if scope.respond_to?( :dated? )
+        criteria = apply_sorting_scope( criteria, scope )       if scope.respond_to?( :sorted? )
         criteria
       end
 
@@ -75,10 +76,15 @@ module Shamu
         end
 
         def apply_paging_scope( criteria, scope )
-          if scope.respond_to?( :page_size )
+          if scope.paged?
             criteria = criteria.page( scope.page || 1 )
-            criteria = criteria.per( scope.page_size ) if scope.page_size
-          elsif scope.page
+            criteria = criteria.per( scope.per_page ) if scope.per_page
+          end
+          criteria
+        end
+
+        def apply_scoped_paging_scope( criteria, scope )
+          if scope.scoped_page?
             criteria = criteria.page( scope.page.number || 1 )
             criteria = criteria.per( scope.page.size ) if scope.page.size
           end
@@ -110,10 +116,10 @@ module Shamu
         end
 
         class StandardListScopeTemplate < ListScope
-          paging
-          scoped_paging
-          dates
-          sorting
+          include ListScope::Paging
+          include ListScope::ScopedPaging
+          include ListScope::Dates
+          include ListScope::Sorting
         end
 
     end

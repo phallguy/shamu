@@ -48,7 +48,7 @@ describe Shamu::Entities::ActiveRecord do
 
     it "filters by paging" do
       klass = Class.new( EntitiesActiveRecordSpec::Scope ) do
-        paging
+        include Shamu::Entities::ListScope::Paging
       end
 
       scope    = klass.new( page: 1, page_size: 25 )
@@ -60,7 +60,7 @@ describe Shamu::Entities::ActiveRecord do
 
     it "filters by scoped paging" do
       klass = Class.new( EntitiesActiveRecordSpec::Scope ) do
-        scoped_paging
+        include Shamu::Entities::ListScope::ScopedPaging
       end
 
       scope    = klass.new( page: { number: 1, size: 25 } )
@@ -72,7 +72,7 @@ describe Shamu::Entities::ActiveRecord do
 
     it "filters by dates" do
       klass = Class.new( EntitiesActiveRecordSpec::Scope ) do
-        dates
+        include Shamu::Entities::ListScope::Dates
       end
 
       since_date = Time.at( 50000 )
@@ -87,7 +87,7 @@ describe Shamu::Entities::ActiveRecord do
 
     it "sorts by attribute" do
       klass = Class.new( EntitiesActiveRecordSpec::Scope ) do
-        sorting
+        include Shamu::Entities::ListScope::Sorting
       end
 
       scope    = klass.new( sort_by: :name )
