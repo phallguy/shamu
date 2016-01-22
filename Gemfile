@@ -5,14 +5,18 @@ gemspec
 
 gem "activemodel", "~> 4.2.5"
 gem "activerecord", "~> 4.2.5"
-gem "sqlite3", "~> 1.3.11"
 gem "kaminari", "~> 0.16.3", require: false
 
 platforms :mri do
+  gem "sqlite3", "~> 1.3.11"
   gem "byebug"
   gem "pry-byebug"
 end
 
+platforms :jruby do
+  gem "jdbc-sqlite3"
+  gem "activerecord-jdbcsqlite3-adapter"
+end
 
 group :test do
 
@@ -28,5 +32,5 @@ group :test do
   gem "awesome_print"
 
   gem "codeclimate-test-reporter", group: :test, require: nil
-  gem 'rspec_junit_formatter', '~> 0.2.2'
+  gem 'rspec_junit_formatter', '~> 0.2.2', platforms: :mri
 end

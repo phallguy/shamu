@@ -66,6 +66,17 @@ module Shamu
     class Entity
       include Shamu::Attributes
 
+      # @return [false] real entities are not empty. See {NullEntity}.
+      def empty?
+        false
+      end
+      alias_method :blank?, :empty?
+
+      # @return [true] the entity is present. See {NullEntity}.
+      def present?
+        !empty?
+      end
+
       private
 
         def serialize_attribute?( name, options )
