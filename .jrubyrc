@@ -73,7 +73,7 @@
 # Compile with all "mostly harmless" compiler optimizations.
 # Options: [true, false], Default: false.
 
-compile.fastest=true
+#compile.fastest=false
 
 # Turn on fast operators for Fixnum and Float.
 # Options: [true, false], Default: true.
@@ -88,7 +88,7 @@ compile.fastest=true
 # Use invokedynamic for optimizing Ruby code.
 # Options: [true, false], Default: false.
 
-compile.invokedynamic=true
+#compile.invokedynamic=false
 
 # Set compilation mode. JIT = at runtime; FORCE = before execution.
 # Options: [JIT, FORCE, OFF, TRUFFLE], Default: JIT.
@@ -123,7 +123,7 @@ compile.invokedynamic=true
 # Enable all possible uses of invokedynamic.
 # Options: [true, false], Default: false.
 
-#invokedynamic.all=true
+#invokedynamic.all=false
 
 # Use invokedynamic to load cached values like literals and constants.
 # Options: [true, false], Default: true.
@@ -238,7 +238,7 @@ compile.invokedynamic=true
 # Save jitted methods to <dir> as they're compiled, for future runs.
 # Options: [dir].
 
-jit.codeCache=~/.jitcache
+#jit.codeCache=
 
 # Log loading of JITed bytecode.
 # Options: [true, false], Default: false.
@@ -929,7 +929,7 @@ cli.debug=true
 # Enable parser debug logging. Same as -y.
 # Options: [true, false], Default: false.
 
-#cli.parser.debug=false
+cli.parser.debug=true
 
 # Enable line ending processing. Same as -l.
 # Options: [true, false], Default: false.
