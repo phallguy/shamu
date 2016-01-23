@@ -1,5 +1,3 @@
-require "shamu/entities/active_model"
-
 module Shamu
   module Entities
 
@@ -22,11 +20,6 @@ module Shamu
     # records = Domain::Models::Account.all.by_list_scope( list_scope )
     # ```
     module ActiveRecord
-
-      def self.extended( base )
-        base.include Shamu::Entities::ActiveModel
-      end
-
 
       # Apply the filters defined in a {ListScope} to an ActiveRecord::Relation.
       #

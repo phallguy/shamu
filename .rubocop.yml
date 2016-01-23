@@ -4,6 +4,9 @@ Lint/AmbiguousRegexpLiteral:
 Lint/AssignmentInCondition:
   Enabled: false
 
+Lint/UnusedMethodArgument:
+  Enabled: false
+
 Metrics/LineLength:
   Max: 120
 
@@ -50,6 +53,9 @@ Style/SignalException:
   Enabled: false
 
 Style/SpaceAroundBlockParameters:
+  Enabled: false
+
+Style/SpaceAroundOperators:
   Enabled: false
 
 Style/SpaceInsideBrackets:

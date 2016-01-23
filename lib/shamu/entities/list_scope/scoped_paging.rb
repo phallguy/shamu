@@ -52,6 +52,11 @@ module Shamu
           # @!attribute
           # @return [Integer] the default page size if not specified.
           attribute :default_size, coerce: :to_i, default: 25, serialize: false
+
+          # @return [Hash] the scope as a params hash.
+          def params
+            to_attributes
+          end
         end
 
       end

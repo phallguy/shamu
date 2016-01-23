@@ -63,4 +63,13 @@ describe Shamu::Entities::ListScope do
       expect( instance.except ).to be_a klass
     end
   end
+
+  describe "#params" do
+    it "calls params on nested values" do
+      name     = "Nested"
+      instance = klass.new( name: name )
+      expect( name ).to receive( :params ).and_return "parameterized"
+      expect( instance.params[:name] ).to eq "parameterized"
+    end
+  end
 end

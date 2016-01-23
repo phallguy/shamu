@@ -8,6 +8,7 @@ describe Shamu::Attributes::Equality do
       include Shamu::Attributes::Equality
 
       attribute :name
+      attribute :random, ignore_inequality: true
     end
   end
 
@@ -51,5 +52,12 @@ describe Shamu::Attributes::Equality do
 
   it "has a different hash for different attributes" do
     expect( value.hash ).not_to eq different.hash
+  end
+
+  it "ignores excluded attributes" do
+    v1 = klass.new( name: "same", random: 123 )
+    v2 = klass.new( name: "same", random: 456 )
+
+    expect( v1 ).to eq v2
   end
 end

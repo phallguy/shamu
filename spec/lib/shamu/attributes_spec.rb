@@ -10,6 +10,8 @@ describe Shamu::Attributes do
       attribute :info, on: :contact
       attribute :contact
       attribute :company, default: "ACME"
+
+      public :set?
     end
   end
 
@@ -30,6 +32,20 @@ describe Shamu::Attributes do
     end
 
     klass.new( address: {} )
+  end
+
+  describe "#set?" do
+    it "is true if the attribute has been set" do
+      expect( klass.new( name: "Set" ) ).to be_set :name
+    end
+
+    it "is true if the attribute has been set to nil" do
+      expect( klass.new( name: nil ) ).to be_set :name
+    end
+
+    it "is false if the attribute has not been set" do
+      expect( klass.new ).not_to be_set :name
+    end
   end
 
 
@@ -220,65 +236,76 @@ describe Shamu::Attributes do
 
   describe "#to_attributes" do
     let( :klass ) do
-      Class.new( Shamu::Entities::Entity ) do
-        model :user
+      Class.new do
+        include Shamu::Attributes::Assignment
+
+        attribute :user, serialize: false
+
         attribute :name, on: :user
         attribute :email, on: :user
       end
     end
 
-    describe "#to_attributes" do
-      let( :user )     { OpenStruct.new( name: "Heisenberg", email: "blue@rock.com" ) }
-      let( :instance ) { klass.new( user: user ) }
+    let( :user )     { OpenStruct.new( name: "Heisenberg", email: "blue@rock.com" ) }
+    let( :instance ) { klass.new( user: user ) }
 
-      subject { instance.to_attributes }
+    subject { instance.to_attributes }
 
-      it { is_expected.to have_key :name }
-      it { is_expected.to have_key :email }
-      it { is_expected.not_to have_key :user }
+    it { is_expected.to have_key :name }
+    it { is_expected.to have_key :email }
+    it { is_expected.not_to have_key :user }
 
-      it "includes only requested attributes array" do
-        attrs = instance.to_attributes( only: :name )
+    it "includes only requested attributes array" do
+      attrs = instance.to_attributes( only: :name )
 
-        expect( attrs ).to have_key :name
-        expect( attrs ).not_to have_key :email
-      end
+      expect( attrs ).to have_key :name
+      expect( attrs ).not_to have_key :email
+    end
 
-      it "includes only requested attributes regex" do
-        attrs = instance.to_attributes( only: /email/ )
+    it "includes only requested attributes regex" do
+      attrs = instance.to_attributes( only: /email/ )
 
-        expect( attrs ).not_to have_key :name
-        expect( attrs ).to have_key :email
-      end
+      expect( attrs ).not_to have_key :name
+      expect( attrs ).to have_key :email
+    end
 
-      it "excludes requested attributes array" do
-        attrs = instance.to_attributes( except: :name )
+    it "excludes requested attributes array" do
+      attrs = instance.to_attributes( except: :name )
 
-        expect( attrs ).not_to have_key :name
-        expect( attrs ).to have_key :email
+      expect( attrs ).not_to have_key :name
+      expect( attrs ).to have_key :email
 
-      end
+    end
 
-      it "excludes requested attributes regex" do
-        attrs = instance.to_attributes( except: /email/ )
+    it "excludes requested attributes regex" do
+      attrs = instance.to_attributes( except: /email/ )
 
-        expect( attrs ).to have_key :name
-        expect( attrs ).not_to have_key :email
-      end
+      expect( attrs ).to have_key :name
+      expect( attrs ).not_to have_key :email
+    end
 
-      it "invokes to_attributes of nested attributes" do
-        user.name = double
-        expect( user.name ).to receive( :to_attributes )
+    it "can be used to clone the entity" do
+      instance = klass.new( name: "Peter", email: "parker@marvel.com" )
+      clone    = klass.new( instance )
 
-        instance.to_attributes
-      end
+      expect( clone.name ).to eq "Peter"
+    end
 
-      it "can be used to clone the entity" do
-        instance = klass.new( name: "Peter", email: "parker@marvel.com" )
-        clone    = klass.new( instance )
+    it "invokes to_attributes of nested attributes" do
+      user.name = double
+      expect( user.name ).not_to receive( :to_attributes )
 
-        expect( clone.name ).to eq "Peter"
-      end
+      instance.to_attributes
+    end
+  end
+
+  describe "Hash like access" do
+    it "recognizes known attributes" do
+      expect( klass.new.key?( :name ) ).to be_truthy
+    end
+
+    it "retrieves attribute values by name" do
+      expect( klass.new( name: "Example" )[ "name" ] ).to eq "Example"
     end
   end
 end
