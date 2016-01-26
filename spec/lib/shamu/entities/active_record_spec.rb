@@ -75,14 +75,14 @@ describe Shamu::Entities::ActiveRecord do
         include Shamu::Entities::ListScope::Dates
       end
 
-      since_date = Time.at( 50000 )
-      until_date = Time.at( 60000 )
+      since_date = Time.at( 50_000 )
+      until_date = Time.at( 60_000 )
 
       scope    = klass.new( since: since_date, until: until_date )
       relation = EntitiesActiveRecordSpec::Model.by_list_scope( scope )
 
-      expect( relation.where_values.any?{ |w| w.left.name == :since } ).to be_truthy
-      expect( relation.where_values.any?{ |w| w.left.name == :until } ).to be_truthy
+      expect( relation.where_values.any? { |w| w.left.name == :since } ).to be_truthy
+      expect( relation.where_values.any? { |w| w.left.name == :until } ).to be_truthy
     end
 
     it "sorts by attribute" do
@@ -93,7 +93,7 @@ describe Shamu::Entities::ActiveRecord do
       scope    = klass.new( sort_by: :name )
       relation = EntitiesActiveRecordSpec::Model.by_list_scope( scope )
 
-      expect( relation.order_values.any?{ |o| o.expr.name == :name } ).to be_truthy
+      expect( relation.order_values.any? { |o| o.expr.name == :name } ).to be_truthy
     end
   end
 end

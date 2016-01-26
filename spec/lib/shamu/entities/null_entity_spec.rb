@@ -39,7 +39,7 @@ describe Shamu::Entities::NullEntity do
   end
 
   let( :null ) do
-    null_klass.new()
+    null_klass.new
   end
 
   describe "#empty?" do

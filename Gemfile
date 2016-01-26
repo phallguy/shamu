@@ -23,4 +23,4 @@ gem "ruby_gntp", "~> 0.3.4"
 gem "awesome_print"
 
 gem "codeclimate-test-reporter", group: :test, require: nil
-gem 'rspec_junit_formatter', '~> 0.2.2', platforms: :mri
+gem "rspec_junit_formatter", "~> 0.2.2", platforms: :mri

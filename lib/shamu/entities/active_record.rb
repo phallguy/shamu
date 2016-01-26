@@ -59,7 +59,7 @@ module Shamu
         # @return [ActiveRecord::Relation] the sorted criteria.
         def apply_sort( criteria, field, direction )
           if attribute_method?( field )
-            criteria.order( arel_table[ field ].send direction )
+            criteria.order( arel_table[ field ].send( direction ) )
           else
             criteria
           end
@@ -67,8 +67,8 @@ module Shamu
 
         def apply_sorting_scope( criteria, scope )
           if scope.sort_by
-            criteria = scope.sort_by.reduce( criteria ) do |criteria, ( field, direction )|
-              apply_sort( criteria, field, direction )
+            criteria = scope.sort_by.reduce( criteria ) do |crit, ( field, direction )|
+              apply_sort( crit, field, direction )
             end
           end
 
@@ -92,8 +92,8 @@ module Shamu
         end
 
         def apply_dates_scope( criteria, scope )
-          criteria = criteria.where( criteria.arel_table[:since].gteq scope.since ) if scope.since
-          criteria = criteria.where( criteria.arel_table[:until].lteq scope.until ) if scope.until
+          criteria = criteria.where( criteria.arel_table[:since].gteq( scope.since ) ) if scope.since
+          criteria = criteria.where( criteria.arel_table[:until].lteq( scope.until ) ) if scope.until
           criteria
         end
 
@@ -104,6 +104,7 @@ module Shamu
               value    = scope.send( name )
               criteria = criteria.send scope_name, value if value.present?
             else
+              # rubocop:disable Metrics/LineLength
               fail ArgumentError, "Cannot apply '#{ name }' filter from #{ scope.class.name }. Add 'scope :#{ scope_name }, ->( #{ name } ) { ... }' to #{ criteria.class.name }"
             end
           end
@@ -115,6 +116,8 @@ module Shamu
           scope.class.attributes.keys - StandardListScopeTemplate.attributes.keys
         end
 
+        # @!visibility private
+        # @!api internal
         class StandardListScopeTemplate < ListScope
           include ListScope::Paging
           include ListScope::ScopedPaging
