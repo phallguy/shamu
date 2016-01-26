@@ -32,7 +32,7 @@ module Shamu
     module NullEntity
 
       # Attributes to automatically format as "Unknown {Entity Class Name}"
-      AUTO_FORMATTED_ATTRIBUTES = %i( name title label )
+      AUTO_FORMATTED_ATTRIBUTES = %i( name title label ).freeze
 
       # @return [nil]
       # Prevent rails url helpers from generating URLs for the entity.
@@ -48,16 +48,16 @@ module Shamu
 
       def self.included( base )
         AUTO_FORMATTED_ATTRIBUTES.each do |attr|
-          if base.attributes.key?( attr )
-            base_name ||= begin
-              base.name
-                  .split( "::" )
-                  .last
-                  .sub( /Entity/, '' )
-                  .gsub( /(.)([[:upper:]])/, '\1 \2' )
-            end
-            base.attribute attr, default: "Unknown #{base_name}"
+          next unless base.attributes.key?( attr )
+
+          base_name ||= begin
+            base.name
+                .split( "::" )
+                .last
+                .sub( /Entity/, "" )
+                .gsub( /(.)([[:upper:]])/, '\1 \2' )
           end
+          base.attribute attr, default: "Unknown #{ base_name }"
         end
       end
 

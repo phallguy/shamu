@@ -21,6 +21,7 @@ module Shamu
     require "shamu/attributes/assignment"
     require "shamu/attributes/fluid_assignment"
     require "shamu/attributes/validation"
+    require "shamu/attributes/equality"
 
     def self.included( base )
       base.extend( Attributes::DSL )

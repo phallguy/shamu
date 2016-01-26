@@ -48,7 +48,7 @@ module Shamu
 
         # @return [Boolean] true if the scope is dated.
         def dated?
-          !!self.since || !!self.until
+          !!self.since || !!self.until # rubocop:disable Style/RedundantSelf
         end
 
       end
