@@ -33,3 +33,8 @@ convenience mixins to make it easier to work with AR.
 
 - **{Shamu::Entities::ActiveRecord}** adds convenience methods for working with
   ActiveRecord models as entities.
+
+
+# Contributing
+
+See [LABELS](LABELS.md)
