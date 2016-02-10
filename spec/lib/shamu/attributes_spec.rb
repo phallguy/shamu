@@ -34,6 +34,16 @@ describe Shamu::Attributes do
     klass.new( address: {} )
   end
 
+  it "creates alias accessor" do
+    klass = Class.new do
+      include Shamu::Attributes
+
+      attribute :q, as: :query
+    end
+
+    expect( klass.new ).to respond_to :query
+  end
+
   describe "#set?" do
     it "is true if the attribute has been set" do
       expect( klass.new( name: "Set" ) ).to be_set :name
@@ -232,6 +242,15 @@ describe Shamu::Attributes do
       end.not_to raise_error
     end
 
+    it "accepts alias key" do
+      klass = Class.new do
+        include Shamu::Attributes
+
+        attribute :q, as: :query
+      end
+
+      expect( klass.new( query: "ABC" ).q ).to eq "ABC"
+    end
   end
 
   describe "#to_attributes" do

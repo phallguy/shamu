@@ -37,7 +37,7 @@ module Shamu
         def attribute( name, *args, **options, &block )
           super
           define_attribute_assignment( name, **options )
-          define_attribute_writer( name )
+          define_attribute_writer( name, **options )
         end
 
         private
@@ -99,9 +99,11 @@ module Shamu
             end
           end
 
-          def define_attribute_writer( name )
+          def define_attribute_writer( name, as: nil, ** )
             alias_method :"#{ name }=", :"assign_#{ name }"
             public :"#{ name }="
+
+            alias_method :"#{ as }=", :"#{ name }=" if as
           end
 
       end
