@@ -25,7 +25,7 @@ describe Shamu::Entities::ListScope::Paging do
   end
 
   it "includes paging values in to_param" do
-    expect( klass.new.to_param ).to eq page: nil, per_page: 25
+    expect( klass.new.params ).to eq page: nil, per_page: 25
   end
 
   it "should not be paged if using defaults" do

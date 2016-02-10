@@ -33,17 +33,20 @@ module Shamu
       require "shamu/entities/list_scope/sorting"
 
 
-      # @return [Hash] the scope as a hash of values that can be used to
-      #     generate a url of the requested scope.
-      def to_param
-        to_attributes
-      end
-
       # Clone the params but exclude the given parameters.
       # @param [Array<Symbol>] param_names to exclude.
       # @return [ListScope]
       def except( *param_names )
         self.class.new( to_attributes( except: param_names ) )
+      end
+
+      # @return [Hash] the hash of attributes that can be used to generate a url.
+      def params
+        params = to_attributes
+        params.each do |key, value|
+          params[key] = value.params if value.respond_to?( :params )
+        end
+        params
       end
 
       class << self
@@ -53,7 +56,7 @@ module Shamu
         def coerce( params )
           if params.is_a?( self )
             params
-          elsif params.respond_to?( :to_h )
+          elsif params.respond_to?( :to_h ) || params.respond_to?( :to_attributes )
             new( params )
           elsif params.nil?
             new

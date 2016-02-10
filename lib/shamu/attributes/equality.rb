@@ -3,6 +3,9 @@ module Shamu
 
     # Override equality methods to support shallow comparison of attribute
     # values for equality.
+    #
+    # Add `ignore_inequality: true` to any {Attributes::DSL#attribute} that
+    # shouldn't be included in equalty comparisons.
     module Equality
 
       # @param [Attributes] other object to compare with.
@@ -26,7 +29,8 @@ module Shamu
         # @return [Boolean] true if the object's attributes and `other`
         #     attributes are all `eql?` to each other.
         def attributes_eql?( other )
-          self.class.attributes.all? do |key, _|
+          self.class.attributes.all? do |key, attr|
+            next true if attr[:ignore_inequality]
             send( key ).eql?( other.send( key ) )
           end
         end

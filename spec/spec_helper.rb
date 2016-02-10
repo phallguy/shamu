@@ -9,6 +9,7 @@ require "pry"
 require "bundler/setup"
 
 require "shamu"
+require "scorpion/rspec"
 
 root_path = File.expand_path( "../..", __FILE__ )
 
@@ -23,6 +24,9 @@ RSpec.configure do |config|
   config.filter_run focus: true
   config.filter_run_excluding :broken => true
   config.run_all_when_everything_filtered = true
+
+  config.include Scorpion::Rspec::Helper
+  config.extend  Support::ActiveRecord
 
   config.before(:each)  { GC.disable }
   config.after(:each)   { GC.enable }

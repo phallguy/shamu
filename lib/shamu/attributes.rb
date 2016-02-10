@@ -9,6 +9,7 @@ module Shamu
   # - {Attributes::Assignment}
   # - {Attributes::FluidAssignment}
   # - {Attributes::Validation}
+  # - {Attributes::Equality}
   #
   # @example
   #
@@ -42,10 +43,22 @@ module Shamu
       self.class.attributes.each_with_object({}) do |(name, options), attrs|
         next if ( only && !match_attribute?( only, name ) ) || ( except && match_attribute?( except, name ) )
         next unless serialize_attribute?( name, options )
-        value = send( name )
-        value = value.to_attributes if value.respond_to?( :to_attributes )
-        attrs[name] = value
+        attrs[name] = send( name )
       end
+    end
+
+    # Indicates if the object has an attribute with the given name. Aliased to
+    # {#key?} to make the object look like a Hash.
+    def attribute?( name )
+      self.class.attributes.key?( name.to_sym )
+    end
+    alias_method :key?, :attribute?
+
+    # Access an attribute using a Hash like index.
+    # @param [Symbol] name of the attribute.
+    # @return [Object]
+    def []( name )
+      send name if attribute?( name )
     end
 
     private
@@ -54,6 +67,13 @@ module Shamu
         Array( pattern ).any? do |matcher|
           matcher === name
         end
+      end
+
+      # @!visiblity public
+      # @param [Symbol] attribute name.
+      # @return [Boolean] true if the attribute has been set.
+      def set?( attribute )
+        instance_variable_defined? :"@#{ attribute }"
       end
 
       # Hook for derived objects to explicitly filter attributes included in
@@ -96,8 +116,13 @@ module Shamu
       def resolve_attributes( attributes )
         if attributes.respond_to?( :to_attributes )
           attributes.to_attributes
+        # Allow protected attributes to be used without explicitly being set.
+        # All 'Attributes' classes are them selves the explicit set of permitted
+        # attributes.
+        elsif attributes.respond_to?( :to_hash )
+          attributes.to_hash.symbolize_keys
         elsif attributes.respond_to?( :to_h )
-          attributes.to_h
+          attributes.to_h.symbolize_keys
         else
           attributes
         end
@@ -160,7 +185,7 @@ module Shamu
 
         def create_attribute( name, *args, **options )
           options = options.dup
-          options[:build]     = args[0] if args.length > 0
+          options[:build]     = args[0] unless args.blank?
           options[:serialize] = options.fetch( :serialize, true )
           attributes[name]    = options
         end
@@ -187,7 +212,7 @@ module Shamu
             end
           else
             class_eval <<-RUBY, __FILE__, __LINE__ + 1
-              def fetch_#{ name }; @name end                        # def fetch_attribute; @attribute end
+              def fetch_#{ name }; @#{ name } end                   # def fetch_attribute; @attribute end
             RUBY
           end
         end

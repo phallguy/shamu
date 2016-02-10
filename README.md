@@ -28,8 +28,6 @@ Shamu does not come with a hard dependency on ActiveRecord - it should work with
 any persistence you've chosen to use in your project. It does come with some
 convenience mixins to make it easier to work with AR.
 
-- **{Shamu::Entities::ActiveModel}** makes an entity work like a readonly model
-  that can be used with url helpers, forms, friendly ids, etc.
 
 - **{Shamu::Entities::ActiveRecord}** adds convenience methods for working with
   ActiveRecord models as entities.

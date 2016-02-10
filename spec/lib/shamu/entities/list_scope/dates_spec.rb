@@ -26,7 +26,7 @@ describe Shamu::Entities::ListScope::Dates do
 
   it "includes paging values in to_param" do
     time = Time.now
-    expect( klass.new( since: time, until: time ).to_param ).to eq since: time, until: time
+    expect( klass.new( since: time, until: time ).params ).to eq since: time, until: time
   end
 
   it "should not be dated when using defaults" do

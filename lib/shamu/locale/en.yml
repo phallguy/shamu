@@ -2,6 +2,7 @@ en:
   shamu:
     errors:
       messages:
+        not_found: The resource was not found.
 
     warnings:
       messages:
