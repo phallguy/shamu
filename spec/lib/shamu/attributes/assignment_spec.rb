@@ -46,6 +46,18 @@ describe Shamu::Attributes::Assignment do
     klass.new( attr: 1 )
   end
 
+  it "creates aliased assignment" do
+    klass = Class.new do
+      include Shamu::Attributes::Assignment
+
+      attribute :q, as: :query
+    end
+
+    instance = klass.new
+    instance.query = "ABC"
+    expect( instance.q ).to eq "ABC"
+  end
+
   describe "coercion" do
     it "coerces using given method name" do
       klass = Class.new( base_klass ) do

@@ -93,8 +93,10 @@ module Shamu
         attributes = resolve_attributes( attributes )
 
         self.class.attributes.each do |key, options|
-          next unless attributes.key? key
+          as = options[ :as ] # Alias support
+          next unless attributes.key?( key ) || ( as && attributes.key?( as ) )
           value = attributes[ key ]
+          value ||= attributes[ as ] if as
 
           if build = options[:build]
             value = build_value( build, value )
@@ -148,6 +150,7 @@ module Shamu
       # @overload attribute(name, build, on:, default:)
       #
       # @param [Symbol] name of the attribute.
+      # @param [Symbol] as an alias of the attribute.
       # @param [Symbol] on another method on the class to delegate the attribute
       #     to.
       # @param [Object,#call] default value if not set.
@@ -172,6 +175,7 @@ module Shamu
         private :"fetch_#{ name }"
         private :"assign_#{ name }"
 
+
         self
       end
 
@@ -190,13 +194,15 @@ module Shamu
           attributes[name]    = options
         end
 
-        def define_attribute_reader( name, ** )
+        def define_attribute_reader( name, as: nil, ** )
           class_eval <<-RUBY, __FILE__, __LINE__ + 1
             def #{ name }                                           # def attribute
               return @#{ name } if defined? @#{ name }              #   return @attribute if defined? @attribute
               @#{ name } = fetch_#{ name }                          #   @attribute = fetch_attribute
             end                                                     # end
           RUBY
+
+          alias_method as, name if as
         end
 
         def define_virtual_fetcher( name, default, &block )
