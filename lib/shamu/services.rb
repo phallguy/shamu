@@ -1,6 +1,7 @@
 module Shamu
   # {include:file:lib/shamu/services/README.md}
   module Services
+    require "shamu/services/error"
     require "shamu/services/service"
     require "shamu/services/request"
     require "shamu/services/request_support"

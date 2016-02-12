@@ -8,6 +8,7 @@ describe Shamu::Services::Request do
       "Users::UserRequest::New" => "Users::User",
       "Users::UserRequest::Change" => "Users::User",
       "Users::UserRequest::Update" => "Users::User",
+      "Users::Request::Change" => "Users::User",
       "Users::FavoritesUpdate" => "Users::Favorite",
       "Users::FavoritesCreate" => "Users::Favorite",
       "Users::FavoritesChange" => "Users::Favorite",
@@ -22,6 +23,35 @@ describe Shamu::Services::Request do
 
         expect( klass.model_name.name ).to eq model_name
       end
+    end
+  end
+
+  describe "#apply_to" do
+    let( :klass ) do
+      Class.new( Shamu::Services::Request ) do
+        attribute :name
+        attribute :label
+      end
+    end
+    let( :request ) { klass.new name: "Example" }
+
+    it "returns the model" do
+      model = double
+      expect( Shamu::Services::Request.new.apply_to( model ) ).to be model
+    end
+
+    it "assigns attributes that have been set" do
+      model = double( name: "", label: "" )
+      expect( model ).to receive( :name= ).with( any_args )
+
+      request.apply_to( model )
+    end
+
+    it "skips attributes that haven't been set" do
+      model = double( name: "", label: "" )
+      expect( model ).not_to receive( :label= )
+
+      request.apply_to( model )
     end
   end
 

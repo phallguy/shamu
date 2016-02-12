@@ -37,4 +37,20 @@ describe Shamu::Entities::Entity do
       expect( klass.model_name.name ).to eq expected
     end
   end
+
+  describe ".null_entity" do
+    it "defines a NullEntity class" do
+      expect( klass.null_entity ).to be < Shamu::Entities::NullEntity
+    end
+
+    it "overrides attributes with default values" do
+      klass.null_entity do
+        attribute :name do
+          "Unknown"
+        end
+      end
+
+      expect( klass.null_entity.new.name ).to eq "Unknown"
+    end
+  end
 end

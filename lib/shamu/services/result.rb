@@ -19,7 +19,7 @@ module Shamu
       #
       # @!endgroup Attributes
 
-      # @param [Array<#errors>] an array of objects that respond to `#errors`
+      # @param [Array<#errors>] validation_sources an array of objects that respond to `#errors`
       #   returning a {ActiveModel::Errors} object.
       # @param [Request] request submitted to the service. If :not_set, uses
       #   the first {Request} object found in the `validation_sources`.

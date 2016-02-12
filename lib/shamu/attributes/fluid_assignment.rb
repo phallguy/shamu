@@ -16,15 +16,15 @@ module Shamu
     #   obj.name( '...' )
     #      .email( '...' )
     module FluidAssignment
+      extend ActiveSupport::Concern
 
-      def self.included( base )
-        base.include( Attributes::Assignment )
-        base.extend( FluidAssignment::DSL )
-        super
+      included do |base|
+        raise "Must include Shamu::Attributes first." unless base < Shamu::Attributes
+        raise "Must include Shamu::Attributes::Assignment first." unless base < Shamu::Attributes::Assignment
       end
 
       # DSL for declaring fluid assignment.
-      module DSL
+      class_methods do
 
         private
 

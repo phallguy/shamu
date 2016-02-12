@@ -67,6 +67,7 @@ module Shamu
     #
     class Entity
       include Shamu::Attributes
+      include Shamu::Attributes::Equality
       include Shamu::ToModelIdExtension::Models
 
       # @!attribute
@@ -124,6 +125,28 @@ module Shamu
 
             ::ActiveModel::Name.new( self, nil, base_name )
           end
+        end
+
+        # Define custom default attributes for a {NullEntity} for this class.
+        # @return [Class] the {NullEntity} class for the entity.
+        #
+        # @example
+        #
+        #   class Users::UserEntity < Shamu::Entities::Entity
+        #     attribute :id
+        #     attribute :name
+        #     attribute :level
+        #
+        #     null_entity do
+        #       attribute :level do
+        #         "Guest"
+        #       end
+        #     end
+        #   end
+        def null_entity( &block )
+          null_class = NullEntity.for( self )
+          null_class.class_eval( &block ) if block_given?
+          null_class
         end
 
         private

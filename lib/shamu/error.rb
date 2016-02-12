@@ -17,4 +17,11 @@ module Shamu
       super translate( message )
     end
   end
+
+  # The method is not implemented.
+  class NotImplementedError < Error
+    def initialize( message = :not_implemented )
+      super translate( message )
+    end
+  end
 end

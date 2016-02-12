@@ -19,6 +19,7 @@ group :test do
   gem "guard-rspec"
   gem "fuubar"
   gem "yard"
+  gem "yard-activesupport-concern"
   gem "simplecov", github: "colszowka/simplecov"
   gem "ruby_gntp", "~> 0.3.4"
   gem "awesome_print"

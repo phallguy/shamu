@@ -1,10 +1,11 @@
 require "spec_helper"
 require "shamu/services"
-require "shamu/services/active_record_service"
+require "shamu/services/active_record"
 
-describe Shamu::Services::ActiveRecordService do
+describe Shamu::Services::ActiveRecord do
   let( :klass ) do
-    Class.new( Shamu::Services::ActiveRecordService ) do
+    Class.new( Shamu::Services::Service ) do
+      include Shamu::Services::ActiveRecord
       public :wrap_not_found, :scope_relation
     end
   end

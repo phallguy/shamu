@@ -49,44 +49,6 @@ describe Shamu::Services::Service do
 
   let( :service ) { scorpion.new ServiceSpec::Service }
 
-  describe "#with_request" do
-    let( :request_params ) { { level: 1, amount: 5 } }
-
-    it "returns a Result" do
-      expect( service.process( request_params ) ).to be_a Shamu::Services::Result
-    end
-
-    it "returns validation errors" do
-      request_params.delete :amount
-      expect( service.process( request_params ) ).not_to be_valid
-    end
-
-    it "is valid without errors" do
-      expect( service.process( request_params ) ).to be_valid
-    end
-
-    it "yield with valid params" do
-      expect( service ).to receive( :request_hook )
-      service.process( request_params )
-    end
-
-    it "doesn't yield if params are invalid" do
-      request_params.delete :amount
-      expect( service ).not_to receive( :request_hook )
-      service.process( request_params )
-    end
-
-    it "captures returned entity into result" do
-      result = service.process( request_params )
-      expect( result.entity ).to be_a ServiceSpec::Entity
-    end
-
-    it "captures request_params into result" do
-      result = service.process( request_params )
-      expect( result.request ).to be_a ServiceSpec::Request::Change
-    end
-  end
-
   describe "#entity_list" do
     it "maps each record" do
       expect do |b|

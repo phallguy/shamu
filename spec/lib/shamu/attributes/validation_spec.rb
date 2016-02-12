@@ -37,10 +37,17 @@ describe Shamu::Attributes::Validation do
     expect( instance ).not_to be_valid
   end
 
-  it "validates methods on validate!" do
+  it "validates methods on validate" do
     instance = klass.new( {} )
     instance.validate
 
     expect( instance.errors ).to have_key :name
+  end
+
+  it "validates on first call to valid?" do
+    instance = klass.new( {} )
+    expect( instance ).to receive( :validate ).once.and_call_original
+    instance.valid?
+    instance.valid?
   end
 end

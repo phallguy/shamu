@@ -23,6 +23,8 @@ module Shamu
     # end
     # ```
     class Request
+      include Shamu::Attributes
+      include Shamu::Attributes::Assignment
       include Shamu::Attributes::FluidAssignment
       include Shamu::Attributes::Validation
 
@@ -33,10 +35,12 @@ module Shamu
       # @param [Object] model or object to apply the attributes to.
       # @return [model]
       def apply_to( model )
-        self.class.attributes.each do |name|
+        self.class.attributes.each do |name, _|
           method = :"#{ name }="
-          model.send method, send( name ) if model.respond_to?( method )
+          model.send method, send( name ) if model.respond_to?( method ) && set?( name )
         end
+
+        model
       end
 
       # Entities are always immutable - so they are considered persisted. Use a
@@ -94,6 +98,11 @@ module Shamu
 
           def reduce_model_name_parts( parts )
             while last = parts.last
+              if last == "Request"
+                parts[-1] = parts[-2].singularize
+                break
+              end
+
               last.sub! REQUEST_ACTION_PATTERN, ""
               if last.empty?
                 parts.pop

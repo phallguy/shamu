@@ -18,6 +18,9 @@ module Shamu
 
       delegate :first, :count, :empty?, to: :raw_entities
 
+      alias_method :size, :count
+      alias_method :length, :count
+
       # Get an entity by it's primary key.
       # @param [Object] key the primary key to look for.
       # @param [Symbol] field to use as the primary key. Default :id.

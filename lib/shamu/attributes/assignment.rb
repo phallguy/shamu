@@ -1,17 +1,17 @@
+require "active_support/concern"
+
 module Shamu
   module Attributes
 
     # Provide a means for defining writable attributes.
     module Assignment
+      extend ActiveSupport::Concern
 
-      def self.included( base )
-        base.include( Shamu::Attributes )
-        base.extend( Assignment::DSL )
-        super
+      included do |base|
+        raise "Must include Shamu::Attributes first." unless base < Shamu::Attributes
       end
 
-      # A DSL for defining writable attributes.
-      module DSL
+      class_methods do
 
         # Define a new attribute for the class.
         #

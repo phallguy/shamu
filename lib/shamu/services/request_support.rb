@@ -12,10 +12,21 @@ module Shamu
       # Combine with {Request#init_from} to prepare a request for use in a rails
       # form ready to modify an existing entity.
       #
-      # @param [Symbol] the method on the service that will be called.
+      # @param [Symbol] method on the service that will be called.
       # @return [Class] a class that inherits from Request.
       def request_class( method )
         self.class.request_class( method )
+      end
+
+      # Build a {Request} object, prepopulated with the current state of the
+      # resource to submit changes to the given `method`.
+      #
+      # @param [Symbol] method that will be called with the generated request.
+      # @param [Object] id optional id of the entity that will modified.
+      # @return [Request]
+      def request_for( method, id = nil )
+        entity = find( id ) if id
+        request_class( method ).new( entity )
       end
 
       private
@@ -56,11 +67,11 @@ module Shamu
         #       scorpion.fetch OrderEntity, { order: order }, {}
         #     end
         #   end
-        def with_request( params, request_class )
+        def with_request( params, request_class, &block )
           request = request_class.coerce( params )
-          entity  = yield( request ) if request.validate
+          sources = yield( request ) if request.valid?
 
-          result request, entity
+          result request, *sources
         end
 
       # Static methods added to {RequestSupport}
@@ -72,13 +83,17 @@ module Shamu
                    || request_class_by_alias( method ) \
                    || request_class_default
 
-          result || fail( "no Shamu::Services::Request classes defined for #{ name }." )
+          result ||= superclass.request_class( method ) if superclass.respond_to?( :request_class )
+
+          result || fail( IncompleteSetupError, "No Shamu::Services::Request classes defined for '#{ name }'." )
         end
 
         private
 
           def request_class_namespace
             @request_class_namespace ||= ( name || "" ).sub( /(Service)?$/, "Request" ).constantize
+          rescue NameError
+            self
           end
 
           def request_class_by_name( method )

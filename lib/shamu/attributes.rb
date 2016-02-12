@@ -1,3 +1,5 @@
+require "active_support/concern"
+
 module Shamu
 
   # Provide  attributes that project data from another source (such as an
@@ -19,15 +21,12 @@ module Shamu
   #     attribute :name
   #   end
   module Attributes
+    extend ActiveSupport::Concern
+
     require "shamu/attributes/assignment"
     require "shamu/attributes/fluid_assignment"
     require "shamu/attributes/validation"
     require "shamu/attributes/equality"
-
-    def self.included( base )
-      base.extend( Attributes::DSL )
-      super
-    end
 
     def initialize( *attributes )
       assign_attributes( attributes.last )
@@ -61,19 +60,18 @@ module Shamu
       send name if attribute?( name )
     end
 
+    # @param [Symbol] attribute name.
+    # @return [Boolean] true if the attribute has been set.
+    def set?( attribute )
+      instance_variable_defined? :"@#{ attribute }"
+    end
+
     private
 
       def match_attribute?( pattern, name )
         Array( pattern ).any? do |matcher|
           matcher === name
         end
-      end
-
-      # @!visiblity public
-      # @param [Symbol] attribute name.
-      # @return [Boolean] true if the attribute has been set.
-      def set?( attribute )
-        instance_variable_defined? :"@#{ attribute }"
       end
 
       # Hook for derived objects to explicitly filter attributes included in
@@ -130,8 +128,7 @@ module Shamu
         end
       end
 
-    # A DSL for declargin attributes for a class.
-    module DSL
+    class_methods do
 
       # @return [Hash] of attributes and their options defined on the class.
       def attributes

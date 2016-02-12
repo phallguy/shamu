@@ -19,6 +19,9 @@ Metrics/AbcSize:
 Metrics/CyclomaticComplexity:
   Max: 10
 
+Metrics/ModuleLength:
+  Max: 500
+
 Style/Alias:
   Enabled: false
 

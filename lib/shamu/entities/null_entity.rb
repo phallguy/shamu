@@ -51,8 +51,8 @@ module Shamu
           next unless base.attributes.key?( attr )
 
           base_name ||= begin
-            base.name
-                .split( "::" )
+            name = base.name || "Resource"
+            name.split( "::" )
                 .last
                 .sub( /Entity/, "" )
                 .gsub( /(.)([[:upper:]])/, '\1 \2' )
@@ -62,21 +62,21 @@ module Shamu
       end
 
       # Dynamically generate a new null entity class.
-      # @param [Class] entity {Entity} class
-      # @return [Class] a null entity class derived from `entity`.
-      def self.for( klass )
-        if null_klass = ( klass.const_defined?( :NullEntity ) && klass.const_get( :NullEntity, false ) )
+      # @param [Class] entity_class {Entity} class
+      # @return [Class] a null entity class derived from `entity_class`.
+      def self.for( entity_class )
+        if null_klass = ( entity_class.const_defined?( :NullEntity ) && entity_class.const_get( :NullEntity, false ) )
           # If the base class is reloaded a-la rails dev, then regenerate the
           # null class as well.
-          null_klass = nil if null_klass.superclass != klass
+          null_klass = nil if null_klass.superclass != entity_class
         end
 
         unless null_klass
-          null_klass = Class.new( klass ) do
+          null_klass = Class.new( entity_class ) do
             include ::Shamu::Entities::NullEntity
           end
 
-          klass.const_set :NullEntity, null_klass
+          entity_class.const_set :NullEntity, null_klass
         end
 
         null_klass

@@ -74,6 +74,31 @@ module Shamu
           raise ArgumentError unless coerced.valid?
           coerced
         end
+
+        # Finds the natural {ListScope} class for the given entity class.
+        #
+        # Users::UserEntity -> Users::UserListScope or Users::ListScope
+        #
+        # @param [Class] entity_class the {Entity} class to find a scope for.
+        # @return [ListScope] the custom list scope if found, otherwise
+        #     {ListScope}.
+        def for( entity_class )
+          base_name = entity_class.name || "Entity"
+          name = base_name.sub /(Entity)?$/, "ListScope"
+          begin
+            return name.constantize
+          rescue NameError # rubocop:disable Lint/HandleExceptions
+          end
+
+          name = base_name.sub /::[A-Za-z0-9]+(Entity)?$/, "::ListScope"
+
+          begin
+            return name.constantize
+          rescue NameError # rubocop:disable Lint/HandleExceptions
+          end
+
+          self
+        end
       end
     end
   end

@@ -8,7 +8,7 @@ module Shamu
 
       # @param [Enumerable] source enumerable to transform.
       # @yieldparam [Object] object the original value.
-      # @yieldresult the transformed value.
+      # @yieldreturn the transformed value.
       # @yield (object)
       def initialize( source, &transformer )
         @transformer = transformer
