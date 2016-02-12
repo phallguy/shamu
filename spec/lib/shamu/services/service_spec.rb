@@ -21,6 +21,7 @@ module ServiceSpec
     public :entity_lookup_list
     public :entity_list
     public :find_by_lookup
+    public :cached_lookup
 
     def build_entity( record, records = nil )
       scorpion.fetch ServiceSpec::Entity, { record: record }, {}
@@ -193,6 +194,98 @@ describe Shamu::Services::Service do
       list = service.entity_lookup_list( records, [192], ServiceSpec::NullEntity, match: matcher )
       expect( list.first ).to be_a ServiceSpec::NullEntity
     end
+  end
+
+  describe "#cached_lookup" do
+
+    context "found entities" do
+      let( :entities ) do
+        Shamu::Entities::List.new [
+          ServiceSpec::Entity.new( id: 5, level: 11, amount: "More" ),
+          ServiceSpec::Entity.new( id: 11, level: 5, amount: "Less" )
+        ]
+      end
+
+      let( :records ) do
+        [
+          OpenStruct.new( id: 5 ),
+          OpenStruct.new( id: 11 )
+        ]
+      end
+      let( :transformer ) { ->(record) { entities.get( record.id ) } }
+      let( :lookup )      { ->(ids) { ids.map { |id| entities.get( id ) } } }
+
+      it "uses existing entities" do
+        service.cached_lookup [ 5 ], &lookup
+
+        expect do |b|
+          service.cached_lookup [ 5 ], &b
+        end.not_to yield_control
+      end
+
+      it "calls build for uncached entities" do
+        service.cached_lookup [ 5 ], &lookup
+
+        expect do |b|
+          service.cached_lookup [ 5, 11 ] do |missing_ids|
+            b.to_proc.call( missing_ids )
+            lookup.call( missing_ids )
+          end
+        end.to yield_with_args( [ 11 ] )
+      end
+
+      it "it handles custom matcher" do
+        lookup = ->( amounts ) { entities.select { |e| amounts.include?( e.amount ) } }
+
+        service.cached_lookup [ "More" ], match: :amount, &lookup
+
+        expect do |b|
+          service.cached_lookup [ "More", "Less" ], match: :amount do |missing_amounts|
+            b.to_proc.call( missing_amounts )
+            lookup.call( missing_amounts )
+          end
+        end.to yield_with_args( [ "Less" ] )
+      end
+
+      it "it handles custom match block" do
+        match = ->( e ) { e.amount.downcase }
+        service.cached_lookup ["more"], match: match do |missing_amounts|
+          entities.select { |e| missing_amounts.include?( e.amount.downcase ) }
+        end
+
+        expect( service.cached_lookup( ["more"], match: match ).first.amount ).to eq "More"
+      end
+
+    end
+
+    context "missing entiites" do
+      it "caches id" do
+        service.cached_lookup( [1] ) do |ids|
+          ids.map { |id| Shamu::Entities::NullEntity.for( ServiceSpec::Entity ).new( id: id ) }
+        end
+
+        expect( service.cached_lookup( [1] ).first ).to be_a Shamu::Entities::NullEntity
+      end
+
+      it "caches custom matcher" do
+        service.cached_lookup( [1], match: :level ) do |ids|
+          ids.map { |id| Shamu::Entities::NullEntity.for( ServiceSpec::Entity ).new( id: id ) }
+        end
+
+        expect( service.cached_lookup( [1], match: :level ).first ).to be_a Shamu::Entities::NullEntity
+      end
+
+      it "caches custom match block" do
+        match = ->( e ) { e.id * 2 }
+
+        service.cached_lookup( [1], match: match ) do |ids|
+          ids.map { |id| Shamu::Entities::NullEntity.for( ServiceSpec::Entity ).new( id: id ) }
+        end
+
+        expect( service.cached_lookup( [1], match: match ).first ).to be_a Shamu::Entities::NullEntity
+      end
+    end
+
   end
 
 end

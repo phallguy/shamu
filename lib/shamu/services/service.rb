@@ -82,7 +82,7 @@ module Shamu
         # @yieldresult [Entities::Entity]
         # @return [Entities::List]
         def entity_list( records, &transformer )
-          return Entities::List.new unless records
+          return Entities::List.new [] unless records
           unless transformer
             fail "Either provide a block or add a private method `def build_entity( record, records = nil )` to #{ self.class.name }." unless respond_to?( :build_entity ) # rubocop:disable Metrics/LineLength
             transformer ||= ->( record ) { build_entity( record, records ) }
@@ -101,6 +101,9 @@ module Shamu
         #     record.
         # @param [Symbol,#call(record)] match the attribute or a Proc used to
         #  extract the id used to compare records.
+        # @param [Symbol,#call] a method that can be used to coerce id values
+        #     to the same type (eg :to_i). If not set, automatically uses :to_i
+        #     if match is an 'id' attribute.
         # @yield (see #entity_list)
         # @yieldparam (see #entity_list)
         # @yieldresult (see #entity_list)
@@ -132,9 +135,10 @@ module Shamu
         #   end
         #
         #
-        def entity_lookup_list( records, ids, null_class, match: :id, &transformer )
+        def entity_lookup_list( records, ids, null_class, match: :id, coerce: :not_set, &transformer ) # rubocop:disable Metrics/ParameterLists, Metrics/LineLength
           matcher = entity_lookup_list_matcher( match )
-          ids     = ids.map( &:to_i ) if match.is_a?( Symbol ) && match =~ /(^|_)id$/
+          coerce  = coerce_method( coerce, match )
+          ids = ids.map( &coerce ) if coerce
 
           list = entity_list records, &transformer
           matched = ids.map do |id|
@@ -152,6 +156,11 @@ module Shamu
             else
               ->( record ) { record && record.send( match ) }
             end
+          end
+
+          def coerce_method( coerce, match )
+            return coerce unless coerce == :not_set
+            :to_i if match.is_a?( Symbol ) && match =~ /(^|_)id$/
           end
 
         # @!visibility public
@@ -182,6 +191,68 @@ module Shamu
           raise Shamu::NotFoundError unless entity.present?
           entity
         end
+
+        # @!visibility public
+        #
+        # Get the {Entities::IdentityCache} for the given {Entities::Entity} class.
+        # @param [Class] entity the type of entity that will be cached. Only
+        #     required if the service manages multiple entities.
+        # @param [Symbol,#call] key the attribute on the entity, or a custom
+        #     block used to obtain the cache key from an entity.
+        # @param [Symbol,#call] coerce a method that can be used to coerce key values
+        #     to the same type (eg :to_i). If not set, automatically uses :to_i
+        #     if key is an 'id' attribute.
+        # @return [Entities::IdentityCache]
+        def cache_for( key: :id, entity: nil, coerce: :not_set )
+          coerce = coerce_method( coerce, key )
+
+          cache_key        = [ entity, key, coerce ]
+          @entity_caches ||= {}
+          @entity_caches[ cache_key ] ||= scorpion.fetch( Entities::IdentityCache, coerce )
+        end
+
+        # @!visibility public
+        #
+        # Caches the results of looking up the given ids in an {IdentityCache}
+        # and only fetches the records that have not yet been cached.
+        #
+        # @param (see #cache_for)
+        # @param [Array] ids to fetch.
+        # @yield (missing_ids)
+        # @yieldparam [Array] missing_ids that have not been cached yet.
+        # @yieldreturn [Entities::List] the list of entities for the missing ids.
+        #
+        # @example
+        #
+        #   def lookup( *ids )
+        #     cached_lookup( ids ) do |missing_ids|
+        #       entity_lookup_list( Models::User.where( id: missing_ids ), missing_ids, UserEntity::Missing )
+        #     end
+        #   end
+        def cached_lookup( ids, match: :id, coerce: :not_set, entity: nil, &lookup )
+          cache       = cache_for( key: match, coerce: coerce, entity: entity )
+          missing_ids = cache.uncached_keys( ids )
+
+          cache_entities( cache, match, missing_ids, &lookup ) if missing_ids.any?
+
+          entities = ids.map { |id| cache.fetch( id ) || fail( Shamu::NotFoundError ) }
+          Entities::List.new( entities )
+        end
+
+          def cache_entities( cache, match, missing_ids, &lookup )
+            matcher = entity_lookup_list_matcher( match )
+            if list = yield( missing_ids )
+              list.each do |e|
+                if e.empty?
+                  # For NullEntitty, the id for a custom field or matcher will
+                  # still always be assigned to the entity id.
+                  cache.add( e.id, e )
+                else
+                  cache.add( matcher.call( e ), e )
+                end
+              end
+            end
+          end
 
         # @!visibility public
         #
