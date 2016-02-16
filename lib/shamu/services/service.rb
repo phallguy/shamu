@@ -194,6 +194,46 @@ module Shamu
 
         # @!visibility public
         #
+        # Find an associated entity from a dependent service. Attempts to
+        # effeciently handle multiple requests to lookup associations by caching
+        # all the associated entities when {#lookup_association} is used
+        # repeatedly when building an entity.
+        #
+        # @param [Object] id of the associated {Entities::Entity} to find.
+        # @param [Service] service used to locate the associated resource.
+        # @return [Entity] the found entity or a {Entities::NullEntity} if the
+        #     association doesn't exist.
+        #
+        # @example
+        #
+        #   def build_entity( record, records = nil )
+        #     owner = lookup_association record.owner_id, users_service do
+        #               records.pluck( :owner_id ) if records
+        #             end
+        #
+        #     scorpion.fetch UserEntity, { record: record, owner: owner }, {}
+        #   end
+        def lookup_association( id, service, &block )
+          return unless id
+
+          cache = cache_for( entity: service )
+          cache.fetch( id ) || begin
+            if block_given? && ( ids = yield )
+              service.lookup( *ids ).map do |entity|
+                cache.add( entity.id, entity )
+              end
+
+              cache.fetch( id )
+            else
+              association = service.lookup( id ).first
+              cache.add( association.id, association )
+            end
+          end
+        end
+
+
+        # @!visibility public
+        #
         # Get the {Entities::IdentityCache} for the given {Entities::Entity} class.
         # @param [Class] entity the type of entity that will be cached. Only
         #     required if the service manages multiple entities.

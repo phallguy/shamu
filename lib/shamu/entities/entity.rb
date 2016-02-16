@@ -144,7 +144,7 @@ module Shamu
         #     end
         #   end
         def null_entity( &block )
-          null_class = NullEntity.for( self )
+          null_class = ::Shamu::Entities::NullEntity.for( self )
           null_class.class_eval( &block ) if block_given?
           null_class
         end
