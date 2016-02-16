@@ -22,6 +22,7 @@ module ServiceSpec
     public :entity_list
     public :find_by_lookup
     public :cached_lookup
+    public :lookup_association
 
     def build_entity( record, records = nil )
       scorpion.fetch ServiceSpec::Entity, { record: record }, {}
@@ -247,7 +248,45 @@ describe Shamu::Services::Service do
         expect( service.cached_lookup( [1], match: match ).first ).to be_a Shamu::Entities::NullEntity
       end
     end
-
   end
 
+  describe "#lookup_association" do
+    before( :each ) do
+      allow( service ).to receive( :lookup ) do |*ids|
+        ids.map { |id| ServiceSpec::Entity.null_entity.new( id: id ) }
+      end
+    end
+
+    it "returns nil if id is nil" do
+      expect( service.lookup_association( nil, service ) ).to be_nil
+    end
+
+    it "yields to get all association links" do
+      expect do |b|
+        service.lookup_association( 1, service, &b )
+      end.to yield_control
+    end
+
+    it "finds assocation from cache" do
+      service.lookup_association( 1, service ) do
+        [ 1, 2 ]
+      end
+
+      expect do |b|
+        service.lookup_association( 1, service, &b )
+      end.not_to yield_control
+    end
+
+    it "returns the found entity with no records" do
+      result = service.lookup_association( 1, service )
+      expect( result ).to be_a ServiceSpec::Entity
+    end
+
+    it "returns the found entity with bulk records" do
+      result = service.lookup_association( 1, service ) do
+        [ 1, 2 ]
+      end
+      expect( result ).to be_a ServiceSpec::Entity
+    end
+  end
 end
