@@ -19,6 +19,25 @@ module Shamu
 
         # @!visibility public
         #
+        # Wrap all the changes to any ActiveRecord resource in a transaction.
+        # @param [Hash] options to pass to
+        #     ActiveRecord::Transactions.transaction.
+        # @yieldreturn [Result] the validation sources for the transaction. See
+        #     {Service#with_result}.
+        # @return [Result]
+        def with_transaction( options = {}, &block )
+          result = nil
+
+          ::ActiveRecord::Base.transaction options do
+            result = yield
+            raise ::ActiveRecord::Rollback if result && !result.valid?
+          end
+
+          result
+        end
+
+        # @!visibility public
+        #
         # Apply the filters specified in `list_scope` to the `relation`.
         #
         # @param [ActiveRecord::Relation] relation to filter.
