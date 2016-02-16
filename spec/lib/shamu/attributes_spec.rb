@@ -256,6 +256,7 @@ describe Shamu::Attributes do
   describe "#to_attributes" do
     let( :klass ) do
       Class.new do
+        include Shamu::Attributes
         include Shamu::Attributes::Assignment
 
         attribute :user, serialize: false

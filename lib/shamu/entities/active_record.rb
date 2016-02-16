@@ -110,7 +110,7 @@ module Shamu
         end
 
         # @!visibility private
-        # @!api internal
+        # @api internal
         class StandardListScopeTemplate < ListScope
           include ListScope::Paging
           include ListScope::ScopedPaging

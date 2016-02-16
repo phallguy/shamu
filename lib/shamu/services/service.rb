@@ -79,12 +79,12 @@ module Shamu
         # @yield (record)
         # @yieldparam [Object] record the raw value from the `list` to to
         #     transform to an {Entities::Entity}.
-        # @yieldresult [Entities::Entity]
+        # @yieldreturn [Entities::Entity]
         # @return [Entities::List]
         def entity_list( records, &transformer )
           return Entities::List.new [] unless records
           unless transformer
-            fail "Either provide a block or add a private method `def build_entity( record, records = nil )` to #{ self.class.name }." unless respond_to?( :build_entity ) # rubocop:disable Metrics/LineLength
+            fail "Either provide a block or add a private method `def build_entity( record, records = nil )` to #{ self.class.name }." unless respond_to?( :build_entity, true ) # rubocop:disable Metrics/LineLength
             transformer ||= ->( record ) { build_entity( record, records ) }
           end
 
@@ -101,12 +101,12 @@ module Shamu
         #     record.
         # @param [Symbol,#call(record)] match the attribute or a Proc used to
         #  extract the id used to compare records.
-        # @param [Symbol,#call] a method that can be used to coerce id values
+        # @param [Symbol,#call] coerce a method that can be used to coerce id values
         #     to the same type (eg :to_i). If not set, automatically uses :to_i
         #     if match is an 'id' attribute.
         # @yield (see #entity_list)
         # @yieldparam (see #entity_list)
-        # @yieldresult (see #entity_list)
+        # @yieldreturn (see #entity_list)
         # @return [Entities::List]
         #
         # @example

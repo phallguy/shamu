@@ -48,6 +48,7 @@ describe Shamu::Attributes::Assignment do
 
   it "creates aliased assignment" do
     klass = Class.new do
+      include Shamu::Attributes
       include Shamu::Attributes::Assignment
 
       attribute :q, as: :query

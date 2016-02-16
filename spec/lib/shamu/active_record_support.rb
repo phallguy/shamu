@@ -7,12 +7,14 @@ module ActiveRecordSpec
     extend Shamu::Entities::ActiveRecord
 
     scope :by_name, ->( name ) { where( name: name ) }
+    scope :by_label, ->( label ) { where( label: label ) }
   end
 
   class FavoriteMigration < ::ActiveRecord::Migration
     def self.up
       create_table :favorites do |t|
         t.string :name
+        t.string :label
       end
     end
 

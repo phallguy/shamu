@@ -3,6 +3,12 @@ en:
     errors:
       messages:
         not_found: The resource was not found.
+        not_implemented: The method has not been implemented.
 
     warnings:
       messages:
+
+    services:
+      errors:
+        active_record_crud_missing_resource: The resource has not been defined. Add `resource entity_class, model_class` to {%service}.
+        incomplete_setup: The service has not been setup. See included modules documentation for details.

@@ -12,7 +12,7 @@ module Shamu
       #     block.
       # @yield (key)
       # @yieldparam [Object] key to coerce
-      # @yieldresult [Object] the coerced value of the key.
+      # @yieldreturn [Object] the coerced value of the key.
       def initialize( coercion = nil, &coercion_block )
         @cache = {}
         @coercion = block_given? ? coercion_block : ( coercion && coercion.to_proc )

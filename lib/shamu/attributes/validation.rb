@@ -6,21 +6,13 @@ module Shamu
     # Defines an interface for entities that report validation failures with
     # respect to their attributes.
     module Validation
+      extend ActiveSupport::Concern
 
-      def self.included( base )
+      included do |base|
         raise "Must include Shamu::Attributes first." unless base < Shamu::Attributes
 
         base.include( ::ActiveModel::Validations )
         base.include( Validation::Overrides )
-
-        base.extend( Validation::DSL )
-
-        super
-      end
-
-      # Validate the attributes and expose any errors via {#errors}.
-      def validate
-        run_validations!
       end
 
       # @return [Boolean] if the object is free from validation errors. Must
@@ -29,8 +21,12 @@ module Shamu
         errors.blank?
       end
 
-      # Extend the {Attributes::DSL} to support validation on defined attributes.
-      module DSL
+      # @return [Boolean] true if the object has been validated at least once.
+      def validated?
+        @validated
+      end
+
+      class_methods do
 
         # Adds validation options to {Attributes::DSL#attribute}. Any option not
         # recognized by one of the Attributes mixins will be used as validation
@@ -62,7 +58,14 @@ module Shamu
         # @return [Boolean] true if there are no errors reported manually or
         #     through {Validation#validate}.
         def valid?
+          validate unless validated?
           errors.empty?
+        end
+
+        # Validate the attributes and expose any errors via {#errors}.
+        def validate
+          @validated = true
+          run_validations!
         end
       end
 

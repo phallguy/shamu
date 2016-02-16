@@ -1,8 +1,9 @@
 module Shamu
   module Services
 
-    # ...
-    class ActiveRecordService < Services::Service
+    # Helper methods useful for services that interact with {ActiveRecord::Base}
+    # models.
+    module ActiveRecord
 
       private
 
@@ -12,7 +13,7 @@ module Shamu
         # {Shamu::NotFoundError}.
         def wrap_not_found( &block )
           yield
-        rescue ActiveRecord::RecordNotFound
+        rescue ::ActiveRecord::RecordNotFound
           raise Shamu::NotFoundError
         end
 
@@ -32,6 +33,7 @@ module Shamu
             fail "Can't scope a #{ relation.klass }. Add `scope :by_list_scope, ->(list_scope) { ... }` or include Shamu::Entities::ActiveRecord." # rubocop:disable Metrics/LineLength
           end
         end
+
     end
   end
 end

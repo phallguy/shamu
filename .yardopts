@@ -3,3 +3,4 @@
 --no-private
 --hide-api internal
 --hide-void-return
+--plugin activesupport-concern
