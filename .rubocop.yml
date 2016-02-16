@@ -25,6 +25,9 @@ Metrics/ModuleLength:
 Style/Alias:
   Enabled: false
 
+Style/CommentIndentation:
+  Enabled: false
+
 Style/EmptyLines:
   Enabled: false
 
@@ -48,6 +51,12 @@ Style/HashSyntax:
 
 Style/IndentationConsistency:
   Enabled: false
+
+Style/IndentationWidth:
+  Enabled: false
+
+Style/OptionHash:
+ Enabled: true
 
 Style/RegexpLiteral:
   Enabled: false

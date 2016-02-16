@@ -12,3 +12,10 @@ en:
       errors:
         active_record_crud_missing_resource: The resource has not been defined. Add `resource entity_class, model_class` to {%service}.
         incomplete_setup: The service has not been setup. See included modules documentation for details.
+
+
+    security:
+      errors:
+        access_denied: You are not permitted to do that.
+        incomplete_setup: Security has been enabled but is not yet configured.
+        no_actiev_record_policy_checks: Don't check for policy on ActiveRecord resources. Check their projected Entity instead.
