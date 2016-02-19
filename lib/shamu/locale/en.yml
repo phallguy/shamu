@@ -19,3 +19,7 @@ en:
         access_denied: You are not permitted to do that.
         incomplete_setup: Security has been enabled but is not yet configured.
         no_actiev_record_policy_checks: Don't check for policy on ActiveRecord resources. Check their projected Entity instead.
+
+    events:
+      errors:
+        unknown_runner: Unknown runner. Each process should offer a consitent but unique runner_id.

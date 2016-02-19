@@ -7,6 +7,10 @@ Lint/AssignmentInCondition:
 Lint/UnusedMethodArgument:
   Enabled: false
 
+
+Metrics/ClassLength:
+  Max: 500
+
 Metrics/LineLength:
   Max: 120
 
@@ -53,6 +57,9 @@ Style/IndentationConsistency:
   Enabled: false
 
 Style/IndentationWidth:
+  Enabled: false
+
+Style/Lambda:
   Enabled: false
 
 Style/OptionHash:

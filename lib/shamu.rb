@@ -8,7 +8,11 @@ module Shamu
   require "shamu/error"
   require "shamu/attributes"
   require "shamu/entities"
+  require "shamu/logger"
   require "shamu/services"
   require "shamu/security"
+  require "shamu/events"
   require "shamu/to_model_id_extension"
+
+  require "shamu/rails" if defined? Rails
 end

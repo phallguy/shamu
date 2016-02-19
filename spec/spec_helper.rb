@@ -10,6 +10,8 @@ require "bundler/setup"
 
 require "shamu"
 require "scorpion/rspec"
+require "rspec/wait"
+require "rspec/its"
 
 root_path = File.expand_path( "../..", __FILE__ )
 
