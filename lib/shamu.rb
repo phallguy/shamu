@@ -9,5 +9,6 @@ module Shamu
   require "shamu/attributes"
   require "shamu/entities"
   require "shamu/services"
+  require "shamu/security"
   require "shamu/to_model_id_extension"
 end

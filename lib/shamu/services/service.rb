@@ -93,7 +93,7 @@ module Shamu
 
         # @!visibility public
         # Match a list of records with the ids used to look up those records.
-        # Uses a {NullEntity} if the id doesn't have a matching record.
+        # Uses a {Entities::NullEntity} if the id doesn't have a matching record.
         #
         # @param [Enumerable] records matching the requested `ids`.
         # @param [Array<Integer>] ids of records found.
@@ -167,7 +167,7 @@ module Shamu
         #
         # For services that expose a standard `lookup` method, find_by_lookup
         # looks up a single entity and raises {Shamu::NotFoundError} if the
-        # entity is nil or a {NullEntity}.
+        # entity is nil or a {Entities::NullEntity}.
         #
         # A `find` method can then be implemented in terms of the `lookup`
         # method.
@@ -253,7 +253,7 @@ module Shamu
 
         # @!visibility public
         #
-        # Caches the results of looking up the given ids in an {IdentityCache}
+        # Caches the results of looking up the given ids in an {Entities::IdentityCache}
         # and only fetches the records that have not yet been cached.
         #
         # @param (see #cache_for)

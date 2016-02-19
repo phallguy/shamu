@@ -4,10 +4,10 @@ module Shamu
 
   module Services
     # A generic error class for problems with shamu services.
-    class Error < StandardError
+    class Error < Shamu::Error
       private
 
-        def translate( key, args = {} )
+        def translate( key, **args )
           I18n.translate key, args.merge( scope: [ :shamu, :services, :errors, :messages ] )
         end
     end
