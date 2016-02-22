@@ -56,8 +56,6 @@ describe Shamu::Services::ActiveRecordCrud do
     expect( ActiveRecordCrudSpec::Service ).to include Shamu::Services::ActiveRecord
   end
 
-  it "fires evenst if it includes Events"
-
   describe ".resource" do
     it "defines an entity_class" do
       expect( klass.entity_class ).to eq ActiveRecordCrudSpec::FavoriteEntity

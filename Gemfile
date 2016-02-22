@@ -17,6 +17,8 @@ group :test do
   gem "guard-rubocop"
   gem "spring"
   gem "guard-rspec"
+  gem "rspec-its"
+  gem "rspec-wait"
   gem "fuubar"
   gem "yard"
   gem "yard-activesupport-concern"
