@@ -7,9 +7,10 @@ module Shamu
     class Error < Shamu::Error
       private
 
-        def translate( key, **args )
-          I18n.translate key, args.merge( scope: [ :shamu, :security, :errors, :messages ] )
+        def translation_scope
+          super.dup.insert( 1, :security )
         end
+
     end
 
     # The requested action was not permitted on the resource.

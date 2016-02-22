@@ -7,9 +7,10 @@ module Shamu
     class Error < Shamu::Error
       private
 
-        def translate( key, **args )
-          I18n.translate key, args.merge( scope: [ :shamu, :services, :errors, :messages ] )
+        def translation_scope
+          super.dup.insert( 1, :services )
         end
+
     end
 
     # The service has included a module that requires some setup or

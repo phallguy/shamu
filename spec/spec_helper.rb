@@ -30,7 +30,8 @@ RSpec.configure do |config|
   config.include Scorpion::Rspec::Helper
   config.extend  Support::ActiveRecord
 
-  config.before(:each)  { GC.disable }
-  config.after(:each)   { GC.enable }
+  config.before(:all) do
+    Shamu::Security.private_key = SecureRandom.base64( 128 )
+  end
 
 end

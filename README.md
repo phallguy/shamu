@@ -18,7 +18,11 @@ Have a whale of a good time adding Service Oriented Architecture to your ruby pr
 - {Shamu::Entities}
 - {Shamu::Services}
 - {Shamu::Security}
+- {Shamu::Sessions}
 - {Shamu::Events}
+- {Shamu::Features}
+
+
 
 # Dependency Injection
 

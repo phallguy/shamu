@@ -7,8 +7,8 @@ module Shamu
     class Error < Shamu::Error
       private
 
-        def translate( key, **args )
-          I18n.translate key, args.merge( scope: [ :shamu, :events, :errors, :messages ] )
+        def translation_scope
+          super.dup.insert( 1, :events )
         end
     end
 
