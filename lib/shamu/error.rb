@@ -6,8 +6,12 @@ module Shamu
   class Error < StandardError
     private
 
+      def translation_scope
+        [ :shamu, :errors ]
+      end
+
       def translate( key, **args )
-        I18n.translate key, args.merge( scope: [ :shamu, :errors, :messages ] )
+        I18n.translate key, args.merge( scope: translation_scope )
       end
   end
 

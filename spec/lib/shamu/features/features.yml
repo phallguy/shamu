@@ -1,0 +1,34 @@
+---
+shopping:
+
+  buy_now:
+    description: Show "Buy Now" one-click purchase option to customers.
+    retire_at: 2055-10-1
+    type: release
+    select:
+    - proc: "FeaturesServiceSpec::ProcToggle#buy_now?"
+    - schedule_at: 2015-4-1
+      percentage: 100
+      roles:
+      - first-time
+      hosts:
+      - web[\d]-sf
+      - web2
+      env:
+      - CANARY
+      matching:
+      - uploads/previews
+      not_matching:
+      - shopping/inline-ads
+      reject: true
+
+  # Import the feature configuration from the given path.
+  import: "secondary.yml"
+
+uploads:
+  previews:
+    description: "Show previews on uploads"
+    retire_at: 2005-10-1
+    type: release
+    select:
+    - reject: true

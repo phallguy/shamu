@@ -4,9 +4,6 @@ module Shamu
 
   # Adds `to_model_id` to several classes that are often used to look up
   # models by id.
-  #
-  # This extension is added by default in Rails. Use {.extend!} for other
-  # frameworks.
   module ToModelIdExtension
 
     # Extend common classes to add `to_model_id` method.
@@ -49,3 +46,5 @@ module Shamu
     end
   end
 end
+
+Shamu::ToModelIdExtension.extend!

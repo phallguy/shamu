@@ -1,0 +1,5 @@
+offers:
+  at_checkout:
+    description: "Show offers after purchase"
+    retire_at: 2050-1-1
+    type: ops
