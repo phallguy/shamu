@@ -1,4 +1,5 @@
 require "shamu/entities/active_record"
+require "shamu/entities/active_record_soft_destroy"
 require "shamu/services/active_record"
 require "shamu/services/active_record_crud"
 require "shamu/security/active_record_policy"

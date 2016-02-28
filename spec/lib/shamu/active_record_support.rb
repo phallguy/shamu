@@ -5,6 +5,7 @@ module ActiveRecordSpec
   class Favorite < ::ActiveRecord::Base
     self.table_name = "favorites"
     extend Shamu::Entities::ActiveRecord
+    include Shamu::Entities::ActiveRecordSoftDestroy
 
     scope :by_name, ->( name ) { where( name: name ) }
     scope :by_label, ->( label ) { where( label: label ) }
@@ -15,6 +16,8 @@ module ActiveRecordSpec
       create_table :favorites do |t|
         t.string :name
         t.string :label
+
+        t.datetime :destroyed_at
       end
     end
 
