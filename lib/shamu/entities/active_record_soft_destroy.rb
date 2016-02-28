@@ -21,6 +21,10 @@ module Shamu
         #
         # @!endgroup Attributes
 
+        # ============================================================================
+        # @!group Scopes
+        #
+
         # Limit the records to those that have been soft destroyed.
         # @return [ActiveRecord::Relation]
         scope :destroyed, ->() { unscope( where: :destroyed_at ).where( arel_table[ :destroyed_at ].not_eq( nil ) ) }
@@ -31,9 +35,14 @@ module Shamu
 
         # Exclude destroyed records by dfault.
         default_scope { where( destroyed_at: nil ) }
+
+        #
+        # @!endgroup Scopes
+
       end
 
       # Mark the record as deleted.
+      # @overload destroy
       # @return [Boolean] true if the record was destroyed.
       def destroy( options = nil )
         if destroyed_at || ( options && options[:obliterate] )
@@ -44,11 +53,13 @@ module Shamu
       end
 
       # Really destroy the record.
+      # @return [Boolean] true if the record was destroyed.
       def obliterate
         destroy( obliterate: true )
       end
 
       # Really destroy! the record.
+      # @overload destroy!
       # @return [Boolean] true if the record was destroyed.
       def destroy!( options = nil )
         if destroyed_at || ( options && options[:obliterate] )
@@ -56,6 +67,12 @@ module Shamu
         else
           update_attribute :destroyed_at, Time.now.utc
         end
+      end
+
+      # Really destroy! the record.
+      # @return [Boolean] true if the record was destroyed.
+      def obliterate!
+        destroy!( obliterate: true )
       end
 
       # Mark the record as no longer destroyed.
