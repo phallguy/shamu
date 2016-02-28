@@ -5,6 +5,7 @@ module Shamu
     # recorded while processing the request and the resulting
     # {Services::Entities::Entity} and {Request} used.
     class Result
+      extend ActiveModel::Translation
 
       # ============================================================================
       # @!group Attributes
@@ -55,13 +56,18 @@ module Shamu
         @errors ||= ActiveModel::Errors.new( self )
       end
 
+      # Delegate model_name to request/entity
+      def model_name
+        ( request && request.model_name ) || ( entity && entity.model_name ) || ActiveModel::Name.new( self, nil, "Request" ) # rubocop:disable Metrics/LineLength
+      end
+
       private
 
         def append_error_source( source )
           return unless source.respond_to?( :errors )
 
           source.errors.each do |attr, message|
-            errors.add attr, message unless errors.include? message
+            errors.add attr, message unless errors[attr].include? message
           end
         end
     end

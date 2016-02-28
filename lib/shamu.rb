@@ -11,6 +11,7 @@ module Shamu
   require "shamu/logger"
   require "shamu/services"
   require "shamu/security"
+  require "shamu/auditing"
   require "shamu/events"
   require "shamu/sessions"
   require "shamu/features"

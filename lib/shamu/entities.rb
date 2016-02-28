@@ -6,5 +6,6 @@ module Shamu
     require "shamu/entities/list"
     require "shamu/entities/list_scope"
     require "shamu/entities/identity_cache"
+    require "shamu/entities/entity_path"
   end
 end

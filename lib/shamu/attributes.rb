@@ -155,6 +155,8 @@ module Shamu
       #     assignement of a hash with nested keys.
       # @param [Boolean] serialize true if the attribute should be included in
       #   {#to_attributes}. Default true.
+      # @yieldreturn the value of the attribute. The result is memoized so the
+      #     block is only invoked once.
       # @return [self]
       def attribute( name, *args, **options, &block )
         name    = name.to_sym

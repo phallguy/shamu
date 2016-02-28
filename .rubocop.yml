@@ -47,10 +47,16 @@ Style/EmptyLinesAroundModuleBody:
 Style/DoubleNegation:
   Enabled: false
 
+Style/Documentation:
+  Enabled: false
+
 Style/GuardClause:
   Enabled: false
 
 Style/HashSyntax:
+  Enabled: false
+
+Style/IndentArray:
   Enabled: false
 
 Style/IndentationConsistency:
@@ -60,6 +66,9 @@ Style/IndentationWidth:
   Enabled: false
 
 Style/Lambda:
+  Enabled: false
+
+Style/MultilineBlockChain:
   Enabled: false
 
 Style/OptionHash:
