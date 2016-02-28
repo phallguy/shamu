@@ -7,10 +7,6 @@ describe Shamu::Entities::ActiveRecordSoftDestroy do
   let!( :zombie ) { ActiveRecordSpec::Favorite.create( name: "Zombie" ) }
   let!( :live )   { ActiveRecordSpec::Favorite.create( name: "Live" ) }
 
-  before( :each ) do
-    # ActiveRecord::Base.logger = Logger.new(STDOUT)
-  end
-
   describe "#destroy" do
     it "marks the record as destroyed" do
       zombie.destroy
@@ -41,7 +37,6 @@ describe Shamu::Entities::ActiveRecordSoftDestroy do
   end
 
   context "with destroyed" do
-
     before( :each ) do
       zombie.destroy
     end
@@ -73,6 +68,14 @@ describe Shamu::Entities::ActiveRecordSoftDestroy do
 
       it "does not include live records" do
         expect( ActiveRecordSpec::Favorite.destroyed ).not_to include live
+      end
+    end
+
+    context "#undestroy" do
+      it "restores the record" do
+        zombie.undestroy
+
+        expect( ActiveRecordSpec::Favorite.unscoped.find( zombie.id ) ).not_to be_soft_destroyed
       end
     end
   end
