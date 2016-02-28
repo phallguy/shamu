@@ -1,0 +1,74 @@
+module Shamu
+  module Entities
+
+    # Add the ability to "soft-delete" a record. Marking it as deleted so it is
+    # no longer present in the default scope but without actually removing the
+    # record from the database.
+    #
+    # > **Note** You must add a column `destroyed_at` to the model.
+    module ActiveRecordSoftDestroy
+      extend ActiveSupport::Concern
+
+      included do
+
+        # ============================================================================
+        # @!group Attributes
+        #
+
+        # @!attribute destroyed_at
+        # @return [DateTime] when the record was destroyed.
+
+        #
+        # @!endgroup Attributes
+
+        # Limit the records to those that have been soft destroyed.
+        # @return [ActiveRecord::Relation]
+        scope :destroyed, ->() { unscope( where: :destroyed_at ).where( arel_table[ :destroyed_at ].not_eq( nil ) ) }
+
+        # Include live and soft destroyed records.
+        # @return [ActiveRecord::Relation]
+        scope :including_destroyed, ->() { unscope( where: :destroyed_at ) }
+
+        # Exclude destroyed records by dfault.
+        default_scope { where( destroyed_at: nil ) }
+      end
+
+      # Mark the record as deleted.
+      # @return [Boolean] true if the record was destroyed.
+      def destroy( options = nil )
+        if destroyed_at || ( options && options[:obliterate] )
+          super()
+        else
+          update_attribute :destroyed_at, Time.now.utc
+        end
+      end
+
+      # Really destroy the record.
+      def obliterate
+        destroy( obliterate: true )
+      end
+
+      # Really destroy! the record.
+      # @return [Boolean] true if the record was destroyed.
+      def destroy!( options = nil )
+        if destroyed_at || ( options && options[:obliterate] )
+          super()
+        else
+          update_attribute :destroyed_at, Time.now.utc
+        end
+      end
+
+      # Mark the record as no longer destroyed.
+      # @return [Boolean] true if the record was restored.
+      def undestroy
+        update_attribute :destroyed_at, nil
+      end
+
+      # @return [Boolean] true if the record has been soft destroyed.
+      def soft_destroyed?
+        !!destroyed_at
+      end
+
+    end
+  end
+end
