@@ -7,5 +7,6 @@ module Shamu
     require "shamu/services/request_support"
     require "shamu/services/result"
     require "shamu/services/lazy_transform"
+    require "shamu/services/lazy_association"
   end
 end

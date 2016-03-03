@@ -106,6 +106,11 @@ module Shamu
         true
       end
 
+      # @return [self]
+      def to_entity
+        self
+      end
+
       private
 
         def serialize_attribute?( name, options )

@@ -246,6 +246,18 @@ module Shamu
           end
         end
 
+        # @!visibility public
+        #
+        # Perform a lazy {#lookup_association} and only load the entity if its
+        # actually dereferenced by the caller.
+        #
+        # @param (see #lookup_association)
+        # @return [LazyAssociation<Entity>]
+        def lazy_association( id, service, &block )
+          LazyAssociation.new( id ) do
+            lookup_association id, service, &block
+          end
+        end
 
         # @!visibility public
         #
