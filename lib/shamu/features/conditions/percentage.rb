@@ -1,3 +1,5 @@
+require "crc32"
+
 module Shamu
   module Features
     module Conditions
@@ -8,7 +10,7 @@ module Shamu
         # (see Condition#match?)
         def match?( context )
           if context.user_id
-            ( user_id_hash( context.user_id ) ^ toggle_hash ) % percentage == 0
+            ( user_id_hash( context.user_id ) ^ toggle_crc ) % 100 < percentage
           else
             context.sticky!
             Random.rand( 100 ) < percentage
@@ -29,10 +31,10 @@ module Shamu
             end
           end
 
-          def toggle_hash
+          def toggle_crc
             # Use the name of the toggle to provide consistent semi-random noise
             # into the user selection process.
-            @toggle_hash ||= toggle.name.sub( /[^a-z]/, "" ).last( 11 ).to_i( 36 )
+            @toggle_crc ||= Crc32.calculate( toggle.name, toggle.name.length, 0 )
           end
 
       end

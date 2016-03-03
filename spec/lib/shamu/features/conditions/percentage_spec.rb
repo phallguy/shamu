@@ -6,33 +6,33 @@ describe Shamu::Features::Conditions::Percentage do
   let( :toggle )  { double( Shamu::Features::Toggle ) }
 
   before( :each ) do
-    allow( toggle ).to receive( :name ).and_return "1z141z4" # 4294967296.to_s( 36 )
+    allow( toggle ).to receive( :name ).and_return "example"
   end
 
   it "matches integer user id" do
     condition = scorpion.new Shamu::Features::Conditions::Percentage, 5, toggle
 
-    expect( context ).to receive( :user_id ).at_least(:once).and_return 50
+    expect( context ).to receive( :user_id ).at_least(:once).and_return 55
     expect( condition.match?( context ) ).to be_truthy
   end
 
   it "matches same user id when percentage grows" do
     condition = scorpion.new Shamu::Features::Conditions::Percentage, 15, toggle
 
-    expect( context ).to receive( :user_id ).at_least(:once).and_return 50
+    expect( context ).to receive( :user_id ).at_least(:once).and_return 55
     expect( condition.match?( context ) ).to be_truthy
   end
 
   it "excludes integer user id" do
     condition = scorpion.new Shamu::Features::Conditions::Percentage, 5, toggle
 
-    expect( context ).to receive( :user_id ).at_least(:once).and_return 51
+    expect( context ).to receive( :user_id ).at_least(:once).and_return 111
     expect( condition.match?( context ) ).to be_falsy
   end
 
 
   it "matches uuid user id" do
-    condition = scorpion.new Shamu::Features::Conditions::Percentage, 7, toggle
+    condition = scorpion.new Shamu::Features::Conditions::Percentage, 23, toggle
 
     expect( context ).to receive( :user_id ).at_least(:once).and_return "45561ca3-5bf9-4f3a-9b4f-89a15ea0e387"
     expect( condition.match?( context ) ).to be_truthy
