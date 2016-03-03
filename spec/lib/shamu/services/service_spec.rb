@@ -23,6 +23,7 @@ module ServiceSpec
     public :find_by_lookup
     public :cached_lookup
     public :lookup_association
+    public :lazy_association
 
     def build_entity( record, records = nil )
       scorpion.fetch ServiceSpec::Entity, { record: record }, {}
@@ -288,5 +289,19 @@ describe Shamu::Services::Service do
       end
       expect( result ).to be_a ServiceSpec::Entity
     end
+  end
+
+  describe "#lazy_association" do
+    before( :each ) do
+      allow( service ).to receive( :lookup ) do |*ids|
+        ids.map { |id| ServiceSpec::Entity.null_entity.new( id: id ) }
+      end
+    end
+
+    it "gets a lazy association" do
+      expect( service.lazy_association( 1, service ) ).to be_a Shamu::Services::LazyAssociation
+    end
+
+
   end
 end
