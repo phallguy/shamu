@@ -30,7 +30,7 @@ module Shamu
     # ```
     # @return [String]
     def self.private_key
-      @private_key ||= ENV[ ENV_PRIVATE_KEY ] || fail( "No private key configured. Set Shamu::Security.private_key or add an the #{ ENV_PRIVATE_KEY } environment variable to the host." ) # rubocop:disable Mtrics/LineLength
+      @private_key ||= ENV[ ENV_PRIVATE_KEY ] || fail( "No private key configured. Set Shamu::Security.private_key or add an the #{ ENV_PRIVATE_KEY } environment variable to the host." ) # rubocop:disable Metrics/LineLength
     end
 
     # @param [String] key to use.

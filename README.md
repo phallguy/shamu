@@ -20,6 +20,7 @@ Have a whale of a good time adding Service Oriented Architecture to your ruby pr
 - {Shamu::Security}
 - {Shamu::Sessions}
 - {Shamu::Events}
+- {Shamu::Auditing}
 - {Shamu::Features}
 
 
