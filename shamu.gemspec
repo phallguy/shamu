@@ -26,6 +26,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "multi_json", "~> 1.11.2"
   spec.add_dependency "rack", "~> 1"
   spec.add_dependency "listen", "~> 3"
+  spec.add_dependency "crc32", "~> 1"
 
 
   spec.add_development_dependency "bundler", "~> 1.6"
