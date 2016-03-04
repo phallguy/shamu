@@ -65,7 +65,8 @@ module Shamu
       # @param [Class] entity_class {Entity} class
       # @return [Class] a null entity class derived from `entity_class`.
       def self.for( entity_class )
-        if null_klass = ( entity_class.const_defined?( :NullEntity ) && entity_class.const_get( :NullEntity, false ) )
+        if null_klass = ( entity_class.const_defined?( :NullEntity, false ) &&
+                          entity_class.const_get( :NullEntity, false ) )
           # If the base class is reloaded a-la rails dev, then regenerate the
           # null class as well.
           null_klass = nil if null_klass.superclass != entity_class
