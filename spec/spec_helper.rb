@@ -9,6 +9,7 @@ require "pry"
 require "bundler/setup"
 
 require "shamu"
+require "shamu/rspec"
 require "scorpion/rspec"
 require "rspec/wait"
 require "rspec/its"
@@ -22,6 +23,8 @@ Dir[ File.join( root_path, "spec/support/**/*.rb" ) ].each { |f| require f }
 RSpec.configure do |config|
 
   config.order = "random"
+
+  config.filter_gems_from_backtrace "activesupport", "actionpack", "actionview", "scorpion-ioc", "rspec-wait"
 
   config.filter_run focus: true
   config.filter_run_excluding :broken => true

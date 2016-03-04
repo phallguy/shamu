@@ -16,7 +16,9 @@ module Shamu
     class EnvStore < Services::Service
 
       RACK_ENV_KEY      = "HTTP_X_SHAMU_FEATURES".freeze
-      RACK_FEATURES_KEY = "shamu.features.from_header".freeze
+      RACK_PARAMS_KEY   = "shamu.features".freeze
+      RACK_PARAMS_FEATURES_KEY = "shamu.features.from_params".freeze
+      RACK_HEADER_FEATURES_KEY = "shamu.features.from_header".freeze
 
       # ============================================================================
       # @!group Dependencies
@@ -32,7 +34,7 @@ module Shamu
       # Fetch a value from the environment.
       def fetch( key, &block )
         return env_fetch( key, &block ) unless defined? Rack
-        rack_fetch( key, &block )
+        rack_params_fetch( key, &block )
       end
 
       # @return [String] the expected ENV key name for the given toggle name.
@@ -53,16 +55,31 @@ module Shamu
           end
         end
 
-        def rack_fetch( key, &block )
+        def rack_header_fetch( key, &block )
           rack_env = scorpion.fetch( Scorpion::Rack::Env )
           return env_fetch( key, &block ) unless header = rack_env[RACK_ENV_KEY]
 
-          features = rack_env.fetch( RACK_FEATURES_KEY ) do
-            rack_env[ RACK_FEATURES_KEY ] = codec.unpack( header )
+          features = rack_env.fetch( RACK_HEADER_FEATURES_KEY ) do
+            rack_env[ RACK_HEADER_FEATURES_KEY ] = codec.unpack( header )
           end
 
           features.fetch( key ) do
             env_fetch( key, &block )
+          end
+        end
+
+        def rack_params_fetch( key, &block )
+          rack_env = scorpion.fetch( Scorpion::Rack::Env )
+          request  = ::Rack::Request.new( rack_env )
+
+          return rack_header_fetch( key, &block ) unless param = request.params[ RACK_PARAMS_KEY ]
+
+          features = rack_env.fetch( RACK_PARAMS_FEATURES_KEY ) do
+            rack_env[ RACK_PARAMS_FEATURES_KEY ] = codec.unpack( param )
+          end
+
+          features.fetch( key ) do
+            rack_header_fetch( key, &block )
           end
         end
 

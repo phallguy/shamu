@@ -68,7 +68,7 @@ module Shamu
 
       # @return [Boolean] true if the feature election should be remembered
       #     between requests.
-      def sticky? # rubocop:disable Style/TrivialAccessors
+      def sticky?
         @sticky
       end
 

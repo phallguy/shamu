@@ -39,7 +39,7 @@ module Shamu
       # @!method initialize( config_path )
       # @param
       # @return [FeaturesService]
-      initialize do |config_path, **|
+      initialize do |config_path = nil, **|
         @config_path = config_path || self.class.default_config_path
       end
 
@@ -77,12 +77,12 @@ module Shamu
 
         def toggles
           @toggles ||= begin
-            listener = Listen.to File.dirname( config_path ), only: File.basename( config_path ) do
-              @toggles = Toggle.load( config_path )
-            end
-            listener.start
-
             if File.exist?( config_path )
+              listener = Listen.to File.dirname( config_path ), only: File.basename( config_path ) do
+                @toggles = Toggle.load( config_path )
+              end
+              listener.start
+
               Toggle.load( config_path )
             else
               logger.warn "Feature configuration file does not exist: #{ config_path }"

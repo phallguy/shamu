@@ -31,7 +31,7 @@ module Shamu
       # @return [String] the packed string.
       def insecure_pack( toggles )
         toggles.each_with_object("") do |(key, state), packed|
-          packed << ";" unless packed.blank?
+          packed << "," unless packed.blank?
           packed << "!" unless state
           packed << key
         end
@@ -56,7 +56,7 @@ module Shamu
       def insecure_unpack( token )
         return {} unless token
 
-        token.split( ";" ).each_with_object( {} ) do |toggle, hash|
+        token.split( "," ).each_with_object( {} ) do |toggle, hash|
           bang = toggle[0] == "!"
           key  = bang ? toggle[1..-1] : toggle
 

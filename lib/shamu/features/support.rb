@@ -14,7 +14,7 @@ module Shamu
         # @!attribute
         # @return [Features::FeaturesService] the service used to resolve
         #     enabled features.
-        attr_dependency :features_service, Features::FeaturesService
+        attr_dependency :features_service, Features::FeaturesService, lazy: true
 
         #
         # @!endgroup Dependencies
@@ -34,12 +34,17 @@ module Shamu
         # @yieldreturn the result of the block or nil if the feature wasn't
         #     enabled.
         def when_feature( feature, override: nil, &block )
-          if ( override.nil? && features_service.enabled?( feature ) ) || override
-            yield
-          end
+          yield if override.nil? ? feature_enabled?( feature ) : override
         end
 
+        # @!visibility public
+        #
+        # Determines if the given feature has been toggled.
+        #
+        # @param [Symbol] feature name of the feature to check.
+        # @return [Boolean] true if the feature has been toggled on.
         def feature_enabled?( feature )
+          features_service.enabled?( feature )
         end
     end
   end

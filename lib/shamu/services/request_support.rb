@@ -22,11 +22,13 @@ module Shamu
       # resource to submit changes to the given `method`.
       #
       # @param [Symbol] method that will be called with the generated request.
-      # @param [Object] id optional id of the entity that will modified.
+      # @param [Entities::Entity] entity optional entity that will modified.
       # @return [Request]
-      def request_for( method, id = nil )
-        entity = find( id ) if id
-        request_class( method ).new( entity )
+      def request_for( method, entity = nil )
+        request    = request_class( method ).new( entity )
+        request.id = entity.id if entity && request.attribute?( :id )
+
+        request
       end
 
       private

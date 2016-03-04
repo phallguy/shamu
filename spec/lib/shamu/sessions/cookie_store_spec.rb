@@ -6,7 +6,7 @@ describe Shamu::Sessions::CookieStore do
   let( :store ) { scorpion.new Shamu::Sessions::CookieStore }
 
   it "stores signed cookies" do
-    expect( cookies ).to receive( :set ).with( "setting", hash_including( value: /[0-9a-f]{40};example/ ) )
+    expect( cookies ).to receive( :set ).with( "setting", hash_including( value: /[0-9a-f]{40}\$example/ ) )
     expect( store ).to receive( :hash_value ).and_call_original
 
     store.set( "setting", "example" )

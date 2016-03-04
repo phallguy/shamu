@@ -121,21 +121,7 @@ describe Shamu::Services::RequestSupport do
   end
 
   describe "#request_for" do
-    it "invokes find if id present" do
-      expect( service ).to receive( :find ).with( 498 )
-      service.request_for( :update, 498 )
-    end
-
-    it "populates request with found entity" do
-      entity = scorpion.fetch RequestSupportSpec::Entity, { id: 89, amount: "Example" }, {}
-      expect( service ).to receive( :find ).with( 89 ).and_return( entity )
-      request = service.request_for( :update, 89 )
-
-      expect( request.id ).to eq 89
-      expect( request.amount ).to eq "Example"
-    end
-
-    it "returns request if id missing" do
+    it "returns request" do
       request = service.request_for( :create )
       expect( request ).to be_a Shamu::Services::Request
     end

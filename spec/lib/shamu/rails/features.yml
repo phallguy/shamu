@@ -1,0 +1,13 @@
+---
+shopping:
+  nux:
+    retire_at: 2055-10-1
+    type: release
+    select:
+      - percentage: 100
+
+  discounts:
+    retire_at: 2055-10-1
+    type: release
+    select:
+      - percentage: 0

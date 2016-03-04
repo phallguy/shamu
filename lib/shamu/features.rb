@@ -8,7 +8,6 @@ module Shamu
     require "shamu/features/toggle_codec"
     require "shamu/features/env_store"
     require "shamu/features/features_service"
-    require "shamu/features/feature_management_service"
     require "shamu/features/config_service"
     require "shamu/features/list_scope"
     require "shamu/features/support"

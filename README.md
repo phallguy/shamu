@@ -22,6 +22,7 @@ Have a whale of a good time adding Service Oriented Architecture to your ruby pr
 - {Shamu::Events}
 - {Shamu::Auditing}
 - {Shamu::Features}
+- {Shamu::Rails}
 
 
 
@@ -30,7 +31,10 @@ Have a whale of a good time adding Service Oriented Architecture to your ruby pr
 ....
 [Scorpion](http://github.com/phallguy/scorpion)
 
-# Using with ActiveRecord
+# Using with Rails
+
+
+## Active Record
 
 Shamu does not come with a hard dependency on ActiveRecord - it should work with
 any persistence you've chosen to use in your project. It does come with some
@@ -40,6 +44,9 @@ convenience mixins to make it easier to work with AR.
 - **{Shamu::Entities::ActiveRecord}** adds convenience methods for working with
   ActiveRecord models as entities.
 
+## Controllers
+
+- {Shamu::Rails::Controller}
 
 # Contributing
 

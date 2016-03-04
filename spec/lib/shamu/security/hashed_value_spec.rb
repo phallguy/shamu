@@ -18,7 +18,7 @@ describe Shamu::Security::HashedValue do
   describe "#pack" do
     subject { codec.hash_value( "example" ) }
 
-    it { is_expected.to match /;/ }
+    it { is_expected.to match /$/ }
     it { is_expected.to match /example/ }
   end
 
@@ -30,7 +30,7 @@ describe Shamu::Security::HashedValue do
 
     it "handles an empty feature value" do
       hashed = codec.hash_value( "" )
-      expect( codec.verify_hash( hashed) ).to eq ""
+      expect( codec.verify_hash( hashed ) ).to eq ""
     end
 
     it "handles an nil feature hash" do
