@@ -3,9 +3,9 @@ source "https://rubygems.org"
 # Specify your gem"s dependencies in shamu.gemspec
 gemspec
 
-
 group :test do
   gem "activerecord", "~> 4.2.5"
+  gem "actionpack", "~> 4.2.5"
   gem "kaminari", "~> 0.16.3", require: false
 
   gem "byebug"
@@ -19,6 +19,7 @@ group :test do
   gem "guard-rspec"
   gem "rspec-its"
   gem "rspec-wait"
+  gem "rspec-rails", require: false
   gem "fuubar"
   gem "yard"
   gem "yard-activesupport-concern"

@@ -6,7 +6,7 @@ describe Shamu::Features::ToggleCodec do
   describe "#pack" do
     subject { codec.pack( "buy_now" => true, "suggestions" => false ) }
 
-    it { is_expected.to match /;/ }
+    it { is_expected.to match /,/ }
     it { is_expected.to match /[^!]buy_now/ }
     it { is_expected.to match /!suggestions/ }
   end

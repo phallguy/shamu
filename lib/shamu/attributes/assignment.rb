@@ -9,6 +9,7 @@ module Shamu
 
       included do |base|
         raise "Must include Shamu::Attributes first." unless base < Shamu::Attributes
+        public :assign_attributes
       end
 
       class_methods do

@@ -1,0 +1,1 @@
+require "shamu/rspec/matchers"

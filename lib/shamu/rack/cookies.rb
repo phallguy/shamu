@@ -1,7 +1,7 @@
 module Shamu
   module Rack
 
-    # Expose a {}
+    # Expose the request cookies as a hash.
     class Cookies
 
       # @return [Cookies]

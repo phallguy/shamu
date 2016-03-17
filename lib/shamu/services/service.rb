@@ -150,7 +150,7 @@ module Shamu
         #   end
         #
         #
-        def entity_lookup_list( records, ids, null_class, match: :id, coerce: :not_set, &transformer ) # rubocop:disable Metrics/ParameterLists, Metrics/LineLength
+        def entity_lookup_list( records, ids, null_class, match: :id, coerce: :not_set, &transformer )
           matcher = entity_lookup_list_matcher( match )
           coerce  = coerce_method( coerce, match )
           ids = ids.map( &coerce ) if coerce

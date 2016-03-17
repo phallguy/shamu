@@ -1,3 +1,7 @@
+AllCops:
+  TargetRubyVersion: 2.2
+
+
 Lint/AmbiguousRegexpLiteral:
   Enabled: false
 
@@ -25,6 +29,9 @@ Metrics/CyclomaticComplexity:
 
 Metrics/ModuleLength:
   Max: 500
+
+Metrics/ParameterLists:
+  CountKeywordArgs: false
 
 Style/Alias:
   Enabled: false
