@@ -158,7 +158,7 @@ module Shamu
 
         # @param [String] path of the default config file.
         # @return [String]
-        def default_config_path=( path ) # rubocop:disable Style/TrivialAccessors
+        def default_config_path=( path )
           @default_config_path = path
         end
       end

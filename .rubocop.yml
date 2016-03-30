@@ -79,7 +79,10 @@ Style/MultilineBlockChain:
   Enabled: false
 
 Style/OptionHash:
- Enabled: true
+  Enabled: true
+
+Style/ParallelAssignment:
+  Enabled: false
 
 Style/RegexpLiteral:
   Enabled: false
@@ -109,6 +112,9 @@ Style/TrailingBlankLines:
   Enabled: false
 
 Style/TrailingCommaInLiteral:
+  Enabled: false
+
+Style/TrivialAccessors:
   Enabled: false
 
 Style/UnneededInterpolation:
