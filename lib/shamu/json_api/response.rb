@@ -56,7 +56,7 @@ module Shamu
       def compile
         @compiled ||= begin
           compiled = output.dup
-          compiled[:jsonapi] = { version: "1" }
+          compiled[:jsonapi] = { version: "1.0" }
 
           while context.included_resources?
             included = ( compiled[ :included ] ||= [] )
