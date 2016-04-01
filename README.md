@@ -23,8 +23,7 @@ Have a whale of a good time adding Service Oriented Architecture to your ruby pr
 - {Shamu::Auditing}
 - {Shamu::Features}
 - {Shamu::Rails}
-
-
+- {Shamu::JsonApi}
 
 # Dependency Injection
 

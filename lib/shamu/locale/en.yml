@@ -25,3 +25,8 @@ en:
     features:
       errors:
         retired_toggle_checked: "The `%{name}` toggle retired at `%{retire_at}` and cannot be checked anymore."
+
+    json_api:
+      errors:
+        incomplete_resource: "`identifier` was not called to define the type and id of the resource"
+        identifier_resource: "`identifier` must be called before defining any fields"

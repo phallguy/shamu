@@ -15,6 +15,7 @@ module Shamu
   require "shamu/events"
   require "shamu/sessions"
   require "shamu/features"
+  require "shamu/json_api"
   require "shamu/to_model_id_extension"
   require "shamu/to_bool_extension"
 
