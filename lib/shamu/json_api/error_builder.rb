@@ -1,3 +1,5 @@
+require "rack"
+
 module Shamu
   module JsonApi
 
@@ -17,7 +19,9 @@ module Shamu
       # @param [Integer] http_status code.
       # @param [String,Symbol] code application specific code for the error.
       # @param [String] human friendly title for the error.
-      def summary( http_status, code, title = nil )
+      def summary( http_status, code = nil, title = nil )
+        code ||= ::Rack::Util::HTTP_STATUS_CODES[ code ].to_s.underscore
+
         output[:status] = http_status.to_s
         output[:code]   = code.to_s
         output[:title]  = title || code.to_s.titleize
@@ -27,7 +31,7 @@ module Shamu
       # @param [Exception] exception
       # @param [Integer] http_status code. Default 400.
       def exception( exception, http_status = nil )
-        http_status ||= 400
+        http_status ||= 500
 
         name = exception.class.name.demodulize.gsub( /Error$/, "" )
         summary http_status, name.underscore, name.titleize

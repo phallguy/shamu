@@ -5,8 +5,7 @@ module Shamu
     require "shamu/json_api/relationship_builder"
     require "shamu/json_api/resource_builder"
     require "shamu/json_api/response"
-    require "shamu/json_api/serializer"
-    require "shamu/json_api/support"
+    require "shamu/json_api/presenter"
     require "shamu/json_api/error"
     require "shamu/json_api/error_builder"
   end

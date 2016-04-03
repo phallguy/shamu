@@ -4,19 +4,19 @@ describe Shamu::JsonApi::Response do
   let( :context )  { Shamu::JsonApi::Context.new }
   let( :response ) { Shamu::JsonApi::Response.new context }
 
-  it "uses serializer if given" do
-    serializer = double Shamu::JsonApi::Serializer
-    expect( serializer ).to receive( :serialize ) do |builder|
+  it "uses presenter if given" do
+    presenter = double Shamu::JsonApi::Presenter
+    expect( presenter ).to receive( :present ) do |_, builder|
       builder.identifier :response, 9
-    end
+    end.with( anything, kind_of( Shamu::JsonApi::ResourceBuilder ) )
 
-    response.resource double, serializer
+    response.resource double, presenter
   end
 
-  it "expects a block if no serializer" do
+  it "expects a block if no presenter" do
     expect do
       response.resource double
-    end.to raise_error /block/
+    end.to raise_error Shamu::JsonApi::NoPresenter
   end
 
   it "appends included resources" do
