@@ -6,6 +6,8 @@ module Shamu
     # Used by a {Serilaizer} to write fields and relationships
     class ResourceBuilder < BaseBuilder
 
+      include BuilderMethods::Identifier
+
       # @overload attribute( attributes )
       #   @param [Hash] attributes to write.
       # @overload attribute( name, value )
@@ -54,20 +56,7 @@ module Shamu
         relationships[ name.to_sym ] = builder.compile
       end
 
-      # (see BaseBuilder#identifier)
-      def identifier( * )
-        super.tap do
-          @type = output[:type]
-        end
-      end
-
       private
-
-        attr_reader :type
-
-        def require_identifier!
-          fail IdentifierRequiredError unless @type
-        end
 
         def add_attribute( name, value )
           return unless context.include_field?( type, name )

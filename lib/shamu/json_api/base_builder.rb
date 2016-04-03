@@ -4,69 +4,29 @@ module Shamu
     # Used by a {Serilaizer} to write fields and relationships
     class BaseBuilder
 
-      # ============================================================================
-      # @!group Attributes
-      #
-
-      # @!attribute
-      # @return [Context] the JSON serialization context.
-        attr_reader :context
-
-      #
-      # @!endgroup Attributes
-
-
       # @param [Context] context the current serialization context.
       def initialize( context )
         @context = context
         @output = {}
       end
 
-      # Write a resource linkage info.
-      #
-      # @param [String] type of the resource.
-      # @param [Object] id of the resource.
-      # @return [void]
-      def identifier( type, id = nil )
-        output[:type] = type.to_s
-        output[:id]   = id.to_s
-      end
-
-      # Write a link  to another resource.
-      #
-      # @param [String,Symbol] name of the link.
-      # @param [String] url
-      # @param [Hash] meta optional additional meta information.
-      # @return [void]
-      def link( name, url, meta: nil )
-        links = ( output[:links] ||= {} )
-
-        if meta # rubocop:disable Style/ConditionalAssignment
-          links[ name.to_sym ] = { href: url, meta: meta }
-        else
-          links[ name.to_sym ] = url
-        end
-      end
-
-      # Add a meta field.
-      # @param [String,Symbol] name of the meta field.
-      # @param [Object] vlaue that can be converted to a JSON primitive type.
-      # @return [void]
-      def meta( name, value )
-        meta = ( output[:meta] ||= {} )
-        meta[ name.to_sym ] = value
-      end
+      include BuilderMethods::Link
+      include BuilderMethods::Meta
 
       # @return [Hash] the results output as JSON safe hash.
       def compile
-        fail JsonApi::IncompleteResourceError unless output[:type]
         output
       end
 
       private
 
-        attr_reader :output
+        # @!attribute
+        # @return [Hash] output hash.
+          attr_reader :output
 
+        # @!attribute
+        # @return [Context] the JSON serialization context.
+          attr_reader :context
     end
   end
 end

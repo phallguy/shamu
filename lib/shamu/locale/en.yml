@@ -29,5 +29,4 @@ en:
     json_api:
       errors:
         incomplete_resource: "`identifier` was not called to define the type and id of the resource."
-        identifier_resource: "`identifier` must be called before defining any fields."
         no_presenter: No presenter available for %{class} objects. Looked in %{namespaces}.

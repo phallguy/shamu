@@ -70,6 +70,9 @@ module Shamu
       include Shamu::Attributes::Equality
       include Shamu::ToModelIdExtension::Models
 
+      extend ActiveModel::Naming
+      include ActiveModel::Conversion
+
       # @!attribute
       # @return [Object] id of the entity.
       #

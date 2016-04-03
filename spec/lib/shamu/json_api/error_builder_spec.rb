@@ -3,14 +3,6 @@ require "spec_helper"
 describe Shamu::JsonApi::ErrorBuilder do
   let( :builder ) { Shamu::JsonApi::ErrorBuilder.new }
 
-  describe "#summary" do
-    it "infers title" do
-      builder.summary 422, :not_allowed
-
-      expect( builder.compile ).to include title: "Not Allowed"
-    end
-  end
-
   describe "#exception" do
     before( :each ) do
       builder.exception NotImplementedError.new( "Nope, we haven't done that yet" )

@@ -1,4 +1,5 @@
 require "shamu/rack"
+require "shamu/json_api"
 
 module Shamu
   module Rails
@@ -16,7 +17,13 @@ module Shamu
           ::ActionController::Base.send :include, Shamu::Rails::Controller
           ::ActionController::Base.send :include, Shamu::Rails::Entity
           ::ActionController::Base.send :include, Shamu::Rails::Features
-          ::ActionController::Base.send :include, Shamu::Rails::JsonApi
+
+          Mime::Type.register Shamu::JsonApi::MIME_TYPE, :json_api
+
+          ActionController::Renderers.add :json_api do |obj, _options|
+            self.content_type ||= Mime[:json_api]
+            obj
+          end
         end
       end
 
