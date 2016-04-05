@@ -25,5 +25,11 @@ module Shamu
         super
       end
     end
+
+    class NoPresenter < Error
+      def initialize( resource, namespaces )
+        super translate( :no_presenter, class: resource.class, namespaces: namespaces )
+      end
+    end
   end
 end

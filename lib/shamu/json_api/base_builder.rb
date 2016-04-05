@@ -4,24 +4,30 @@ module Shamu
     # Used by a {Serilaizer} to write fields and relationships
     class BaseBuilder
 
+      # ============================================================================
+      # @!group Attributes
+      #
+
+      # @!attribute
+      # @return [Context] the JSON serialization context.
+        attr_reader :context
+
+      #
+      # @!endgroup Attributes
+
+
       # @param [Context] context the current serialization context.
       def initialize( context )
         @context = context
         @output = {}
       end
 
-      # @overload identifier( type, id )
-      #   @param [String] type of the resource.
-      #   @param [Object] id of the resource.
-      # @overload identifier( resource )
-      #   @param [#json_api_type,#id] resource an object that responds to `json_api_type` and `id`
-      #
       # Write a resource linkage info.
       #
+      # @param [String] type of the resource.
+      # @param [Object] id of the resource.
       # @return [void]
       def identifier( type, id = nil )
-        type, id = type.json_api_type, type.id if type.respond_to? :json_api_type
-
         output[:type] = type.to_s
         output[:id]   = id.to_s
       end
@@ -59,7 +65,6 @@ module Shamu
 
       private
 
-        attr_reader :context
         attr_reader :output
 
     end

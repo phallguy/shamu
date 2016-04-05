@@ -2,28 +2,53 @@ module Shamu
   module JsonApi
     class Context
 
-      def initialize( fields: nil )
+      # @param [Hash<Symbol,Array>] fields explicitly declare the attributes and
+      #     resources that should be included in the response. The hash consists
+      #     of a keys of the resource types and values as an array of fields to
+      #     be included.
+      #
+      #     A String value will be split on `,` to allow for easy parsing of
+      #     HTTP query parameters.
+      #
+      # @param [Array<String>] namespaces to look for resource {Presenter
+      #     presenters}. See {#find_presenter}.
+      #
+      # @param [Hash<Class,Class>] presenters a hash that maps resource classes
+      #     to the presenter class to use when building responses. See
+      #     {#find_presenter}.
+      def initialize( fields: nil, namespaces: [], presenters: {} )
         @included_resources = {}
         @all_resources = Set.new
         @fields = parse_fields( fields )
+        @namespaces = Array( namespaces )
+        @presenters = presenters || {}
       end
 
       # Add an included resource for a compound response.
       #
+      # If no `presenter` and no block are provided a default presenter will be
+      # obtained by calling {#find_presenter}.
+      #
       # @param [Object] resource to be serialized.
-      # @param [Serializer] the serializer to use to serialize the object. If
-      #     not provided a default {Serializer} will be chosen.
+      # @param [Presenter] presenter to use to serialize the object. If
+      #     not provided a default {Presenter} will be chosen.
       # @return [resource]
       # @yield (builder)
       # @yieldparam [ResourceBuilder] builder to write embedded resource to.
-      def include_resource( resource, serializer = nil, &block )
+      def include_resource( resource, presenter = nil, &block )
         return if all_resources.include?( resource )
 
         all_resources << resource
-        included_resources[resource] ||= { serializer: serializer, block: block }
+        included_resources[resource] ||= begin
+          presenter ||= find_presenter( resource ) unless block
+          { presenter: presenter, block: block }
+        end
       end
 
       # Collects all the currently included resources and resets the queue.
+      #
+      # @return [Array<Object,Hash>] returns the the resource and presentation
+      #     options from each resource buffered with {#include_resource}.
       def collect_included_resources
         included = included_resources.dup
         @included_resources = {}
@@ -39,11 +64,43 @@ module Shamu
       #
       # @param [Symbol] type the resource type in question.
       # @param [Symbol] name of the field on the resouce in question.
-      # @return [Boolean] true if the
-      def include_field?( type, name )
-        return true unless type_fields = fields[ type ]
+      # @param [Boolean] default true if the field should be included by default
+      #     when no explicit fields have been selected.
+      # @return [Boolean] true if the field should be included.
+      def include_field?( type, name, default = true )
+        return default unless type_fields = fields[ type ]
 
         type_fields.include?( name )
+      end
+
+      # Find a {Presenter} that can write the resource to a {ResourceBuilder}.
+      #
+      # - First looks for any explicit presenter given to the constructor that
+      #   maps the resource's class to a specific presenter.
+      # - Next, looks through each of the namespaces given to the constructor.
+      #   For each namespace, looks for a `Namespace::#{ resource.class.name
+      #   }Presenter`. Will also check `resource.class.model_name.name` if
+      #   available.
+      # - Fails with a {NoPresenter} error if a presenter cannot be found.
+      #
+      # @param [Object] resource to present.
+      # @return [Presenter]
+      # @raise [NoPresenter] if a presenter cannot be found.
+      def find_presenter( resource )
+        presenter   = presenters[ resource.class ]
+        presenter ||= find_namespace_presenter( resource )
+
+        fail NoPresenter.new( resource, namespaces ) unless presenter
+
+        presenter.is_a?( Class ) ? presenter.new : presenter
+      end
+
+
+      # @return [Hash] of request param options to be output in the response meta.
+      def params_meta
+        return unless fields.any?
+
+        { fields: fields }
       end
 
       private
@@ -51,6 +108,8 @@ module Shamu
         attr_reader :all_resources
         attr_reader :included_resources
         attr_reader :fields
+        attr_reader :namespaces
+        attr_reader :presenters
 
         def parse_fields( raw )
           return {} unless raw
@@ -64,6 +123,28 @@ module Shamu
             end
           end
         end
+
+        def find_namespace_presenter( resource )
+          presenter   = find_namespace_presenter_for( resource.class.name.demodulize )
+          presenter ||= find_namespace_presenter_for( resource.model_name.element.camelize )       if resource.respond_to?( :model_name )        # rubocop:disable Metrics/LineLength
+          presenter ||= find_namespace_presenter_for( resource.class.model_name.element.camelize ) if resource.class.respond_to?( :model_name )  # rubocop:disable Metrics/LineLength
+          presenter
+        end
+
+        def find_namespace_presenter_for( name )
+          name = "#{ name }Presenter".to_sym
+
+          namespaces.each do |namespace|
+            begin
+              scope = namespace.constantize
+              return scope.const_get( name, false ) if scope.const_defined?( name, false )
+            rescue NameError # rubocop:disable Lint/HandleExceptions
+            end
+          end
+
+          nil
+        end
+
     end
   end
 end

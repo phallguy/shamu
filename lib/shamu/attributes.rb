@@ -135,6 +135,11 @@ module Shamu
         @attributes ||= {}
       end
 
+      # @return [Hash] of all association {.attributes} defined on the class.
+      def associations
+        attributes.select { |_, v| v[:association] }
+      end
+
       def inherited( subclass )
         # Clone the base class's attributes into the subclass
         subclass.instance_variable_set :@attributes, attributes.dup
@@ -143,8 +148,8 @@ module Shamu
 
       # Define a new attribute for the class.
       #
-      # @overload attribute(name, on:, default:, build: )
-      # @overload attribute(name, build, on:, default:)
+      # @overload attribute(name, on:, default:, build:, &block )
+      # @overload attribute(name, build, on:, default:, &block)
       #
       # @param [Symbol] name of the attribute.
       # @param [Symbol] as an alias of the attribute.
@@ -174,8 +179,19 @@ module Shamu
         private :"fetch_#{ name }"
         private :"assign_#{ name }"
 
-
         self
+      end
+
+      # Define an {.attribute} that defines an association to another resource
+      # that also has it's own attributes.
+      #
+      # @param (see .attribute)
+      # @yieldreturn (see .attribute)
+      # @return [self]
+      def association( name, *args, **options, &block )
+        options[:association] = true
+
+        attribute( name, *args, **options, &block )
       end
 
       private

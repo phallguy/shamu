@@ -16,6 +16,7 @@ module Shamu
           ::ActionController::Base.send :include, Shamu::Rails::Controller
           ::ActionController::Base.send :include, Shamu::Rails::Entity
           ::ActionController::Base.send :include, Shamu::Rails::Features
+          ::ActionController::Base.send :include, Shamu::Rails::JsonApi
         end
       end
 
