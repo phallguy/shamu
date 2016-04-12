@@ -1,4 +1,5 @@
 require "spec_helper"
+require "active_model"
 
 describe Shamu::JsonApi::Response do
   let( :context )  { Shamu::JsonApi::Context.new }
@@ -38,5 +39,28 @@ describe Shamu::JsonApi::Response do
     response.error NotImplementedError.new
 
     expect( response.compile ).to include errors: [ hash_including( code: "not_implemented" ) ]
+  end
+
+  it "writes validation errors" do
+    klass = Class.new do
+      include ActiveModel::Validations
+
+      attr_reader :title
+      validates :title, presence: true
+
+      validate :general_problem
+
+      def general_problem
+        errors.add :base, "nope"
+      end
+    end
+
+    allow( klass ).to receive( :name ).and_return "Example"
+    record = klass.new
+    record.valid?
+
+    response.validation_errors record
+    expect( response.compile ).to include errors: include( hash_including( source: { pointer: "/data/attributes/title" } ) ) # rubocop:disable Metrics/LineLength
+    expect( response.compile ).to include errors: include( hash_including( source: { pointer: "/data" } ) )
   end
 end

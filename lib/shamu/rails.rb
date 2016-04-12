@@ -6,6 +6,7 @@ module Shamu
     require "shamu/rails/controller"
     require "shamu/rails/features"
     require "shamu/rails/json_api"
+    require "shamu/rails/json_api_responder"
     require "shamu/rails/railtie"
   end
 end

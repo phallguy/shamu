@@ -34,29 +34,49 @@ module Shamu
         self
       end
 
-      # @overload error( exception, http_status = nil )
+      # @overload error( exception )
       #   @param (see ErrorBuilder#exception)
       # @overload error( &block )
       #   @yield (builder)
       #   @yieldparam [ErrorBuilder] builder used to describe the error.
       #
       # @return [self]
-      def error( exception = nil, http_status = nil, &block )
+      def error( error = nil, &block )
         builder = ErrorBuilder.new
 
-        if block_given?
-          yield builder
-        elsif exception.is_a?( Exception )
-          builder.exception( exception, http_status )
-        else
-          http_status ||= 500
-          builder.summary http_status, http_status.to_s, exception
+        if error.is_a?( Exception )
+          builder.exception( error )
+        elsif error
+          builder.title error
         end
+
+        yield builder if block_given?
 
         errors = ( output[:errors] ||= [] )
         errors << builder.compile
 
         self
+      end
+
+      # Write ActiveModel validation errors to the response.
+      #
+      # @param [#errors] record an object that responds to `#errors` and returns
+      #     a map from fields to error messages.
+      # @yield ( builder, attr, message )
+      # @yieldparam [ErrorBuilder] builder the builder for this error message.
+      # @yieldparam [String] attr the attribute with a validation error.
+      # @yieldparam [String] message the error message.
+      # @return [self]
+      def validation_errors( record, &block )
+        record.errors.each do |attr, message|
+          error message do |builder|
+            path = "/data"
+            path << "/attributes/#{ attr }" unless attr == :base
+            builder.pointer path
+
+            yield builder, attr, message if block_given?
+          end
+        end
       end
 
       # (see BaseBuilder#compile)
@@ -94,9 +114,6 @@ module Shamu
       def to_s
         to_json
       end
-
-      # Responses don't have identifiers
-      undef :identifier
 
       private
 

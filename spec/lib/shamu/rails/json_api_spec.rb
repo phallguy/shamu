@@ -8,6 +8,7 @@ module JsonApiControllerSpec
   end
 
   class ResourcesController < ActionController::Base
+    include Shamu::Rails::JsonApi
   end
 
   module Resources
@@ -24,7 +25,7 @@ end
 describe JsonApiControllerSpec::ResourcesController, type: :controller do
   controller JsonApiControllerSpec::ResourcesController do
     def show
-      resource = JsonApiControllerSpec::Resource.new id: 562, name: "Example"
+      resource = resources.first
       json_api resource: resource
     end
 
@@ -37,13 +38,15 @@ describe JsonApiControllerSpec::ResourcesController, type: :controller do
     end
 
     def resources
-      @resources ||= [ JsonApiControllerSpec::Resource.new( id: 562, name: "Example" ) ]
     end
-
   end
+
+  let( :resource )  { JsonApiControllerSpec::Resource.new( id: 562, name: "Example" ) }
+  let( :resources ) { [ resource ] }
 
   before( :each ) do
     allow( controller ).to receive( :_routes ).and_return @routes
+    allow( controller ).to receive( :resources ).and_return resources
   end
 
   describe "#json_resource" do
