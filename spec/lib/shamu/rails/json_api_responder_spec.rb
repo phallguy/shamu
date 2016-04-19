@@ -23,8 +23,8 @@ module JsonApiResponderSpec
   end
 
   module Resources
-    class ResourcePresenter
-      def present( resource, builder )
+    class ResourcePresenter < Shamu::JsonApi::Presenter
+      def present
         builder.identifier :resource, resource.id
         builder.attribute name: resource.name
       end

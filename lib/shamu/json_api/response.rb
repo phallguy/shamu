@@ -60,15 +60,14 @@ module Shamu
 
       # Write ActiveModel validation errors to the response.
       #
-      # @param [#errors] record an object that responds to `#errors` and returns
-      #     a map from fields to error messages.
+      # @param [Hash<Symbol,String>] errors map of attributes to errors.
       # @yield ( builder, attr, message )
       # @yieldparam [ErrorBuilder] builder the builder for this error message.
       # @yieldparam [String] attr the attribute with a validation error.
       # @yieldparam [String] message the error message.
       # @return [self]
-      def validation_errors( record, &block )
-        record.errors.each do |attr, message|
+      def validation_errors( errors, &block )
+        errors.each do |attr, message|
           error message do |builder|
             path = "/data"
             path << "/attributes/#{ attr }" unless attr == :base
@@ -119,10 +118,11 @@ module Shamu
 
         def build_resource( resource, presenter, &block )
           presenter = context.find_presenter( resource ) if !presenter && !block_given?
+          builder   = ResourceBuilder.new( context )
 
-          builder = ResourceBuilder.new( context )
           if presenter
-            presenter.present( resource, builder )
+            instance = presenter.new( resource, builder )
+            instance.present
           else
             yield builder
           end

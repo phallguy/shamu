@@ -12,8 +12,8 @@ module JsonApiControllerSpec
   end
 
   module Resources
-    class ResourcePresenter
-      def present( resource, builder )
+    class ResourcePresenter < Shamu::JsonApi::Presenter
+      def present
         builder.identifier :resource, resource.id
         builder.attribute name: resource.name
       end
@@ -26,15 +26,15 @@ describe JsonApiControllerSpec::ResourcesController, type: :controller do
   controller JsonApiControllerSpec::ResourcesController do
     def show
       resource = resources.first
-      json_api resource: resource
+      render json: json_resource( resource )
     end
 
     def index
-      json_api collection: resources
+      render json: json_collection( resources )
     end
 
     def nope
-      json_api error: StandardError.new( "Nope" )
+      render json: json_error( StandardError.new( "Nope" ) )
     end
 
     def resources

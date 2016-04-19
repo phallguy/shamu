@@ -6,10 +6,16 @@ describe Shamu::JsonApi::Response do
   let( :response ) { Shamu::JsonApi::Response.new context }
 
   it "uses presenter if given" do
-    presenter = double Shamu::JsonApi::Presenter
-    expect( presenter ).to receive( :present ) do |_, builder|
-      builder.identifier :response, 9
-    end.with( anything, kind_of( Shamu::JsonApi::ResourceBuilder ) )
+    presenter = double
+    expect( presenter ).to receive( :new ) do |resource, builder|
+      instance = Shamu::JsonApi::Presenter.new resource, builder
+
+      expect( instance ).to receive( :present ) do
+        builder.identifier :response, 9
+      end
+
+      instance
+    end
 
     response.resource double, presenter
   end
@@ -59,7 +65,7 @@ describe Shamu::JsonApi::Response do
     record = klass.new
     record.valid?
 
-    response.validation_errors record
+    response.validation_errors record.errors
     expect( response.compile ).to include errors: include( hash_including( source: { pointer: "/data/attributes/title" } ) ) # rubocop:disable Metrics/LineLength
     expect( response.compile ).to include errors: include( hash_including( source: { pointer: "/data" } ) )
   end
