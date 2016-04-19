@@ -28,6 +28,7 @@ module Shamu
           end
         end
       end
+      alias_method :attributes, :attribute
 
       # Build a relationship reference.
       #

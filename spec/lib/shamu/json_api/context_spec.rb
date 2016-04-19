@@ -43,18 +43,18 @@ describe Shamu::JsonApi::Context do
       klass = Class.new( Shamu::JsonApi::Presenter )
 
       context = Shamu::JsonApi::Context.new presenters: { String => klass }
-      expect( context.find_presenter( "Ms. Piggy" ) ).to be_a klass
+      expect( context.find_presenter( "Ms. Piggy" ) ).to eq klass
     end
 
     it "finds implicitly named presenter in namespaces" do
       context = Shamu::JsonApi::Context.new namespaces: [ "JsonApiContextSpec" ]
-      expect( context.find_presenter( :symbols ) ).to be_a JsonApiContextSpec::SymbolPresenter
+      expect( context.find_presenter( :symbols ) ).to eq JsonApiContextSpec::SymbolPresenter
     end
 
     it "finds implicitly named model_name presenter in namespaces" do
       resource = double model_name: ActiveModel::Name.new( Class, nil, "JsonApiContextSpec::Symbol" )
       context = Shamu::JsonApi::Context.new namespaces: [ "JsonApiContextSpec" ]
-      expect( context.find_presenter( resource ) ).to be_a JsonApiContextSpec::SymbolPresenter
+      expect( context.find_presenter( resource ) ).to eq JsonApiContextSpec::SymbolPresenter
     end
 
     it "raises if no presenter can be found" do

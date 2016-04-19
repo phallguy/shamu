@@ -14,8 +14,10 @@ module Shamu
       include BuilderMethods::Meta
 
       # @param [String] id unique id for this occurrence of the error.
+      # @return [self]
       def id( id )
         output[:id] = id
+        self
       end
 
       # Summarize an exception as an error.

@@ -30,9 +30,9 @@ module Shamu
       # obtained by calling {#find_presenter}.
       #
       # @param [Object] resource to be serialized.
-      # @param [Presenter] presenter to use to serialize the object. If
-      #     not provided a default {Presenter} will be chosen.
-      # @return [resource]
+      # @param [Class] presenter tpresenter {Presenter} class to use to
+      #     serialize the `resource`. If not provided a default {Presenter} will
+      #     be chosen.
       # @yield (builder)
       # @yieldparam [ResourceBuilder] builder to write embedded resource to.
       def include_resource( resource, presenter = nil, &block )
@@ -84,7 +84,7 @@ module Shamu
       # - Fails with a {NoPresenter} error if a presenter cannot be found.
       #
       # @param [Object] resource to present.
-      # @return [Presenter]
+      # @return [Class] the {Presenter} class to use.
       # @raise [NoPresenter] if a presenter cannot be found.
       def find_presenter( resource )
         presenter   = presenters[ resource.class ]
@@ -92,7 +92,7 @@ module Shamu
 
         fail NoPresenter.new( resource, namespaces ) unless presenter
 
-        presenter.is_a?( Class ) ? presenter.new : presenter
+        presenter
       end
 
 

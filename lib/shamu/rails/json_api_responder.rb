@@ -5,8 +5,11 @@ module Shamu
     module JsonApiResponder
 
       # Render the response as JSON
+      # @return [String]
       def to_json
-        if get?
+        if has_errors?
+          display_errors
+        elsif get?
           display resource
         elsif put? || patch?
           display resource, :location => api_location
@@ -20,13 +23,12 @@ module Shamu
 
       protected
 
+        # @visibility private
         def display( resource, given_options = {} )
           given_options.merge!( options )
 
           json =
-            if validation_resource?( resource ) && !resource.valid?
-              controller.json_validation_errors resource, **given_options
-            elsif resource.is_a?( Enumerable )
+            if resource.is_a?( Enumerable )
               controller.json_collection resource, **given_options
             else
               controller.json_resource resource, **given_options
@@ -34,6 +36,13 @@ module Shamu
 
           super json, given_options
         end
+
+        # @visibility private
+        def display_errors
+          controller.render format => controller.json_validation_errors( resource_errors ), :status => :unprocessable_entity # rubocop:disable Metrics/LineLength
+        end
+
+      private
 
         def validation_resource?( resource )
           resource.respond_to?( :valid? ) && resource.respond_to?( :errors )
