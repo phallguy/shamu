@@ -8,13 +8,13 @@ module JsonApiResponderSpec
   end
 
   class Responder < ActionController::Responder
-    include Shamu::Rails::JsonApiResponder
+    include Shamu::JsonApi::Rails::Responder
   end
 
   class ResourcesController < ActionController::Base
-    include Shamu::Rails::JsonApi
+    include Shamu::JsonApi::Rails::Controller
 
-    respond_to :json, :json_api
+    respond_to :json_api, :json
     self.responder = Responder
 
     def json_api_responder_spec_resource_url( * )

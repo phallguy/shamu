@@ -1,4 +1,4 @@
 class ApiResponder < ActionController::Responder
   include Responders::HttpCacheResponder
-  include Shamu::Rails::JsonApiResponder
+  include Shamu::JsonApi::Rails::Responder
 end
