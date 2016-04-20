@@ -8,7 +8,7 @@ module JsonApiControllerSpec
   end
 
   class ResourcesController < ActionController::Base
-    include Shamu::Rails::JsonApi
+    include Shamu::JsonApi::Rails::Controller
   end
 
   module Resources
@@ -78,12 +78,21 @@ describe JsonApiControllerSpec::ResourcesController, type: :controller do
     end
 
     subject do
-      get :index, format: :json
+      get :index
       JSON.parse( response.body )
     end
 
     it { is_expected.to include "data" => kind_of( Array ) }
-    it { is_expected.to include "links" => hash_including( "next" ) }
+    it { is_expected.to include "links" => include( "next" => match( /page.*number/ ) ) }
+  end
+
+  describe "#json_pagination" do
+    it "parses pagination parameters" do
+      controller.params[:page] = { number: 3 }
+      pagination = controller.send :json_pagination
+
+      expect( pagination.number ).to eq 3
+    end
   end
 
   it "writes an error" do
