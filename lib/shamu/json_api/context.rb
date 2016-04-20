@@ -88,7 +88,7 @@ module Shamu
       # @raise [NoPresenter] if a presenter cannot be found.
       def find_presenter( resource )
         presenter   = presenters[ resource.class ]
-        presenter ||= find_namespace_presenter( resource )
+        presenter ||= presenters[ resource.class ] = find_namespace_presenter( resource )
 
         fail NoPresenter.new( resource, namespaces ) unless presenter
 
@@ -136,8 +136,7 @@ module Shamu
 
           namespaces.each do |namespace|
             begin
-              scope = namespace.constantize
-              return scope.const_get( name, false ) if scope.const_defined?( name, false )
+              return "#{ namespace }::#{ name }".constantize
             rescue NameError # rubocop:disable Lint/HandleExceptions
             end
           end

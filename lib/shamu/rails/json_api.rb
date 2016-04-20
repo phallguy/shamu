@@ -34,7 +34,7 @@ module Shamu
         response = build_json_response( context )
         response.resource resource, presenter
         yield response if block_given?
-        response
+        response.to_json
       end
 
       # Builds a well-formed JSON API response for a collection of resources.
@@ -53,7 +53,7 @@ module Shamu
         response.collection resources, presenter
         json_paginate_resources response, resources, pagination
         yield response if block_given?
-        response
+        response.to_json
       end
 
       # Add page-based pagination links for the resources to the builder.
@@ -89,7 +89,7 @@ module Shamu
           yield builder if block_given?
         end
 
-        response
+        response.to_json
       end
 
       # Write all the validation errors from a record to the response.
@@ -102,7 +102,7 @@ module Shamu
         response = build_json_response( context )
         response.validation_errors errors, &block
 
-        response
+        response.to_json
       end
 
       JSON_CONTEXT_KEYWORDS = [ :fields, :namespaces, :presenters ].freeze

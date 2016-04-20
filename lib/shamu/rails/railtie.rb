@@ -13,6 +13,10 @@ module Shamu
       end
 
       initializer "shamu.configure" do
+        config.shamu = ActiveSupport::OrderedOptions.new
+        config.shamu.json_api = ActiveSupport::OrderedOptions.new
+        config.shamu.json_api.default_url_options = {}
+
         if defined? ::ActionController
           ::ActionController::Base.send :include, Shamu::Rails::Controller
           ::ActionController::Base.send :include, Shamu::Rails::Entity
