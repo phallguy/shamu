@@ -16,7 +16,6 @@ module Shamu
         config.shamu = ActiveSupport::OrderedOptions.new
         config.shamu.json_api = ActiveSupport::OrderedOptions.new
         config.shamu.json_api.default_url_options = {}
-        config.shamu.json_api.default_url_options = { host: "localhost:3000" } if Rails.env.test?
 
         if defined? ::ActionController
           ::ActionController::Base.send :include, Shamu::Rails::Controller
