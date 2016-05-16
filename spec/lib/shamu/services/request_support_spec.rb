@@ -15,6 +15,12 @@ module RequestSupportSpec
       end
     end
 
+    def partial_process( params )
+      with_partial_request( params, Request::Change ) do |_|
+        request_hook
+      end
+    end
+
     def request_hook
     end
 
@@ -117,6 +123,24 @@ describe Shamu::Services::RequestSupport do
     it "captures request_params into result" do
       result = service.process( request_params )
       expect( result.request ).to be_a RequestSupportSpec::Request::Change
+    end
+  end
+
+  describe "#with_partial_request" do
+    let( :request_params ) { { level: 1, amount: 5 } }
+    let( :service ) { scorpion.new RequestSupportSpec::Service }
+
+    it "yields even if params are invalid" do
+      request_params.delete :amount
+      expect( service ).to receive( :request_hook )
+      service.partial_process( request_params )
+    end
+
+    it "reports errors even if block doesn't check" do
+      request_params.delete :amount
+      result = service.partial_process( request_params )
+
+      expect( result.request.errors ).not_to be_empty
     end
   end
 

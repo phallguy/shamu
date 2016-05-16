@@ -67,6 +67,12 @@ module Shamu
         self.class.new( user_id: user_id, parent_principal: self, remote_ip: remote_ip, elevated: elevated )
       end
 
+      # @return [Boolean] true if the principal was offered by one service to
+      #     another and requesting that the downstream service delegate security
+      #     checks to the calling service.
+      def service_delegate?
+      end
+
     end
   end
 end

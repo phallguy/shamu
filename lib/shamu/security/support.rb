@@ -76,6 +76,7 @@ module Shamu
         # @return [Boolean] true if the service has been asked to delegate
         #     policy checks to the upstream service and
         def service_policy_delegation?
+          security_principal.service_delegate?
         end
 
     end

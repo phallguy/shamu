@@ -61,5 +61,11 @@ module Shamu
       end
     end
 
+    # Principal does not support impersonation.
+    class NoPolicyImpersonationError < Error
+      def initialize( message = :no_policy_impersonation )
+        super
+      end
+    end
   end
 end

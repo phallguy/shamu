@@ -7,5 +7,6 @@ module Shamu
     require "shamu/entities/list_scope"
     require "shamu/entities/identity_cache"
     require "shamu/entities/entity_path"
+    require "shamu/entities/html_sanitation"
   end
 end

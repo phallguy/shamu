@@ -70,10 +70,34 @@ module Shamu
         #     end
         #   end
         def with_request( params, request_class, &block )
-          request = request_class.coerce( params )
-          sources = yield( request ) if request.valid?
+          with_partial_request params, request_class do |request|
+            next unless request.valid?
 
-          result request, *sources
+            yield request
+          end
+        end
+
+        # @!visibility public
+        #
+        # Behaves the same as {#with_request} but always executes the block even
+        # if the params are not yet valid. Allows the block to populate the
+        # request with missing information before validating.
+        #
+        # @param (see #with_request)
+        # @return (see #with_request)
+        # @see #with_request
+        def with_partial_request( params, request_class, &block )
+          request = request_class.coerce( params )
+          # Make sure the request captures errors even if the block doesn't
+          # check
+          request.valid?
+          sources = yield( request )
+
+          if sources.is_a?( Result )
+            sources
+          else
+            result request, *Array.wrap( sources )
+          end
         end
 
       # Static methods added to {RequestSupport}
