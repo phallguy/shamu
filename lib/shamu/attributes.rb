@@ -12,6 +12,7 @@ module Shamu
   # - {Attributes::FluidAssignment}
   # - {Attributes::Validation}
   # - {Attributes::Equality}
+  # - {Attributes::HtmlSanitation}
   #
   # @example
   #
@@ -27,6 +28,7 @@ module Shamu
     require "shamu/attributes/fluid_assignment"
     require "shamu/attributes/validation"
     require "shamu/attributes/equality"
+    require "shamu/attributes/html_sanitation"
 
     def initialize( *attributes )
       assign_attributes( attributes.last )

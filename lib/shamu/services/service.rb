@@ -116,9 +116,9 @@ module Shamu
         #     record.
         # @param [Symbol,#call(record)] match the attribute or a Proc used to
         #  extract the id used to compare records.
-        # @param [Symbol,#call] coerce a method that can be used to coerce id values
-        #     to the same type (eg :to_i). If not set, automatically uses :to_i
-        #     if match is an 'id' attribute.
+        # @param [Symbol,#call] coerce a method that can be used to coerce id
+        #     values to the same type (eg :to_i). If not set, automatically uses
+        #     :to_model_id if match is an 'id' attribute.
         # @yield (see #entity_list)
         # @yieldparam (see #entity_list)
         # @yieldreturn (see #entity_list)
@@ -153,7 +153,7 @@ module Shamu
         def entity_lookup_list( records, ids, null_class, match: :id, coerce: :not_set, &transformer )
           matcher = entity_lookup_list_matcher( match )
           coerce  = coerce_method( coerce, match )
-          ids = ids.map( &coerce ) if coerce
+          ids     = ids.map( &coerce ) if coerce
 
           list = entity_list records, &transformer
           matched = ids.map do |id|
@@ -175,7 +175,7 @@ module Shamu
 
           def coerce_method( coerce, match )
             return coerce unless coerce == :not_set
-            :to_i if match.is_a?( Symbol ) && match =~ /(^|_)id$/
+            :to_model_id if match.is_a?( Symbol ) && match =~ /(^|_)ids?$/
           end
 
         # @!visibility public
@@ -297,6 +297,8 @@ module Shamu
         #     end
         #   end
         def cached_lookup( ids, match: :id, coerce: :not_set, entity: nil, &lookup )
+          coerce      = coerce_method( coerce, match )
+          ids         = ids.map( &coerce ) if coerce
           cache       = cache_for( key: match, coerce: coerce, entity: entity )
           missing_ids = cache.uncached_keys( ids )
 
