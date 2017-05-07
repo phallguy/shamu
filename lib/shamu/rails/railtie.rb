@@ -32,9 +32,9 @@ module Shamu
       end
 
       initializer "shamu.insert_middleware" do |app|
-        app.config.middleware.use "Scorpion::Rack::Middleware"
-        app.config.middleware.use "Shamu::Rack::CookiesMiddleware"
-        app.config.middleware.use "Shamu::Rack::QueryParamsMiddleware"
+        app.config.middleware.use Scorpion::Rack::Middleware
+        app.config.middleware.use Shamu::Rack::CookiesMiddleware
+        app.config.middleware.use Shamu::Rack::QueryParamsMiddleware
       end
 
     end
