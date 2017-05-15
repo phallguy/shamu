@@ -3,9 +3,11 @@ source "https://rubygems.org"
 # Specify your gem"s dependencies in shamu.gemspec
 gemspec
 
+gem 'rake'
+
 group :test do
-  gem "activerecord", "~> 4.2.5"
-  gem "actionpack", "~> 4.2.5"
+  gem "activerecord", "~> 5.0"
+  gem "actionpack", "~> 5.0"
   gem "responders", "~> 2.1.2"
   gem "kaminari", "~> 0.16.3", require: false
 

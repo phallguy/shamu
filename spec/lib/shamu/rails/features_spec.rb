@@ -6,7 +6,7 @@ describe Shamu::Rails::Features, type: :controller do
     public :feature_enabled?
 
     def show
-      render text: ""
+      render plain: ""
     end
   end
 
@@ -22,10 +22,10 @@ describe Shamu::Rails::Features, type: :controller do
 
     expect( controller ).to receive( :show ) do
       expect( controller.feature_enabled?( "shopping/nux" ) ).to be_truthy
-      controller.render text: ""
+      controller.render plain: ""
     end
 
-    get :show, id: 1
+    get :show, params: { id: 1 }
   end
 
   it "allows toggles to be overridden by query param" do
@@ -36,10 +36,10 @@ describe Shamu::Rails::Features, type: :controller do
 
     expect( controller ).to receive( :show ) do
       expect( controller.feature_enabled?( "shopping/discounts" ) ).to be_truthy
-      controller.render text: ""
+      controller.render plain: ""
     end
 
-    get :show, id: 1, Shamu::Features::EnvStore::RACK_PARAMS_KEY => override
+    get :show, params: { id: 1, Shamu::Features::EnvStore::RACK_PARAMS_KEY => override } 
   end
 
 end

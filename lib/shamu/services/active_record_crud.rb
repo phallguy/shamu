@@ -29,12 +29,14 @@ module Shamu
     #     destroy
     #
     #     # Build the entity class from the given record.
-    #     build_entity do |record, records = nil|
-    #       parent = lookup_association( record.parent_id, self ) do
-    #                  records.pluck( :parent_id ) if records
-    #                end
+    #     build_entities do |records|
+    #       records.map do |record|
+    #         parent = lookup_association( record.parent_id, self ) do
+    #                    records.pluck( :parent_id )
+    #                  end
     #
-    #       scorpion.fetch UserEntity, { parent: parent }, {}
+    #         scorpion.fetch UserEntity, { parent: parent }, {}
+    #       end
     #     end
     #   end
     module ActiveRecordCrud
@@ -97,17 +99,16 @@ module Shamu
         # Creates instance and class level methods `entity_class` and
         # `model_class`.
         #
-        # See {.build_entity} for build_entity block details.
+        # See {.build_entities} for build_entities block details.
         #
         # @param [Class] entity_class the {Entities::Entity} class that will be
         #   returned by finders and mutator methods.
         # @param [Class] model_class the {ActiveRecord::Base} model
         # @param [Array<Symbol>] methods the {DSL_METHODS DSL methods} to
         #     include (eg :create, :update, :find, etc.)
-        # @yield (record, records = nil )
-        # @yieldparam [ActiveRecord::Base] record to build an {Entities::Entity}
-        #     for.
-        # @yieldparam [ActiveRecord::Relation] records that are all being built
+        # @yield ( records )
+        # @yieldparam [ActiveRecord::Relation] records to be mapped to an
+        #   entity.
         # @yieldreturn [Entities::Entity] the entity projection for the given
         #     record.
         # @return [void]
@@ -122,7 +123,7 @@ module Shamu
             send method
           end
 
-          build_entity( &block )
+          build_entities( &block )
         end
 
         # @return [Class] the {Entities::Entity} class that the service will
@@ -172,7 +173,11 @@ module Shamu
         # @return [void]
         def change( method = :update, &block )
           define_method method do |id, params = nil|
-            with_request params, request_class( method ) do |request|
+            klass = request_class( method )
+
+            id, params = id.id, id if id.is_a?( klass ) && !params
+
+            with_request params, klass do |request|
               record = model_class.find( id.to_model_id )
               authorize! method, build_entity( record ), request
 
@@ -247,7 +252,7 @@ module Shamu
             define_method :find do |id|
               wrap_not_found do
                 record = yield( id )
-                authorize! :read, build_entity( record )
+                authorize! :read, build_entities( record )
               end
             end
           else
@@ -258,8 +263,8 @@ module Shamu
         end
 
         # Define a `lookup( *ids )` method that takes a list of entity ids to
-        # find. Calls {#build_entity} for each found record, or constructs a
-        # {Entities::NullEntity} for ids that were not found.
+        # find. Calls {#build_entities} to map all found records to entities,
+        # or constructs a {Entities::NullEntity} for ids that were not found.
         #
         # @param [ActiveRecord::Relation] default_scope to use when finding
         #     records.
@@ -317,11 +322,8 @@ module Shamu
           end
         end
 
-        # Define a private `build_entity( record, records = nil )` method that
-        # constructs an {Entities::Entity} from the given `record`. The optional
-        # `records` argument is used when constructing a list of entities so
-        # that associations can all be fetched once and cached while building
-        # the list of entities.
+        # Define a private `build_entities( records )` method that
+        # constructs an {Entities::Entity} for each of the given `records`.
         #
         # If no block is given, creates a simple builder that simply constructs
         # an instance of the {.entity_class} passing `record: record` to the
@@ -329,28 +331,24 @@ module Shamu
         #
         # See {Service#lookup_association} for details on association caching.
         #
-        # @yield (record, records = nil )
-        # @yieldparam [ActiveRecord::Base] record to build an {Entities::Entity}
-        #     for.
-        # @yieldparam [ActiveRecord::Relation] records that are all being built.
-        # @yieldreturn [Entities::Entity] the entity projection for the given
-        #     record.
+        # @yield ( records )
+        # @yieldparam [ActiveRecord::Relation] records to be mapped to
+        #   entities.
+        # @yieldreturn [Array<Entities::Entity>] the projected entities.
         # @return [void]
-        def build_entity( &block )
+        def build_entities( &block )
           if block_given?
-            define_method :build_entity_instance, &block
+            define_method :build_entities, &block
           else
-            define_method :build_entity_instance do |record, _ = nil|
-              scorpion.fetch( entity_class, { record: record }, {} )
+            define_method :build_entities do |records|
+              records.map do |record|
+                entity = scorpion.fetch( entity_class, { record: record }, {} )
+                authorize! :read, entity
+              end
             end
           end
 
-          define_method :build_entity do |record, records = nil|
-            authorize! :read, build_entity_instance( record, records )
-          end
-
-          private :build_entity
-          private :build_entity_instance
+          private :build_entities
         end
 
         private
@@ -361,7 +359,7 @@ module Shamu
 
           def inferred_resource_name
             inferred = name || "Resource"
-            inferred.split( "::" ).last.sub /Service/, ""
+            inferred.split( "::" ).last.sub( /Service/, "" )
           end
 
           def inferred_namespace

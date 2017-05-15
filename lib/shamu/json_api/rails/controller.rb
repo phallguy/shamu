@@ -8,68 +8,122 @@ module Shamu
       module Controller
         extend ActiveSupport::Concern
 
+        # Pattern to identify request params that hold 'ids'
+        ID_PATTERN = /\A(id|.+_id)\z/
+
         included do
           before_action do
             render json: json_error( "The 'include' parameter is not supported" ), status: :bad_request if params[:include] # rubocop:disable Metrics/LineLength
             request.formats = [ :json_api, :json ]
           end
+
+          rescue_from Exception, with: :render_unhandled_exception unless ::Rails.env.test?
         end
 
-        # def process_action( * )
-        #   # If no format has been specfied, default to json_api
-        #   request.parameters[:format] ||= "json_api"
-        #   super
-        # end
+        private
 
-        # Builds a well-formed JSON API response for a single resource.
-        #
-        # @param [Object] resource to present as JSON.
-        # @param [Class] presenter {Presenter} class to use when building the
-        #     response for the given resource. If not given, attempts to find a
-        #     presenter by calling {Context#find_presenter}.
-        # @param (see #json_context)
-        # @yield (response) write additional top-level links and meta
-        #     information.
-        # @yieldparam [JsonApi::Response] response
-        # @return [JsonApi::Response] the presented JSON response.
-        def json_resource( resource, presenter = nil, **context, &block )
-          response = build_json_response( context )
-          response.resource resource, presenter
-          yield response if block_given?
-          response.to_json
-        end
+          # @!visibility public
+          #
+          # Builds a well-formed JSON API response for a single resource.
+          #
+          # @param [Object] resource to present as JSON.
+          # @param [Class] presenter {Presenter} class to use when building the
+          #     response for the given resource. If not given, attempts to find a
+          #     presenter by calling {Context#find_presenter}.
+          # @param (see #json_context)
+          # @yield (response) write additional top-level links and meta
+          #     information.
+          # @yieldparam [JsonApi::Response] response
+          # @return [JsonApi::Response] the presented JSON response.
+          def json_resource( resource, presenter = nil, **context, &block )
+            response = build_json_response( context )
+            response.resource resource, presenter
+            yield response if block_given?
+            response.as_json
+          end
 
-        # Builds a well-formed JSON API response for a collection of resources.
-        #
-        # @param [Enumerable<Object>] resources to present as a JSON array.
-        # @param [Class] presenter {Presenter} class to use when building the
-        #     response for each of the resources. If not given, attempts to find
-        #     a presenter by calling {Context#find_presenter}
-        # @param (see #json_context)
-        # @yield (response) write additional top-level links and meta
-        #     information.
-        # @yieldparam [JsonApi::Response] response
-        # @return [JsonApi::Response] the presented JSON response.
-        def json_collection( resources, presenter = nil, pagination: :auto, **context, &block )
-          response = build_json_response( context )
-          response.collection resources, presenter
-          json_paginate_resources response, resources, pagination
-          yield response if block_given?
-          response.to_json
-        end
+          # @!visibility public
+          #
+          # Present the `resource` as json and render it adding appropriate
+          # HTTP response codes and headers for standard JSON API actions.
+          #
+          # @param [Symbol,Number] status the HTTP status code.
+          # @param (see #json_resource)
+          def render_resource( resource, presenter: nil, status: nil, location: nil, **context, &block )
+            json = json_resource( resource, presenter, **context, &block )
 
-        # Write all the validation errors from a record to the response.
-        #
-        # @param (see Shamu::JsonApi::Response#validation_errors)
-        # @yield (builder, attr, message)
-        # @yieldparam (see Shamu::JsonApi::Response#validation_errors)
-        # @return [JsonApi::Response] the presented JSON response.
-        def json_validation_errors( errors, **context, &block )
-          response = build_json_response( context )
-          response.validation_errors errors, &block
+            # Include canonical url to resource if present
+            if data = json[ "data" ]
+              if links = data[ "links" ]
+                location ||= links[ "self" ] if links[ "self" ]
+              end
+            end
 
-          response.to_json
-        end
+            render json: json, status: status, location: location
+          end
+
+          # @!visibility public
+          #
+          # Renders a {Shamu::Services::Result} presenting either the
+          # validation errors or the entity.
+          #
+          # @param [Shamu::Services::Result] result of a service call
+          # @param (see #json_resource)
+          def render_result( result, presenter: nil, status: nil, **context, &block )
+            if result.valid?
+              if result.entity
+                status ||= case request.method
+                           when 'POST'   then :created
+                           when 'DELETE' then :no_content
+                           else               :ok
+                           end
+
+                render_resource result.entity, presenter: presenter, status: status, **context, &block
+              else
+                head status || :no_content
+              end
+            else
+              render json: json_validation_errors( result.errors, **context ), status: :unprocessable_entity
+            end
+          end
+
+          # Builds a well-formed JSON API response for a collection of resources.
+          #
+          # @param [Enumerable<Object>] resources to present as a JSON array.
+          # @param [Class] presenter {Presenter} class to use when building the
+          #     response for each of the resources. If not given, attempts to find
+          #     a presenter by calling {Context#find_presenter}
+          # @param (see #json_context)
+          # @yield (response) write additional top-level links and meta
+          #     information.
+          # @yieldparam [JsonApi::Response] response
+          # @return [JsonApi::Response] the presented JSON response.
+          def json_collection( resources, presenter = nil, pagination: :auto, **context, &block )
+            response = build_json_response( context )
+            response.collection resources, presenter
+            json_paginate_resources response, resources, pagination
+            yield response if block_given?
+            response.as_json
+          end
+
+          # Present the resources as json and render it adding appropriate HTTP
+          # response codes and headers.
+          def render_collection( resources, presenter: nil, pagination: :auto, **context, &block )
+            render json: json_collection( resources, presenter, pagination: pagination, **context, &block )
+          end
+
+          # Write all the validation errors from a record to the response.
+          #
+          # @param (see Shamu::JsonApi::Response#validation_errors)
+          # @yield (builder, attr, message)
+          # @yieldparam (see Shamu::JsonApi::Response#validation_errors)
+          # @return [JsonApi::Response] the presented JSON response.
+          def json_validation_errors( errors, **context, &block )
+            response = build_json_response( context )
+            response.validation_errors errors, &block
+
+            response.as_json
+          end
 
         private
 
@@ -93,12 +147,15 @@ module Shamu
             end
           end
 
-            def json_page_parameter( page_param_name, param, value )
-              page_params = params.reverse_merge page_param_name => {}
-              page_params[page_param_name][param] = value
+          def json_page_parameter( page_param_name, param, value )
+            params = self.params
+            params = params.to_unsafe_hash if params.respond_to?( :to_unsafe_hash )
 
-              page_params
-            end
+            page_params = params.reverse_merge page_param_name => {}
+            page_params[page_param_name][param] = value
+
+            page_params
+          end
 
           # @!visibility public
           #
@@ -127,11 +184,28 @@ module Shamu
 
             response.error error do |builder|
               builder.http_status json_http_status_code_from_error( error )
+              annotate_json_error( error, builder )
               yield builder if block_given?
             end
 
             response.to_json
           end
+
+          def render_unhandled_exception( exception )
+            render json: json_error( exception ), status: :internal_server_error
+          end
+
+          # @!visibility public
+          #
+          # Annotate an exception that is being rendered to the browser - for
+          # example to add current user or security information if available.
+          def annotate_json_error( error, builder )
+            if ::Rails.env.development?
+              builder.meta :type, error.class.to_s
+              builder.meta :backtrace, error.backtrace
+            end
+          end
+
 
           JSON_CONTEXT_KEYWORDS = [ :fields, :namespaces, :presenters ].freeze
 
@@ -157,8 +231,67 @@ module Shamu
           #     parameters sent by the client.
           def json_context( fields: :not_set, namespaces: :not_set, presenters: :not_set )
             Shamu::JsonApi::Context.new fields: fields == :not_set ? json_context_fields : fields,
-                                        namespaces: namespaces == :not_set ? json_context_namespaces : namespaces,
-                                        presenters: presenters == :not_set ? json_context_presenters : presenters
+              namespaces: namespaces == :not_set ? json_context_namespaces : namespaces,
+              presenters: presenters == :not_set ? json_context_presenters : presenters
+          end
+
+
+          # See (Shamu::Rails::Entity#request_params)
+          def request_params( param_key )
+            if relationships = json_request_payload[ :relationships ]
+              return map_json_resource_payload( relationships[ param_key ][ :data ] ) if relationships.key?( param_key )
+            end
+
+            payload = map_json_resource_payload( json_request_payload )
+
+            request.params.each do |key, value|
+              if ID_PATTERN =~ key
+                payload[ key.to_sym ] ||= value
+              end
+            end
+
+            payload
+          end
+
+          def map_json_resource_payload( resource )
+            payload = resource[ :attributes ] ? resource[ :attributes ].dup : {}
+            payload[ :id ] = resource[ :id ] if resource.key?( :id )
+
+            if relationships = resource[ :relationships ]
+              relationships.each do |key, value|
+                attr_key = "#{ key.to_s.singularize }_id"
+
+                if value[ :data ].is_a?( Array )
+                  attr_key += 's' if value[ :data ].is_a?( Array )
+
+                  payload[ attr_key.to_sym ] = value[ :data ].map { |d| d[ :id ] }
+                  payload[ key ] = value[ :data ].map { |d| map_json_resource_payload( d ) }
+                else
+                  payload[ attr_key.to_sym ] = value[ :data ][ :id ]
+                  payload[ key ] = map_json_resource_payload( value[ :data ] )
+                end
+              end
+            end
+
+            payload
+          end
+
+          # @!visibility public
+          #
+          # Map a JSON body to a hash.
+          # @return [Hash] the parsed JSON payload.
+          def json_request_payload
+            @json_request_payload ||=
+              begin
+                body = request.body.read || "{}"
+                json = JSON.parse( body, symbolize_names: true )
+
+                unless json.blank?
+                  fail NoJsonBodyError unless json[ :data ]
+                end
+
+                json ? json[ :data ] : {}
+              end
           end
 
 
@@ -167,7 +300,7 @@ module Shamu
           end
 
           def json_context_namespaces
-            name = self.class.name.sub /Controller$/, ""
+            name = self.class.name.sub( /Controller$/, "" )
             namespaces = [ name.pluralize ]
             loop do
               name = name.deconstantize

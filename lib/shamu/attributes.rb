@@ -121,6 +121,8 @@ module Shamu
         # Allow protected attributes to be used without explicitly being set.
         # All 'Attributes' classes are them selves the explicit set of permitted
         # attributes.
+        elsif attributes.respond_to?( :to_unsafe_h )
+          attributes.to_unsafe_h
         elsif attributes.respond_to?( :to_hash )
           attributes.to_hash.symbolize_keys
         elsif attributes.respond_to?( :to_h )

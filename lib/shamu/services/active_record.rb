@@ -49,7 +49,7 @@ module Shamu
           if relation.respond_to?( :by_list_scope )
             relation.by_list_scope( list_scope )
           else
-            fail "Can't scope a #{ relation.klass }. Add `scope :by_list_scope, ->(list_scope) { ... }` or include Shamu::Entities::ActiveRecord." # rubocop:disable Metrics/LineLength
+            fail "Can't scope a #{ relation.klass }. Add `scope :by_list_scope, ->(list_scope) { ... }` or extend Shamu::Entities::ActiveRecord." # rubocop:disable Metrics/LineLength
           end
         end
 

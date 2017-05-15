@@ -18,9 +18,14 @@ module Shamu
         config.shamu.json_api.default_url_options = {}
 
         if defined? ::ActionController
-          ::ActionController::Base.send :include, Shamu::Rails::Controller
-          ::ActionController::Base.send :include, Shamu::Rails::Entity
-          ::ActionController::Base.send :include, Shamu::Rails::Features
+          controller_classes = [ ::ActionController::Base ]
+          controller_classes << ::ActionController::API if defined? ::ActionController::API
+
+          controller_classes.each do |klass|
+            klass.send :include, Shamu::Rails::Controller
+            klass.send :include, Shamu::Rails::Entity
+            klass.send :include, Shamu::Rails::Features
+          end
 
           Mime::Type.register Shamu::JsonApi::MIME_TYPE, :json_api
 

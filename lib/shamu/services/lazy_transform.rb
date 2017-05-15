@@ -7,8 +7,8 @@ module Shamu
       include Enumerable
 
       # @param [Enumerable] source enumerable to transform.
-      # @yieldparam [Object] object the original value.
-      # @yieldreturn the transformed value.
+      # @yieldparam [Array<Object>] objects the original values.
+      # @yieldreturn the transformed values.
       # @yield (object)
       def initialize( source, &transformer )
         @transformer = transformer
@@ -48,7 +48,7 @@ module Shamu
           return @first if defined? @first
           @first = begin
             value = source.first
-            transformer.call( value ) unless value.nil?
+            raise_if_not_transformed( transformer.call( [ value ] ) ).first unless value.nil?
           end
         end
       end
@@ -86,11 +86,16 @@ module Shamu
         attr_reader :transformer
 
         def transformed
-          @transformed ||= source.map( &transformer )
+          @transformed ||= raise_if_not_transformed( transformer.call( source ) )
         end
 
         def transformed?
           !!@transformed
+        end
+
+        def raise_if_not_transformed( transformed )
+          raise "Block to LazyTransform did not return an enumerable value" unless transformed.is_a? Enumerable
+          transformed
         end
     end
   end

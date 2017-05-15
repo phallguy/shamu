@@ -45,6 +45,28 @@ module Shamu
         attr_reader :resource
         attr_reader :builder
 
+
+        # Present all the named attributes of the {#resource}.
+        # @param [Array<Symbol>] names of the resource to present.
+        def resource_attributes( *names )
+          names.map do |name|
+            attribute name, attribute_value( resource.send( name ) )
+          end
+        end
+
+        # Get a JSON API safe version of the value.
+        # @param [Object] value the value to be coerced.
+        # @return [Object]
+        def attribute_value( value )
+          case value
+          when Date, DateTime then
+            value.to_date.to_time.iso8601
+          when Time, ActiveSupport::TimeWithZone then
+            value.iso8601
+          else value
+          end
+        end
+
     end
   end
 end
