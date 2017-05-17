@@ -16,8 +16,11 @@ module Shamu
       included do
         include Scorpion::Rails::Controller
 
-        helper_method :permit?
-        helper_method :current_user
+        # ActionController::API does not have #helper_method
+        if respond_to?( :helper_method )
+          helper_method :permit?
+          helper_method :current_user
+        end
       end
 
       private

@@ -7,6 +7,7 @@ module Shamu
     class Result
       extend ActiveModel::Translation
 
+
       # ============================================================================
       # @!group Attributes
       #
@@ -17,17 +18,41 @@ module Shamu
       # @return [Entities::Entity] the entity created or changed by the request.
       attr_reader :entity
 
+      # @return [Entities::Entity] the entity created or changed by the request.
+      # @raise [ServiceRequestFailedError] if the result was not valid.
+      def entity!
+        valid!
+        entity
+      end
+
+      # @return [Array<Object>] the values returned by the service call.
+      attr_reader :values
+
+      # @return [Object] the primary return value of the service call.
+      attr_reader :value
+
+      # @return [Object] the primary return value of the service call.
+      # @raise [ServiceRequestFailedError] if the result was not valid.
+      def value!
+        valid!
+        value
+      end
+
       #
       # @!endgroup Attributes
 
-      # @param [Array<#errors>] validation_sources an array of objects that respond to `#errors`
-      #   returning a {ActiveModel::Errors} object.
+      # @param [Array<Object,#errors>] values an array of objects that
+      #   represent the result of the service call. If they respond to `#errors`
+      #   those errors will be included in {#errors} on the result object itself.
       # @param [Request] request submitted to the service. If :not_set, uses
-      #   the first {Request} object found in the `validation_sources`.
+      #   the first {Request} object found in the `values`.
       # @param [Entities::Entity] entity submitted to the service. If :not_set,
-      #   uses the first {Request} object found in the `validation_sources`.
-      def initialize( *validation_sources, request: :not_set, entity: :not_set )
-        validation_sources.each do |source|
+      #   uses the first {Entity} object found in the `values`.
+      def initialize( *values, request: :not_set, entity: :not_set )
+        @values = values
+        @value  = values.first
+
+        values.each do |source|
           request = source if request == :not_set && source.is_a?( Services::Request )
           entity  = source if entity == :not_set && source.is_a?( Entities::Entity )
 
@@ -61,7 +86,15 @@ module Shamu
         ( request && request.model_name ) || ( entity && entity.model_name ) || ActiveModel::Name.new( self, nil, "Request" ) # rubocop:disable Metrics/LineLength
       end
 
+      # @return [self]
+      # @raise [ServiceRequestFailedError] if the result was not valid.
+      def valid!
+        raise ServiceRequestFailedError.new( self ) unless valid?
+        self
+      end
+
       private
+
 
         def append_error_source( source )
           return unless source.respond_to?( :errors )

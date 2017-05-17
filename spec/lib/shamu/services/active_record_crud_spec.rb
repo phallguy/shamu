@@ -65,8 +65,8 @@ describe Shamu::Services::ActiveRecordCrud do
       expect( klass.model_class ).to eq ActiveRecordSpec::Favorite
     end
 
-    it "defines a build_entity method" do
-      expect( klass.new.respond_to?( :build_entity, true ) ).to be_truthy
+    it "defines a build_entities method" do
+      expect( klass.new.respond_to?( :build_entities, true ) ).to be_truthy
     end
 
     Shamu::Services::ActiveRecordCrud::DSL_METHODS.each do |method|
@@ -76,7 +76,7 @@ describe Shamu::Services::ActiveRecordCrud do
       end
     end
 
-    it "takes a block defining #build_entity" do
+    it "takes a block defining #build_entities" do
       expect do |b|
         yield_klass = Class.new( klass ) do
           resource( ActiveRecordCrudSpec::FavoriteEntity, ActiveRecordSpec::Favorite, &b )
@@ -223,6 +223,8 @@ describe Shamu::Services::ActiveRecordCrud do
     end
 
     it "calls #authorize!" do
+      entity
+
       expect( service ).to receive( :authorize! ).with(
         :update,
         kind_of( ActiveRecordCrudSpec::FavoriteEntity ),
@@ -434,7 +436,7 @@ describe Shamu::Services::ActiveRecordCrud do
     end
   end
 
-  describe ".build_entity" do
+  describe ".build_entities" do
     let!( :entity ) { service.create( name: "Example", label: "Books" ).entity }
     let( :entity_class ) do
       Class.new( Shamu::Entities::Entity ) do
@@ -444,9 +446,12 @@ describe Shamu::Services::ActiveRecordCrud do
     let( :klass ) do
       ec = entity_class
       Class.new( super() ) do
-        build_entity do |record, _ = nil|
-          scorpion.fetch ec, { record: record }, {}
+        build_entities do |records|
+          records.map do |record|
+            scorpion.fetch ec, { record: record }, {}
+          end
         end
+        public :build_entities
         public :build_entity
       end
     end

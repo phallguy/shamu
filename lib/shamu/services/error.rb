@@ -20,5 +20,15 @@ module Shamu
         super
       end
     end
+
+    class ServiceRequestFailedError < Error
+      attr_reader :result
+
+      def initialize( result )
+        @result = result
+
+        super translate( :service_request_failed, errors: result.errors.full_messages.join( ', ' ) )
+      end
+    end
   end
 end

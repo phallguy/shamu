@@ -78,6 +78,16 @@ module Shamu
 
       private
 
+        # Maps a single record to an entity. Requires a `build_entities` method
+        # that maps an enumerable set of records to entities.
+        #
+        # @param [Object] record to map.
+        # @return [Entity] the mapped entity.
+        def build_entity( record )
+          mapped = build_entities( [ record ] )
+          mapped && mapped.first
+        end
+
         # @!visibility public
         # Takes a raw enumerable list of records and transforms them to a proper
         # {Entities::List}.
@@ -85,10 +95,9 @@ module Shamu
         # As simple as the method is, it also serves as a hook for mixins to add
         # additional behavior when processing lists.
         #
-        # If a block is not provided, looks for a method `build_entity(record,
-        # records=nil)` where `record` is the individual record to be
-        # transformed and `records` is the original collection or database query
-        # being transformed.
+        # If a block is not provided, looks for a method `build_entities(
+        # records )` that maps a set of records to their corresponding
+        # entities.
         #
         # @param [Enumerable] records the raw list of records.
         # @yield (record)
@@ -99,8 +108,8 @@ module Shamu
         def entity_list( records, &transformer )
           return Entities::List.new [] unless records
           unless transformer
-            fail "Either provide a block or add a private method `def build_entity( record, records = nil )` to #{ self.class.name }." unless respond_to?( :build_entity, true ) # rubocop:disable Metrics/LineLength
-            transformer ||= ->( record ) { build_entity( record, records ) }
+            fail "Either provide a block or add a private method `def build_entities( records )` to #{ self.class.name }." unless respond_to?( :build_entities, true ) # rubocop:disable Metrics/LineLength
+            transformer ||= method( :build_entities )
           end
 
           Entities::List.new LazyTransform.new( records, &transformer )
@@ -325,7 +334,7 @@ module Shamu
 
         # @!visibility public
         #
-        # @overload result( *validation_sources, request: nil, entity: nil )
+        # @overload result( *values, request: nil, entity: nil )
         # @param (see Result#initialize)
         # @return [Result]
         def result( *args )

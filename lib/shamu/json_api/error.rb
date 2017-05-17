@@ -24,5 +24,11 @@ module Shamu
         super translate( :no_presenter, class: resource.class, namespaces: namespaces )
       end
     end
+
+    class NoJsonBodyError < Error
+      def initialize( message = :no_json_body )
+        super
+      end
+    end
   end
 end

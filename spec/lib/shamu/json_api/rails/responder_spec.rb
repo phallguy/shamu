@@ -60,7 +60,7 @@ describe JsonApiResponderSpec::ResourcesController, type: :controller do
 
   let( :resource )  { JsonApiResponderSpec::Resource.new( id: 562, name: "Example" ) }
   let( :resources ) { [ resource ] }
-  let( :body )      { JSON.load( response.body, nil, symbolize_names: true ) }
+  let( :body )      { JSON.parse( response.body, symbolize_names: true ) }
 
   before( :each ) do
     allow( controller ).to receive( :_routes ).and_return @routes
@@ -69,12 +69,12 @@ describe JsonApiResponderSpec::ResourcesController, type: :controller do
 
   describe "#show" do
     it "has JSON content_type" do
-      get :show, id: 1
+      get :show, params: { id: 1 }
       expect( response.content_type ).to eq Shamu::JsonApi::MIME_TYPE
     end
 
     it "renders JSON API response" do
-      get :show, id: 1
+      get :show, params: { id: 1 }
       expect( body ).to include data: hash_including( id: resource.id.to_s )
     end
 
@@ -84,7 +84,7 @@ describe JsonApiResponderSpec::ResourcesController, type: :controller do
       allow( resource ).to receive( :errors ).and_return errors
       allow( resource ).to receive( :valid? ).and_return false
 
-      get :show, id: 1
+      get :show, params: { id: 1 }
       expect( body ).to include :errors
     end
   end
@@ -113,22 +113,22 @@ describe JsonApiResponderSpec::ResourcesController, type: :controller do
 
   describe "#update" do
     it "has JSON content_type" do
-      put :update, id: 1
+      put :update, params: { id: 1 }
       expect( response.content_type ).to eq Shamu::JsonApi::MIME_TYPE
     end
 
     it "includes location header" do
-      post :update, id: 1
+      post :update, params: { id: 1 }
       expect( response.location ).to be_present
     end
 
     it "returns 200 status code" do
-      put :update, id: 1
+      put :update, params: { id: 1 }
       expect( response.status ).to eq 200
     end
 
     it "includes the json entity" do
-      put :update, id: 1
+      put :update, params: { id: 1 }
       expect( body ).to include data: hash_including( id: resource.id.to_s )
     end
   end

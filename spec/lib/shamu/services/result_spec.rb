@@ -34,4 +34,40 @@ describe Shamu::Services::Result do
     result  = Shamu::Services::Result.new
     expect( result.entity ).to be_nil
   end
+
+  describe "#value!" do
+    it "raises an error if not valid" do
+      result = Shamu::Services::Result.new
+      result.errors.add :base, :whatever
+
+      expect do
+        result.value!
+      end.to raise_error Shamu::Services::ServiceRequestFailedError
+    end
+
+    it "returns #value if valid" do
+      result = Shamu::Services::Result.new :one
+
+      expect( result.value! ).to eq :one
+    end
+  end
+
+  describe "#entity!" do
+    it "raises an error if not valid" do
+      entity = Shamu::Entities::Entity.new
+      result = Shamu::Services::Result.new entity
+      result.errors.add :base, :whatever
+
+      expect do
+        result.entity!
+      end.to raise_error Shamu::Services::ServiceRequestFailedError
+    end
+
+    it "returns #entity if valid" do
+      entity = Shamu::Entities::Entity.new
+      result = Shamu::Services::Result.new entity
+
+      expect( result.entity! ).to be entity
+    end
+  end
 end

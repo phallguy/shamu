@@ -8,8 +8,9 @@ en:
 
     services:
       errors:
-        active_record_crud_missing_resource: The resource has not been defined. Add `resource entity_class, model_class` to {%service}.
+        active_record_crud_missing_resource: "The resource has not been defined. Add `resource entity_class, model_class` to %{service}."
         incomplete_setup: The service has not been setup. See included modules documentation for details.
+        service_request_failed: 'The service call failed with: %{errors}.'
 
 
     security:
@@ -30,3 +31,4 @@ en:
       errors:
         incomplete_resource: "`identifier` was not called to define the type and id of the resource."
         no_presenter: No presenter available for %{class} objects. Looked in %{namespaces}.
+        no_json_body: "Missing `data` node for JSON API body. Override `json_request_payload` if no body is expected."

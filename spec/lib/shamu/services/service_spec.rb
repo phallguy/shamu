@@ -25,8 +25,10 @@ module ServiceSpec
     public :lookup_association
     public :lazy_association
 
-    def build_entity( record, records = nil )
-      scorpion.fetch ServiceSpec::Entity, { record: record }, {}
+    def build_entities( records )
+      records.map do |record|
+        scorpion.fetch ServiceSpec::Entity, { record: record }, {}
+      end
     end
   end
 
@@ -51,10 +53,19 @@ describe Shamu::Services::Service do
 
   let( :service ) { scorpion.new ServiceSpec::Service }
 
+  def transformer( &block )
+    ->( records ) {
+      records.map do |r|
+        yield || r
+      end
+    }
+  end
+
+
   describe "#entity_list" do
     it "maps each record" do
       expect do |b|
-        list = service.entity_list [ double ], &b
+        list = service.entity_list [ double ], &transformer( &b )
         list.to_a
       end.to yield_control
     end
@@ -64,7 +75,7 @@ describe Shamu::Services::Service do
     end
 
     it "invokes build_entity if no transformer provided" do
-      expect( service ).to receive( :build_entity ).and_call_original
+      expect( service ).to receive( :build_entities ).and_call_original
       list = service.entity_list( [{}] )
       list.first
     end
@@ -100,7 +111,7 @@ describe Shamu::Services::Service do
 
     it "yields for a matching id" do
       expect do |b|
-        service.entity_lookup_list( records, [record.id], ServiceSpec::NullEntity, &b )
+        service.entity_lookup_list( records, [record.id], ServiceSpec::NullEntity, &transformer( &b ) )
       end.to yield_control
     end
 
@@ -109,24 +120,24 @@ describe Shamu::Services::Service do
     end
 
     it "matches on id by default" do
-      list = service.entity_lookup_list( records, [record.id], ServiceSpec::NullEntity ) do |r|
-        scorpion.fetch ServiceSpec::Entity, { record: r }, {}
+      list = service.entity_lookup_list( records, [record.id], ServiceSpec::NullEntity ) do |records|
+        records.map { |r| scorpion.fetch ServiceSpec::Entity, { record: r }, {} }
       end
 
       expect( list.first ).to be_present
     end
 
     it "matches on id with string numbers" do
-      list = service.entity_lookup_list( records, [record.id.to_s], ServiceSpec::NullEntity ) do |r|
-        scorpion.fetch ServiceSpec::Entity, { record: r }, {}
+      list = service.entity_lookup_list( records, [record.id.to_s], ServiceSpec::NullEntity ) do |records|
+        records.map { |r| scorpion.fetch ServiceSpec::Entity, { record: r }, {} }
       end
 
       expect( list.first ).to be_present
     end
 
     it "matches on a custom field" do
-      list = service.entity_lookup_list( records, [record.amount], ServiceSpec::NullEntity, match: :amount ) do |r|
-        scorpion.fetch ServiceSpec::Entity, { record: r }, {}
+      list = service.entity_lookup_list( records, [record.amount], ServiceSpec::NullEntity, match: :amount ) do |records|
+        records.map { |r| scorpion.fetch ServiceSpec::Entity, { record: r }, {} }
       end
 
       expect( list.first ).to be_present
@@ -134,8 +145,8 @@ describe Shamu::Services::Service do
 
     it "matches with a custom proc" do
       matcher = ->( record ) { record.amount }
-      list = service.entity_lookup_list( records, [record.amount], ServiceSpec::NullEntity, match: matcher ) do |r|
-        scorpion.fetch ServiceSpec::Entity, { record: r }, {}
+      list = service.entity_lookup_list( records, [record.amount], ServiceSpec::NullEntity, match: matcher ) do |records|
+        records.map { |r| scorpion.fetch ServiceSpec::Entity, { record: r }, {} }
       end
 
       expect( list.first ).to be_present

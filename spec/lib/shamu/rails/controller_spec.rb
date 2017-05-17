@@ -18,7 +18,7 @@ describe Shamu::Rails::Controller, type: :controller do
     public :services, :secure_services, :permit?
 
     def show
-      render text: ""
+      render plain: ""
     end
   end
 
@@ -47,10 +47,10 @@ describe Shamu::Rails::Controller, type: :controller do
 
       expect( controller ).to receive( :show ) do
         expect( scorpion.fetch( Shamu::Security::Principal ).user_id ).to eq 945
-        controller.render( text: "" )
+        controller.render( plain: "" )
       end
 
-      get :show, id: 5
+      get :show, params: { id: 5 }
     end
   end
 

@@ -15,8 +15,6 @@ module LoadEntitySpec
 
     def authorize!( * )
     end
-
-
   end
 
   class ExampleEntity < Shamu::Entities::Entity
@@ -34,20 +32,24 @@ describe Shamu::Rails::Entity, type: :controller do
   hunt( :example_service, LoadEntitySpec::Service ) { scorpion.new LoadEntitySpec::Service }
 
   controller ActionController::Base do
-    service :example_service, LoadEntitySpec::Service
+    service :examples_service, LoadEntitySpec::Service
     entity LoadEntitySpec::ExampleEntity
 
     def show
-      render text: ""
+      render plain: ""
     end
 
     def index
-      render text: ""
+      render plain: ""
     end
 
     def new
+      render plan: ""
+    end
+
+    def create
       example_request
-      render text: ""
+      render plain: ""
     end
 
   end
@@ -62,6 +64,7 @@ describe Shamu::Rails::Entity, type: :controller do
 
   it "loads the entity from the service" do
     expect( example_service ).to receive( :find )
+    controller.params[:id] = 1
     controller.send :example
   end
 
@@ -83,7 +86,7 @@ describe Shamu::Rails::Entity, type: :controller do
 
   it "loads the entity before the request" do
     expect( controller ).to receive( :example ).and_call_original
-    get :show, id: 1
+    get :show, params: { id: 1 }
   end
 
   it "invokes list for index types" do
@@ -94,7 +97,13 @@ describe Shamu::Rails::Entity, type: :controller do
   it "authorizes action for entity request" do
     expect( example_service ).to receive( :authorize! )
 
-    get :new
+    post :create
+  end
+
+  it "doesn't load entity on create actions" do
+    expect( controller ).not_to receive( :example )
+
+    post :create
   end
 
   context "only some actions" do
@@ -103,21 +112,26 @@ describe Shamu::Rails::Entity, type: :controller do
       entity LoadEntitySpec::ExampleEntity, only: :show
 
       def show
-        render text: ""
+        render plain: ""
       end
 
       def new
-        render text: ""
+        render plain: ""
+      end
+
+      def create
+        render plain: ""
       end
     end
 
     it "loads on show" do
       expect( controller ).to receive( :example )
-      get :show, id: 1
+      get :show, params: { id: 1 }
     end
 
     it "doesn't load on new" do
       expect( controller ).not_to receive( :example )
+      post :create
       get :new
     end
   end
@@ -128,21 +142,25 @@ describe Shamu::Rails::Entity, type: :controller do
       entity LoadEntitySpec::ExampleEntity, except: :show
 
       def show
-        render text: ""
+        render plain: ""
       end
 
       def new
-        render text: ""
+        render plain: ""
+      end
+
+      def create
+        render plain: ""
       end
     end
 
     it "loads on show" do
       expect( controller ).not_to receive( :example )
-      get :show, id: 1
+      get :show, params: { id: 1 }
     end
 
     it "doesn't load on new" do
-      expect( controller ).to receive( :example )
+      expect( controller ).not_to receive( :example )
       get :new
     end
   end

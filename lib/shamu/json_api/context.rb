@@ -114,6 +114,8 @@ module Shamu
         def parse_fields( raw )
           return {} unless raw
 
+          raw = raw.to_unsafe_hash if raw.respond_to?( :to_unsafe_hash )
+
           raw.each_with_object( {} ) do |(type, fields), parsed|
             fields = fields.split( "," ) if fields.is_a?( String )
 

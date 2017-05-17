@@ -9,7 +9,7 @@ module Shamu
       private
 
         def fetch_entity( service, param )
-          service.find( params[ param ] )
+          service.find( params[ param ] ) if params.key?( param )
         end
 
         def fetch_entities( service, param )
@@ -22,16 +22,24 @@ module Shamu
           return unless request = service.request_for( action, entity )
 
           param_key ||= entity.model_name.param_key
-
-          strong_param = :"#{ param_key }_params"
-          if respond_to?( strong_param, true )
-            request.assign_attributes( send( strong_param ) )
-          else
-            request.assign_attributes( params[ param_key ] )
-          end
+          request.assign_attributes( request_params( param_key ) )
 
           service.authorize!( action, entity, request ) if service.respond_to?( :authorize! )
           request
+        end
+
+        # @!visibility public
+        #
+        # Get the raw request hash params for the given parameter key.
+        # @param [Symbol] param_key key of the entity params to fetch.
+        # @return [Hash] the params
+        def request_params( param_key )
+          strong_param = :"#{ param_key }_params"
+          if respond_to?( strong_param, true )
+            send( strong_param )
+          else
+            params[ param_key ]
+          end
         end
 
         def load_entity( method:, list_method:, action: nil, only: nil, except: nil )
@@ -44,11 +52,16 @@ module Shamu
         def matching_entity_action?( action, only:, except: )
           return if only.present? && !only.include?( action )
           return if except.present? && except.include?( action )
-          true
+
+          !create_action?( action )
         end
 
-        def list_action?( action )
-          action == :index
+        def list_action?( action = params[ :action ] )
+          action.to_sym == :index
+        end
+
+        def create_action?( action = params[ :action ] )
+          [ :new, :create ].include?( action.to_sym )
         end
 
       class_methods do
@@ -101,7 +114,7 @@ module Shamu
         #     not being modified in an :update request.
         def entity( entity_class, through: nil, as: nil, list: nil, only: nil, except: nil, param: :id, list_param: nil, action: nil, param_key: nil ) # rubocop:disable Metrics/LineLength
           as      ||= entity_as_name( entity_class )
-          through ||= :"#{ as }_service"
+          through ||= :"#{ as.to_s.pluralize }_service"
           list    ||= as.to_s.pluralize.to_sym
 
           define_entity_method( as, through, param )
@@ -132,7 +145,7 @@ module Shamu
                 @#{ as } = fetch_entity( #{ through }, :#{ param } )                         #   @entity = fetch_entity( entity_service, :id )
               end                                                                            # end
 
-              helper_method :#{ as }
+              helper_method :#{ as } if respond_to?( :helper_method )
             RUBY
           end
 
@@ -145,7 +158,7 @@ module Shamu
                 @#{ as } = fetch_entities( #{ through }, #{ param ? ":#{ param }" : 'nil' } ) #   @entities = fetch_entities( entity_service, nil )
               end                                                                             # end
 
-              helper_method :#{ as }
+              helper_method :#{ as } if respond_to?( :helper_method )
             RUBY
           end
 
@@ -155,10 +168,11 @@ module Shamu
 
               def #{ as }_request                                                              # def entity_request
                 return @#{ as }_request if defined? @#{ as }_request                           #   return @entity_request if defined? @entity_request
-                @#{ as }_request = fetch_entity_request( #{ through }, #{ as }, :#{ as } )     #   @entity_request = fetch_entity_request( entity_service, entity, :entity )
+                _entity = #{ as } unless create_action?                                        #   _entity = entity unless create_action?
+                @#{ as }_request = fetch_entity_request( #{ through }, _entity, :#{ as } )     #   @entity_request = fetch_entity_request( entity_service, _entity, :entity )
               end                                                                              # end
 
-              helper_method :#{ as }_request
+              helper_method :#{ as }_request if respond_to?( :helper_method )
             RUBY
           end
 

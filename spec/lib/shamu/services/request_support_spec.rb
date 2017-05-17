@@ -49,6 +49,15 @@ module RequestSupportSpec
     attribute :level, on: :record
     attribute :amount, on: :record
   end
+
+  class UsersService < Shamu::Services::Service
+    include Shamu::Services::RequestSupport
+  end
+
+  module UserRequest
+    class Change < Shamu::Services::Request
+    end
+  end
 end
 
 describe Shamu::Services::RequestSupport do
@@ -71,6 +80,11 @@ describe Shamu::Services::RequestSupport do
           include Shamu::Services::RequestSupport
         end.request_class( :change )
       end.to raise_error Shamu::Services::IncompleteSetupError, /Request/
+    end
+    
+    it "singularizes service namespace" do
+      service = scorpion.new RequestSupportSpec::UsersService
+      expect( service.request_class( :change ) ).to be RequestSupportSpec::UserRequest::Change
     end
 
     it "uses common alias fallback new -> create" do
