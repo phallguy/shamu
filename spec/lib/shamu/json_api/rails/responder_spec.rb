@@ -14,6 +14,8 @@ module JsonApiResponderSpec
   class ResourcesController < ActionController::Base
     include Shamu::JsonApi::Rails::Controller
 
+    public :json_resource, :json_collection, :json_validation_errors, :json_error
+
     respond_to :json_api, :json
     self.responder = Responder
 

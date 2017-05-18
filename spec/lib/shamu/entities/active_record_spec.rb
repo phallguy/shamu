@@ -1,6 +1,6 @@
 require "spec_helper"
-require "shamu/entities/active_record"
 require "active_record"
+require "shamu/entities/active_record"
 
 describe Shamu::Entities::ActiveRecord do
   use_active_record
@@ -48,8 +48,8 @@ describe Shamu::Entities::ActiveRecord do
       scope    = klass.new( since: since_date, until: until_date )
       relation = ActiveRecordSpec::Favorite.by_list_scope( scope )
 
-      expect( relation.where_values.any? { |w| w.left.name == :since } ).to be_truthy
-      expect( relation.where_values.any? { |w| w.left.name == :until } ).to be_truthy
+      expect( relation.where_clause.any? { |w| w.left.name == :since } ).to be_truthy
+      expect( relation.where_clause.any? { |w| w.left.name == :until } ).to be_truthy
     end
 
     it "sorts by attribute" do

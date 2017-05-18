@@ -73,8 +73,8 @@ module Shamu
             if result.valid?
               if result.entity
                 status ||= case request.method
-                           when 'POST'   then :created
-                           when 'DELETE' then :no_content
+                           when "POST"   then :created
+                           when "DELETE" then :no_content
                            else               :ok
                            end
 
@@ -124,8 +124,6 @@ module Shamu
 
             response.as_json
           end
-
-        private
 
           # @!visibility public
           #
@@ -230,7 +228,8 @@ module Shamu
           # @return [JsonApi::Context] the builder context honoring any filter
           #     parameters sent by the client.
           def json_context( fields: :not_set, namespaces: :not_set, presenters: :not_set )
-            Shamu::JsonApi::Context.new fields: fields == :not_set ? json_context_fields : fields,
+            Shamu::JsonApi::Context.new \
+              fields: fields == :not_set ? json_context_fields : fields,
               namespaces: namespaces == :not_set ? json_context_namespaces : namespaces,
               presenters: presenters == :not_set ? json_context_presenters : presenters
           end
@@ -245,15 +244,13 @@ module Shamu
             payload = map_json_resource_payload( json_request_payload )
 
             request.params.each do |key, value|
-              if ID_PATTERN =~ key
-                payload[ key.to_sym ] ||= value
-              end
+              payload[ key.to_sym ] ||= value if ID_PATTERN =~ key
             end
 
             payload
           end
 
-          def map_json_resource_payload( resource )
+          def map_json_resource_payload( resource ) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
             payload = resource[ :attributes ] ? resource[ :attributes ].dup : {}
             payload[ :id ] = resource[ :id ] if resource.key?( :id )
 
@@ -262,7 +259,7 @@ module Shamu
                 attr_key = "#{ key.to_s.singularize }_id"
 
                 if value[ :data ].is_a?( Array )
-                  attr_key += 's' if value[ :data ].is_a?( Array )
+                  attr_key += "s" if value[ :data ].is_a?( Array )
 
                   payload[ attr_key.to_sym ] = value[ :data ].map { |d| d[ :id ] }
                   payload[ key ] = value[ :data ].map { |d| map_json_resource_payload( d ) }

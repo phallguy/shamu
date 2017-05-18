@@ -39,7 +39,7 @@ describe Shamu::Rails::Features, type: :controller do
       controller.render plain: ""
     end
 
-    get :show, params: { id: 1, Shamu::Features::EnvStore::RACK_PARAMS_KEY => override } 
+    get :show, params: { id: 1, Shamu::Features::EnvStore::RACK_PARAMS_KEY => override }
   end
 
 end

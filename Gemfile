@@ -3,7 +3,7 @@ source "https://rubygems.org"
 # Specify your gem"s dependencies in shamu.gemspec
 gemspec
 
-gem 'rake'
+gem "rake"
 
 group :test do
   gem "activerecord", "~> 5.0"
@@ -26,7 +26,7 @@ group :test do
   gem "fuubar"
   gem "yard"
   gem "yard-activesupport-concern"
-  gem "simplecov", github: "colszowka/simplecov"
+  gem "simplecov"
   gem "ruby_gntp", "~> 0.3.4"
   gem "awesome_print"
 

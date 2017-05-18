@@ -103,13 +103,13 @@ describe JsonApiControllerSpec::ResourcesController, type: :controller do
   describe "#render_resource" do
     it "adds Location header" do
       get :show, params: { id: 1 }
-      expect( response.headers ).to include 'Location'
+      expect( response.headers ).to include "Location"
     end
   end
 
   describe "#render_result" do
     it "returns status created on #create" do
-      post :create, params: { name: 'example' }
+      post :create, params: { name: "example" }
       expect( response.status ).to eq 201
       expect( response.body ).to include "data"
     end
@@ -203,7 +203,7 @@ describe JsonApiControllerSpec::ResourcesController, type: :controller do
           },
           relationships: {
             book: {
-              data: { type: "book", id: "5", attributes: { title: "Bibliography" }  }
+              data: { type: "book", id: "5", attributes: { title: "Bibliography" } }
             },
             stores: {
               data: [

@@ -81,7 +81,7 @@ describe Shamu::Services::RequestSupport do
         end.request_class( :change )
       end.to raise_error Shamu::Services::IncompleteSetupError, /Request/
     end
-    
+
     it "singularizes service namespace" do
       service = scorpion.new RequestSupportSpec::UsersService
       expect( service.request_class( :change ) ).to be RequestSupportSpec::UserRequest::Change
