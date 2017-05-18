@@ -35,12 +35,13 @@ module Shamu
                 controller.json_resource resource, **given_options
               end
 
-            super json, given_options
+            super json.to_json, given_options
           end
 
           # @visibility private
           def display_errors
-            controller.render format => controller.json_validation_errors( resource_errors ), :status => :unprocessable_entity # rubocop:disable Metrics/LineLength
+            controller.render format => controller.json_validation_errors( resource_errors ).to_json,
+                              :status => :unprocessable_entity
           end
 
         private

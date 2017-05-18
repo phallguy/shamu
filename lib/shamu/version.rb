@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 module Shamu
   # The primary version number
-  VERSION_NUMBER  = "0.0.12".freeze
+  VERSION_NUMBER  = "0.0.13"
 
   # Version suffix such as 'beta' or 'alpha'
-  VERSION_SUFFIX  = "".freeze
+  VERSION_SUFFIX  = ""
 
   # Published version number
-  VERSION         = "#{ VERSION_NUMBER }#{ VERSION_SUFFIX }".freeze
+  VERSION         = "#{ VERSION_NUMBER }#{ VERSION_SUFFIX }"
 end

@@ -54,11 +54,11 @@ describe Shamu::Services::Service do
   let( :service ) { scorpion.new ServiceSpec::Service }
 
   def transformer( &block )
-    ->( records ) {
+    ->( records ) do
       records.map do |r|
         yield || r
       end
-    }
+    end
   end
 
 
@@ -136,7 +136,7 @@ describe Shamu::Services::Service do
     end
 
     it "matches on a custom field" do
-      list = service.entity_lookup_list( records, [record.amount], ServiceSpec::NullEntity, match: :amount ) do |records|
+      list = service.entity_lookup_list( records, [record.amount], ServiceSpec::NullEntity, match: :amount ) do |records| # rubocop:disable Metrics/LineLength
         records.map { |r| scorpion.fetch ServiceSpec::Entity, { record: r }, {} }
       end
 
@@ -145,7 +145,7 @@ describe Shamu::Services::Service do
 
     it "matches with a custom proc" do
       matcher = ->( record ) { record.amount }
-      list = service.entity_lookup_list( records, [record.amount], ServiceSpec::NullEntity, match: matcher ) do |records|
+      list = service.entity_lookup_list( records, [record.amount], ServiceSpec::NullEntity, match: matcher ) do |records| # rubocop:disable Metrics/LineLength
         records.map { |r| scorpion.fetch ServiceSpec::Entity, { record: r }, {} }
       end
 

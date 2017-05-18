@@ -89,7 +89,7 @@ module Shamu
       # @return [self]
       # @raise [ServiceRequestFailedError] if the result was not valid.
       def valid!
-        raise ServiceRequestFailedError.new( self ) unless valid?
+        raise ServiceRequestFailedError, self unless valid?
         self
       end
 

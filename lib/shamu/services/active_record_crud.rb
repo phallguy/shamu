@@ -163,6 +163,8 @@ module Shamu
           end
         end
 
+        # rubocop:disable Metrics/MethodLength
+
         # Define an change `method` on the service that takes the id of the
         # resource to modify and a corresponding {Request} parameter.
         #
@@ -194,6 +196,9 @@ module Shamu
             end
           end
         end
+
+        # rubocop:enabled Metrics/MethodLength
+
 
         # Define an `update` method on the service that takes the id of the
         # resource to update and a {Request} parameter. After applying the
@@ -252,7 +257,7 @@ module Shamu
             define_method :find do |id|
               wrap_not_found do
                 record = yield( id )
-                authorize! :read, build_entities( record )
+                authorize! :read, build_entity( record )
               end
             end
           else

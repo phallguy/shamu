@@ -119,7 +119,7 @@ module Shamu
           def request_class_namespace
             @request_class_namespace ||= ( name || "" ).sub( /(Service)?$/, "" )
                                                        .singularize
-                                                       .concat( 'Request' )
+                                                       .concat( "Request" )
                                                        .constantize
           rescue NameError
             self

@@ -4,12 +4,12 @@ describe Shamu::Services::LazyTransform do
   let( :source ) { [ 1, 2, 3 ] }
 
   def transformer( &block  )
-    ->( records ) {
+    ->( records ) do
       records.map do |r|
         yield
         r
       end
-    }
+    end
   end
 
   it "short-circuits count" do
@@ -69,7 +69,7 @@ describe Shamu::Services::LazyTransform do
   end
 
   it "yields transformed values" do
-    transformed = Shamu::Services::LazyTransform.new( source ) { |vs| vs.map { |v| v * v  } }
+    transformed = Shamu::Services::LazyTransform.new( source ) { |vs| vs.map { |v| v * v } }
     expect( transformed.to_a ).to eq [ 1, 4, 9 ]
   end
 

@@ -58,7 +58,6 @@ module Shamu
         # @param [Object] value the value to be coerced.
         # @return [Object]
         def attribute_value( value )
-          tap{ |o| binding.pry; o }
           case value
           when Date, DateTime then
             value.to_date.iso8601

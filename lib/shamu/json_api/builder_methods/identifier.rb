@@ -35,7 +35,7 @@ module Shamu
             type = type.model_name.element         if type.respond_to?( :model_name )
             type = type.name.demodulize.underscore if type.is_a?( Module )
 
-            type
+            type.to_s
           end
 
           def require_identifier!

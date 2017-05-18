@@ -298,7 +298,10 @@ describe Shamu::Services::ActiveRecordCrud do
     it "yields to block if block given" do
       find_klass = Class.new( klass )
       expect do |b|
-        find_klass.find( &b )
+        find_klass.find do |_|
+          b.to_proc.call
+          ActiveRecordSpec::Favorite.all.first
+        end
         scorpion.new( find_klass ).find( entity.id )
       end.to yield_control
     end

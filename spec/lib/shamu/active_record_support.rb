@@ -4,8 +4,8 @@ require "shamu/entities/active_record"
 module ActiveRecordSpec
   class Favorite < ::ActiveRecord::Base
     self.table_name = "favorites"
-    extend Shamu::Entities::ActiveRecord
-    include Shamu::Entities::ActiveRecordSoftDestroy
+    extend ::Shamu::Entities::ActiveRecord
+    include ::Shamu::Entities::ActiveRecordSoftDestroy
 
     scope :by_name, ->( name ) { where( name: name ) }
     scope :by_label, ->( label ) { where( label: label ) }

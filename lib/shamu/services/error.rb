@@ -27,7 +27,7 @@ module Shamu
       def initialize( result )
         @result = result
 
-        super translate( :service_request_failed, errors: result.errors.full_messages.join( ', ' ) )
+        super translate( :service_request_failed, errors: result.errors.full_messages.join( ", " ) )
       end
     end
   end

@@ -1,10 +1,6 @@
 require "simplecov"
-if ENV[ "COVERAGE" ]
-  require "codeclimate-test-reporter"
-  CodeClimate::TestReporter.start
-else
-  SimpleCov.start
-end
+SimpleCov.start
+
 require "pry"
 require "bundler/setup"
 
@@ -24,7 +20,8 @@ RSpec.configure do |config|
 
   config.order = "random"
 
-  config.filter_gems_from_backtrace "activesupport", "actionpack", "actionview", "scorpion-ioc", "rspec-wait", "rspec-core", "rspec", "rspec-support", "rspec-expectations"
+  config.filter_gems_from_backtrace "activesupport", "actionpack", "actionview", "scorpion-ioc", "rspec-wait",
+                                    "rspec-core", "rspec", "rspec-support", "rspec-expectations"
 
   config.filter_run focus: true
   config.filter_run_excluding :broken => true
