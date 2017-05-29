@@ -16,7 +16,7 @@ group :test do
 
   gem "sqlite3", "~> 1.3.11"
   gem "guard", "~> 2.12.8"
-  gem "rubocop", "~> 0.39.0"
+  gem "rubocop", "~> 0.49.0"
   gem "guard-rubocop"
   gem "spring"
   gem "guard-rspec"
@@ -26,10 +26,10 @@ group :test do
   gem "fuubar"
   gem "yard"
   gem "yard-activesupport-concern"
-  gem "simplecov"
+  gem "simplecov", "~> 0.14"
   gem "ruby_gntp", "~> 0.3.4"
   gem "awesome_print"
 
-  gem "codeclimate-test-reporter", group: :test, require: nil
+  gem "codeclimate-test-reporter", "~> 1.0 ", group: :test, require: nil
   gem "rspec_junit_formatter", "~> 0.2.2", platforms: :mri
 end

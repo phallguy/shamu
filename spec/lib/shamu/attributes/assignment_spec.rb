@@ -59,6 +59,49 @@ describe Shamu::Attributes::Assignment do
     expect( instance.q ).to eq "ABC"
   end
 
+  describe "#assigned_attributes" do
+    let( :klass ) do
+      Class.new do
+        include Shamu::Attributes
+        include Shamu::Attributes::Assignment
+
+        attribute :name
+        attribute :email
+      end
+    end
+
+    it "identifies attributes assigned in constructor" do
+      instance = klass.new name: "set"
+
+      expect( instance.assigned_attributes ).to include :name
+      expect( instance.assigned_attributes ).not_to include :email
+      expect( instance.unassigned_attributes ).to include :email
+    end
+
+    it "does not identity attributes memoized by reading" do
+      instance = klass.new name: "set"
+
+      expect( instance.email ).to be_nil
+      expect( instance.assigned_attributes ).to include :name
+      expect( instance.assigned_attributes ).not_to include :email
+      expect( instance.set?( :email ) ).to be_truthy
+    end
+
+    it "identifies attributes assigned explicitly" do
+      instance = klass.new
+      instance.name = "set"
+
+      expect( instance.assigned_attributes ).to include :name
+      expect( instance.assigned_attributes ).not_to include :email
+    end
+
+    it "identifies attribute_assigned?" do
+      instance = klass.new name: "set"
+      expect( instance.name_assigned? ).to be_truthy
+    end
+  end
+
+
   describe "coercion" do
     it "coerces using given method name" do
       klass = Class.new( base_klass ) do
@@ -83,6 +126,19 @@ describe Shamu::Attributes::Assignment do
       expect( instance.label ).to eq "coerced"
     end
 
+    it "coerces using a class" do
+      coerce_class = Class.new do
+        def initialize( v ); end
+      end
+
+      klass = Class.new( base_klass ) do
+        attribute :label, coerce: coerce_class
+      end
+
+      instance = klass.new( label: "original" )
+      expect( instance.label ).to be_a coerce_class
+    end
+
     describe "smart" do
       let( :klass ) do
         Class.new( base_klass ) do
@@ -91,6 +147,7 @@ describe Shamu::Attributes::Assignment do
 
           attribute :user_id
           attribute :tag_ids
+          attribute :id
         end
       end
       let( :instance ) { klass.new }
@@ -109,16 +166,23 @@ describe Shamu::Attributes::Assignment do
         instance.expire_on = value
       end
 
-      it "coerces nnn_id to an Integer" do
+      it "coerces nnn_id to a model id" do
         value = double
-        expect( value ).to receive( :to_i )
+        expect( value ).to receive( :to_model_id )
 
         instance.user_id = value
       end
 
-      it "coerces nnn_ids to an array of Integers" do
+      it "coerces id to a model id" do
         value = double
-        expect( value ).to receive( :to_i )
+        expect( value ).to receive( :to_model_id )
+
+        instance.id = value
+      end
+
+      it "coerces nnn_ids to an array o model ids" do
+        value = double
+        expect( value ).to receive( :to_model_id )
 
         instance.tag_ids = value
       end

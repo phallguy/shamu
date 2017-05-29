@@ -101,7 +101,7 @@ module Shamu
         #
         # @param [Enumerable] records the raw list of records.
         # @yield (record)
-        # @yieldparam [Object] record the raw value from the `list` to to
+        # @yieldparam [Enumerable<Object>] records the raw values from the `list` to
         #     transform to an {Entities::Entity}.
         # @yieldreturn [Entities::Entity]
         # @return [Entities::List]
@@ -112,8 +112,16 @@ module Shamu
             transformer ||= method( :build_entities )
           end
 
-          Entities::List.new LazyTransform.new( records, &transformer )
+          build_entity_list build_records_transform( records, &transformer )
         end
+
+          def build_records_transform( records, &transformer )
+            LazyTransform.new( records, &transformer )
+          end
+
+          def build_entity_list( source )
+            Entities::List.new source
+          end
 
         # @!visibility public
         # Match a list of records with the ids used to look up those records.
@@ -219,7 +227,7 @@ module Shamu
         # @!visibility public
         #
         # Find an associated entity from a dependent service. Attempts to
-        # effeciently handle multiple requests to lookup associations by caching
+        # efficiently handle multiple requests to lookup associations by caching
         # all the associated entities when {#lookup_association} is used
         # repeatedly when building an entity.
         #

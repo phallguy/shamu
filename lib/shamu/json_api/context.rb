@@ -95,7 +95,6 @@ module Shamu
         presenter
       end
 
-
       # @return [Hash] of request param options to be output in the response meta.
       def params_meta
         return unless fields.any?

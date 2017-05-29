@@ -56,6 +56,10 @@ describe Shamu::Attributes do
     it "is false if the attribute has not been set" do
       expect( klass.new ).not_to be_set :name
     end
+
+    it "has per attribute set? method" do
+      expect( klass.new( name: "Set" ).name_set? ).to be_truthy
+    end
   end
 
 

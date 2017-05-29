@@ -110,7 +110,6 @@ module Shamu
             end
 
             dispatch_messages( state, runner_id, limit )
-
           ensure
             mutex.synchronize do
               state[ :dispatching ] = false

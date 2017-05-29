@@ -76,7 +76,6 @@ module Shamu
         !retire_at || context.time > retire_at
       end
 
-
       def initialize( attributes )
         fail ArgumentError, "Must provide a retire_at attribute for '#{ attributes[ 'name' ] }' toggle." unless attributes["retire_at"] # rubocop:disable Metrics/LineLength
         fail ArgumentError, "Type must be one of #{ TYPES } for '#{ attributes[ 'name' ] }' toggle." unless TYPES.include?( attributes["type"] ) # rubocop:disable Metrics/LineLength
@@ -107,7 +106,7 @@ module Shamu
           def load_from_path( path, toggles, state )
             path = File.expand_path( path, state.file_path )
             File.open( path, "r" ) do |file|
-              yaml = YAML.load( file.read )
+              yaml = YAML.load( file.read ) # rubocop:disable  Security/YAMLLoad
               parse_node( yaml, toggles, ParsingState.new( state.name, File.dirname( path ) ) )
             end
           end

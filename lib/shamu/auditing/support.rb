@@ -26,6 +26,14 @@ module Shamu
 
         # @!visibility public
         #
+        # Same as {#audit_request} but does not validate the request before
+        # yielding to the block.
+        def audit_partial_request( params, request_class, action: :smart, &block )
+          perform_audit_request( :with_partial_request, params, request_class, action: action, &block )
+        end
+
+        # @!visibility public
+        #
         # Audit the requested changes and report the request to the
         # {#auditing_service}.
         #
@@ -40,10 +48,14 @@ module Shamu
         #     should call {Transaction#append_entity} to include any parent
         #     entities in the entity path.
         def audit_request( params, request_class, action: :smart, &block )
+          perform_audit_request( :with_request, params, request_class, action: action, &block )
+        end
+
+        def perform_audit_request( method, params, request_class, action: :smart, &block )
           transaction = Transaction.new \
             user_id_chain: auditing_security_principal.user_id_chain
 
-          result = with_request params, request_class do |request|
+          result = send method, params, request_class do |request|
             transaction.action  = audit_request_action( request, action )
             transaction.changes = request.to_attributes
 

@@ -47,6 +47,20 @@ describe Shamu::Services::LazyTransform do
     end.to yield_control.exactly(3)
   end
 
+  it "short-circuits last" do
+    expect do |block|
+      transformed = Shamu::Services::LazyTransform.new( source, &transformer( &block ) )
+      transformed.last
+    end.to yield_control.once
+  end
+
+  it "doesn't short-circuit last(n)" do
+    expect do |block|
+      transformed = Shamu::Services::LazyTransform.new( source, &transformer( &block ) )
+      transformed.last( 2 )
+    end.to yield_control.exactly(3)
+  end
+
   it "short-circuits empty?" do
     expect do |block|
       transformed = Shamu::Services::LazyTransform.new( source, &transformer( &block ) )

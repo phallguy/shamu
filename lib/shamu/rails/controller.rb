@@ -59,7 +59,6 @@ module Shamu
           secure_services.any? { |s| s.permit?( *args ) }
         end
 
-
         # @!visibility public
         #
         # Gets the security principal for the current request.

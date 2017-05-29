@@ -23,6 +23,10 @@ describe Shamu::ToModelIdExtension do
     it "returns self for an integer" do
       expect( 789.to_model_id ).to eq 789
     end
+
+    it "returns nil for nil" do
+      expect( nil.to_model_id ).to eq nil
+    end
   end
 
   describe Shamu::ToModelIdExtension::Enumerables do

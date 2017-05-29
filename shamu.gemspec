@@ -1,4 +1,5 @@
 # coding: utf-8
+
 lib = File.expand_path( "../lib", __FILE__ )
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require "shamu/version"
@@ -23,7 +24,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "activemodel", ">= 5.0"
   spec.add_dependency "activesupport", ">= 5.0"
   spec.add_dependency "scorpion-ioc", "~> 0.6"
-  spec.add_dependency "multi_json", "~> 1.11.2"
+  spec.add_dependency "multi_json", "~> 1.11"
   spec.add_dependency "rack", ">= 1"
   spec.add_dependency "listen", "~> 3"
   spec.add_dependency "crc32", "~> 1"

@@ -55,7 +55,6 @@ module Shamu
         @roles     = roles || []
       end
 
-
       # Authorize the given `action` on the given resource. If it is not
       # {#permit? permitted} then an exception is raised.
       #

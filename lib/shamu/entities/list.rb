@@ -16,10 +16,16 @@ module Shamu
         entities.each( &block )
       end
 
-      delegate :first, :count, :empty?, to: :raw_entities
+      delegate :first, :last, :count, :empty?, :index, to: :raw_entities
 
       alias_method :size, :count
       alias_method :length, :count
+
+      # @return [Boolean] true if the list represents a slice of a larger set.
+      # See {PagedList} for paged implementation.
+      def paged?
+        false
+      end
 
       # Get an entity by it's primary key.
       # @param [Object] key the primary key to look for.

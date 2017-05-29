@@ -234,7 +234,6 @@ module Shamu
               presenters: presenters == :not_set ? json_context_presenters : presenters
           end
 
-
           # See (Shamu::Rails::Entity#request_params)
           def request_params( param_key )
             if relationships = json_request_payload[ :relationships ]
@@ -290,7 +289,6 @@ module Shamu
                 json ? json[ :data ] : {}
               end
           end
-
 
           def json_context_fields
             params[:fields]

@@ -43,7 +43,7 @@ module Shamu
       extend ActiveSupport::Concern
 
       # Known DSL methods defined by {ActiveRecordCrud}.
-      DSL_METHODS = %i( create update change destroy find list lookup finders ).freeze
+      DSL_METHODS = %i[ create update change destroy find list lookup finders ].freeze
 
       included do |base|
         base.include Shamu::Services::RequestSupport
@@ -173,15 +173,21 @@ module Shamu
         # @yieldparam (see .apply_changes)
         # @return [Result] the result of the request.
         # @return [void]
-        def change( method = :update, &block )
+        def change( method = :update, &block ) # rubocop:disable Metrics/PerceivedComplexity, Metrics/AbcSize
           define_method method do |id, params = nil|
             klass = request_class( method )
 
-            id, params = id.id, id if id.is_a?( klass ) && !params
+            params, id = id, id[ :id ] if !params && !id.respond_to?( :to_model_id )
 
-            with_request params, klass do |request|
-              record = model_class.find( id.to_model_id )
-              authorize! method, build_entity( record ), request
+            with_partial_request params, klass do |request|
+              record = model_class.find( id.to_model_id || request.id )
+              entity = build_entity( record )
+
+              backfill_attributes = entity.to_attributes( only: request.unassigned_attributes )
+              request.assign_attributes backfill_attributes
+              next unless request.valid?
+
+              authorize! method, entity, request
 
               request.apply_to( record )
 
@@ -211,6 +217,26 @@ module Shamu
         # @return [void]
         def update( &block )
           change :update, &block
+        end
+
+        # Define a `destroy( id )` method that takes an {Entities::Entity} {Entities::Entity#id}
+        # and destroys the resource.
+        #
+        # @param [ActiveRecord::Relation] default_scope to use when finding
+        #     records.
+        # @return [void]
+        def destroy( default_scope = model_class.all )
+          define_method :destroy do |params|
+            klass = request_class( :destroy )
+
+            params = { id: params } if params.respond_to?( :to_model_id )
+
+            with_request params, klass do |request|
+              record = default_scope.find( request.id )
+              authorize! :destroy, build_entity( record )
+              next record unless record.destroy
+            end
+          end
         end
 
         # Define a private method `apply_changes` on the service used by the
@@ -308,22 +334,6 @@ module Shamu
             records    = authorize_relation( :read, records, list_scope )
 
             entity_list records
-          end
-        end
-
-        # Define a `destroy( id )` method that takes an {Entities::Entity} {Entities::Entity#id}
-        # and destroys the resource.
-        #
-        # @param [ActiveRecord::Relation] default_scope to use when finding
-        #     records.
-        # @return [void]
-        def destroy( default_scope = model_class.all )
-          define_method :destroy do |id|
-            wrap_not_found do
-              record = default_scope.find( id.to_model_id )
-              authorize! :destroy, build_entity( record )
-              record.destroy
-            end
           end
         end
 

@@ -75,7 +75,6 @@ module Shamu
             end
 
             dispatch_messages( state )
-
           ensure
             mutex.synchronize do
               state[ :dispatching ] = false

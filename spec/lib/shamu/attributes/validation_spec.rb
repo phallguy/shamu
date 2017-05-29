@@ -50,4 +50,12 @@ describe Shamu::Attributes::Validation do
     instance.valid?
     instance.valid?
   end
+
+  it "supports shamu validators with simple hash names" do
+    nested = Class.new( klass ) do
+      attribute :nested, valid: true
+    end
+
+    expect( nested.validators ).to include Shamu::Attributes::Validators::ValidValidator
+  end
 end

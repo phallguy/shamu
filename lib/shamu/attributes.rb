@@ -27,7 +27,9 @@ module Shamu
     require "shamu/attributes/assignment"
     require "shamu/attributes/fluid_assignment"
     require "shamu/attributes/validation"
+    require "shamu/attributes/validators"
     require "shamu/attributes/equality"
+    require "shamu/attributes/camel_case"
     require "shamu/attributes/html_sanitation"
 
     def initialize( *attributes )
@@ -108,19 +110,18 @@ module Shamu
 
       def build_value( build, value )
         if build.is_a?( Class )
-          klass = build
-          build = ->(v) { klass.new( v ) }
+          build.new( value )
+        else
+          build.call( value )
         end
-
-        build.call( value )
       end
 
       def resolve_attributes( attributes )
         if attributes.respond_to?( :to_attributes )
           attributes.to_attributes
         # Allow protected attributes to be used without explicitly being set.
-        # All 'Attributes' classes are them selves the explicit set of permitted
-        # attributes.
+        # All 'Attributes' classes are themselves the explicit set of permitted
+        # attributes so there is no danger of 'over assignment'.
         elsif attributes.respond_to?( :to_unsafe_h )
           attributes.to_unsafe_h
         elsif attributes.respond_to?( :to_hash )
@@ -161,7 +162,7 @@ module Shamu
       #     to.
       # @param [Object,#call] default value if not set.
       # @param [Class,#call] build method used to build a nested object on
-      #     assignement of a hash with nested keys.
+      #     assignment of a hash with nested keys.
       # @param [Boolean] serialize true if the attribute should be included in
       #   {#to_attributes}. Default true.
       # @yieldreturn the value of the attribute. The result is memoized so the
@@ -203,7 +204,7 @@ module Shamu
         # @return [Array<Symbol>] keys used by the {.attribute} method options
         #   argument. Used by {Attributes::Validation} to filter option keys.
         def attribute_option_keys
-          [ :on, :build, :default, :serialize ]
+          [ :on, :build, :default, :serialize, :as ]
         end
 
         def create_attribute( name, *args, **options )
@@ -218,6 +219,10 @@ module Shamu
             def #{ name }                                           # def attribute
               return @#{ name } if defined? @#{ name }              #   return @attribute if defined? @attribute
               @#{ name } = fetch_#{ name }                          #   @attribute = fetch_attribute
+            end                                                     # end
+
+            def #{ name }_set?                                      # def attribute_set?
+              defined? @#{ name }                                   #   defined? @attribute
             end                                                     # end
           RUBY
 
