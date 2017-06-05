@@ -3,7 +3,6 @@ module Shamu
 
     # An audit record of a discrete change transaction.
     class Transaction < Services::Request
-      include Shamu::Attributes
       include Entities::EntityPath
 
       # ============================================================================
