@@ -24,11 +24,11 @@ module Shamu
     class ListScope
       include Attributes
       include Attributes::Assignment
-      include Attributes::FluidAssignment
       include Attributes::Validation
 
       require "shamu/entities/list_scope/paging"
       require "shamu/entities/list_scope/scoped_paging"
+      require "shamu/entities/list_scope/window_paging"
       require "shamu/entities/list_scope/dates"
       require "shamu/entities/list_scope/sorting"
 

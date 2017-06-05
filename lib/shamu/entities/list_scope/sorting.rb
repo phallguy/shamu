@@ -42,7 +42,7 @@ module Shamu
         def self.included( base )
           super
 
-          base.attribute :sort_by, coerce: ->( *values ) { parse_sort_by( values ) }
+          base.attribute :sort_by, as: :order, coerce: ->( *values ) { parse_sort_by( values ) }
         end
 
         # @return [Boolean] true if the scope is paged.
@@ -50,7 +50,26 @@ module Shamu
           !!sort_by
         end
 
+        # @return [Hash] gets a normalized hash of attribute to direction with
+        # all transforms applied.
+        def sort_by_resolved
+          return sort_by unless reverse_sort?
+
+          sort_by.each_with_object( {} ) do |( attribute, direction ), resolved|
+            resolved[ attribute ] = direction == :asc ? :desc : :asc
+          end
+        end
+
         private
+
+          def reverse_sort?
+            @reverse_sort
+          end
+
+          def reverse_sort!
+            @reverse_sort = true
+            self.sort_by = { id: :asc } unless sort_by_set?
+          end
 
           def parse_sort_by( arguments )
             Array( arguments ).each_with_object( {} ) do |arg, sorted|

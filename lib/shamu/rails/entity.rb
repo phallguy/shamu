@@ -21,7 +21,7 @@ module Shamu
           return unless service.respond_to?( :request_for )
           return unless request = service.request_for( action, entity )
 
-          param_key ||= entity.model_name.param_key
+          param_key ||= entity.model_name.param_key if entity
           request.assign_attributes( request_params( param_key ) )
 
           service.authorize!( action, entity, request ) if service.respond_to?( :authorize! )

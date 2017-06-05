@@ -21,11 +21,15 @@ describe Shamu::Entities::ListScope::Paging do
   end
 
   it "uses default_per_page if not per_page set" do
-    expect( klass.new.per_page ).to eq 25
+    scope = klass.new
+    scope.default_per_page = 25
+    expect( scope.per_page ).to eq 25
   end
 
   it "includes paging values in to_param" do
-    expect( klass.new.params ).to eq page: nil, per_page: 25
+    scope = klass.new
+    scope.default_per_page = 25
+    expect( scope.params ).to eq page: nil, per_page: 25
   end
 
   it "should not be paged if using defaults" do

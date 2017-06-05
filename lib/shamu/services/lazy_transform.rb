@@ -53,6 +53,22 @@ module Shamu
         end
       end
 
+      # Get the last transformed value without transforming the entire list.
+      # @overload last(n)
+      # @overload last
+      # @return [Object]
+      def last( *args )
+        if args.any?
+          transformed.last( *args )
+        else
+          return @last if defined? @last
+          @last = begin
+            value = source.last
+            raise_if_not_transformed( transformer.call( [ value ] ) ).last unless value.nil?
+          end
+        end
+      end
+
       # @return [Boolean] true if there are no source values.
       def empty?
         source.empty?
@@ -78,6 +94,21 @@ module Shamu
         else
           self.class.new( source.drop( n ), &transformer )
         end
+      end
+
+      # For all other methods, force a transform then delegate to the
+      # transformed list.
+
+      def method_missing( name, *args, &block )
+        if respond_to_missing?( name, false )
+          source.public_send( name, *args, &block )
+        else
+          super
+        end
+      end
+
+      def respond_to_missing?( *args )
+        super || source.respond_to?( *args )
       end
 
       private

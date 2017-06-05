@@ -53,6 +53,22 @@ module Shamu
           end
         end
 
+        # @param [ActiveRecord::Relation, Enumerable] source
+        # @return [Boolean] true if the source supports paging and has paging
+        # constraints set.
+        def source_paged?( source )
+          source.respond_to?( :current_page ) && !!source.current_page
+        end
+
+        # (see Service#build_entity_list)
+        def build_entity_list( source )
+          if source_paged?( source )
+            Shamu::Entities::PagedList.new( source )
+          else
+            super
+          end
+        end
+
     end
   end
 end

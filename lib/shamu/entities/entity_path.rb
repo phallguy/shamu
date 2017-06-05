@@ -1,14 +1,13 @@
 module Shamu
   module Entities
 
-    # An entity path descrives one or more levels of parent/child relationships
+    # An entity path describes one or more levels of parent/child relationships
     # that can be used to navigate from the root entity to a target entity.
     #
     # Entity paths can be used to identify polymorphic relationships between
     # entities managed by difference services.
     module EntityPath
-      module_function
-
+      extend self # rubocop:disable Style/ModuleFunction
 
       # Composes an array of entities describing the path from the root entity
       # to the leaf into a string.
@@ -29,12 +28,10 @@ module Shamu
       def compose_entity_path( entities )
         return unless entities.present?
 
-        entities.each_with_object( "" ) do |entity, path|
-          path << "/" if path.present?
-          path << compose_single_entity( entity )
-        end
+        entities.map do |entity|
+          compose_single_entity( entity )
+        end.join( "/" )
       end
-
 
       # Decompose an entity path into an array of arrays of entity classes with
       # their ids.

@@ -11,6 +11,7 @@ module Shamu
       Integer.include Integers
       String.include Strings
       Array.include Enumerables
+      NilClass.include Integers
 
       ActiveRecord::Base.include Models if defined? ActiveRecord::Base
     end

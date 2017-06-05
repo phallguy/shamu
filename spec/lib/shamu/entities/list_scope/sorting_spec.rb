@@ -18,12 +18,6 @@ describe Shamu::Entities::ListScope::Paging do
     expect( scope.sort_by ).to eq first_name: :asc, last_name: :asc
   end
 
-  it "parses array of args to fluid_assignment" do
-    scope = klass.new
-    scope.sort_by :first_name, :last_name
-    expect( scope.sort_by ).to eq first_name: :asc, last_name: :asc
-  end
-
   it "parses array via assignment" do
     scope = klass.new
     scope.sort_by = [ :first_name, :last_name ]

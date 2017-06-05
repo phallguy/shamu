@@ -12,6 +12,30 @@ module Shamu
         public :assign_attributes
       end
 
+      # @return [Array<Symbol>] the attributes that have been assigned.
+      def assigned_attributes
+        @assigned_attributes.to_a || []
+      end
+
+      # @return [Array<Symbol>] the attributes that have not been assigned.
+      def unassigned_attributes
+        self.class.attributes.keys - assigned_attributes
+      end
+
+      # @return [Boolean] true if the attribute as explicitly been defined -
+      # not just present/memoized.
+      def assigned?( name )
+        assigned_attributes.include?( name )
+      end
+
+      private
+
+        def assigned_attribute!( name )
+          @assigned_attributes ||= Set.new
+          @assigned_attributes << name
+        end
+
+
       class_methods do
 
         # Define a new attribute for the class.
@@ -36,7 +60,7 @@ module Shamu
         #     attribute :tags, coerce: :to_s, array: true
         #   end
         def attribute( name, *args, **options, &block )
-          super
+          super( name, *args, **options )
           define_attribute_assignment( name, **options )
           define_attribute_writer( name, **options )
         end
@@ -52,6 +76,7 @@ module Shamu
 
             class_eval <<-RUBY, __FILE__, __LINE__ + 1
               def assign_#{ name }( *values )
+                assigned_attribute!( :#{ name } )
                 @#{ name } = coerce_#{ name }#{ array ? '_array' : '' }( *values )
               end
             RUBY
@@ -73,10 +98,14 @@ module Shamu
             private :"coerce_#{ name }_array"
           end
 
-          def define_attribute_coercion( name, coerce )
+          def define_attribute_coercion( name, coerce ) # rubocop:disable Metrics/PerceivedComplexity
             coerce = cource_method( name, coerce )
 
-            if !coerce || coerce.is_a?( Symbol )
+            if coerce.is_a?( Class )
+              define_method :"coerce_#{ name }" do |value|
+                coerce.new( value ) if value
+              end
+            elsif !coerce || coerce.is_a?( Symbol )
               class_eval <<-RUBY, __FILE__, __LINE__ + 1
                 def coerce_#{ name }( value )
                   value#{ coerce && ".#{ coerce }" }
@@ -93,7 +122,7 @@ module Shamu
             if coerce == :smart
               case name
               when /_at$/, /_on$/ then :to_datetime
-              when /_ids?$/       then :to_i
+              when /(^|_)ids?$/   then :to_model_id
               end
             else
               coerce
@@ -105,6 +134,16 @@ module Shamu
             public :"#{ name }="
 
             alias_method :"#{ as }=", :"#{ name }=" if as
+          end
+
+          def define_attribute_reader( name, as: nil, ** )
+            super
+
+            class_eval <<-RUBY, __FILE__, __LINE__ + 1
+              def #{ name }_assigned?                # def attribute_assigned?
+                assigned?( :#{ name } )              #   assigned( :attribute )
+              end                                    # end
+            RUBY
           end
 
       end

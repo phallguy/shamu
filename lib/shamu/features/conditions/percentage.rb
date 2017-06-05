@@ -25,9 +25,9 @@ module Shamu
 
           def user_id_hash( user_id )
             if user_id.is_a?( Numeric )
-              return user_id
+              user_id
             else
-              return user_id.sub( "-", "" ).to_i( 16 )
+              user_id.sub( "-", "" ).to_i( 16 )
             end
           end
 

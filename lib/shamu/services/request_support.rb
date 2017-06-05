@@ -88,15 +88,16 @@ module Shamu
         # @see #with_request
         def with_partial_request( params, request_class, &block )
           request = request_class.coerce( params )
+          sources = yield( request )
+
           # Make sure the request captures errors even if the block doesn't
           # check
           request.valid?
-          sources = yield( request )
 
           if sources.is_a?( Result )
             sources
           else
-            result request, *Array.wrap( sources )
+            result( *Array.wrap( sources ), request: request )
           end
         end
 

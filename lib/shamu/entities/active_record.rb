@@ -30,6 +30,7 @@ module Shamu
         criteria = apply_custom_list_scope( criteria, scope )
         criteria = apply_paging_scope( criteria, scope )        if scope.respond_to?( :paged? )
         criteria = apply_scoped_paging_scope( criteria, scope ) if scope.respond_to?( :scoped_page? )
+        criteria = apply_window_paging_scope( criteria, scope ) if scope.respond_to?( :window_paged? )
         criteria = apply_dates_scope( criteria, scope )         if scope.respond_to?( :dated? )
         criteria = apply_sorting_scope( criteria, scope )       if scope.respond_to?( :sorted? )
         criteria
@@ -60,7 +61,7 @@ module Shamu
 
         def apply_sorting_scope( criteria, scope )
           if scope.sort_by
-            criteria = scope.sort_by.reduce( criteria ) do |crit, ( field, direction )|
+            criteria = scope.sort_by_resolved.reduce( criteria ) do |crit, ( field, direction )|
               apply_sort( crit, field, direction )
             end
           end
@@ -81,6 +82,18 @@ module Shamu
             criteria = criteria.page( scope.page.number || 1 )
             criteria = criteria.per( scope.page.size ) if scope.page.size
           end
+          criteria
+        end
+
+        def apply_window_paging_scope( criteria, scope )
+          if scope.window_paged?
+            criteria = criteria.page( 1 )
+            criteria = criteria.per( scope.first )      if scope.first
+            criteria = criteria.padding( scope.after )  if scope.after
+            criteria = criteria.per( scope.last )       if scope.last
+            criteria = criteria.padding( scope.before ) if scope.before
+          end
+
           criteria
         end
 
@@ -114,6 +127,7 @@ module Shamu
         class StandardListScopeTemplate < ListScope
           include ListScope::Paging
           include ListScope::ScopedPaging
+          include ListScope::WindowPaging
           include ListScope::Dates
           include ListScope::Sorting
         end

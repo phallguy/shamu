@@ -1,5 +1,6 @@
 require "active_record"
 require "shamu/entities/active_record"
+require "shamu/entities/active_record_soft_destroy"
 
 module ActiveRecordSpec
   class Favorite < ::ActiveRecord::Base
@@ -28,5 +29,10 @@ module ActiveRecordSpec
 
   class FavoriteScope < Shamu::Entities::ListScope
     attribute :name
+  end
+
+  class FavoriteEntity < Shamu::Entities::Entity
+    model :record
+    attribute :name, on: :record
   end
 end

@@ -13,11 +13,7 @@ module Shamu
     class AuditingService < Services::Service
 
       def self.create( scorpion, *args )
-        if defined? ActiveRecord
-          scorpion.fetch Shamu::Auditing::ActiveRecord::Service, *args
-        else
-          fail "No available auditing service available."
-        end
+        scorpion.fetch Shamu::Auditing::LoggingAuditingService, *args
       end
 
       # Records an auditable event in persistent storage.

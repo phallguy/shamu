@@ -23,6 +23,10 @@ module ActiveRecordCrudSpec
       attribute :id
     end
 
+    class Destroy < Change
+      attribute :id
+    end
+
   end
 
   class Service < Shamu::Services::Service
@@ -186,6 +190,11 @@ describe Shamu::Services::ActiveRecordCrud do
 
     it "calls request.apply_to" do
       expect( request ).to receive( :apply_to ).and_call_original
+      service.update entity, request
+    end
+
+    it "backfills missing attributes" do
+      expect( request ).to receive( :assign_attributes ).with( hash_including( label: "Books" ) )
       service.update entity, request
     end
 
@@ -425,7 +434,7 @@ describe Shamu::Services::ActiveRecordCrud do
 
     it "destroys the record" do
       expect do
-        service.destroy entity
+        service.destroy( entity ).valid!
       end.to change( ActiveRecordSpec::Favorite, :count ).by( -1 )
     end
 

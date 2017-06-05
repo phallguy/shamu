@@ -1,6 +1,7 @@
 require "spec_helper"
 require "active_record"
 require "shamu/entities/active_record"
+require "shamu/entities/active_record_soft_destroy"
 
 describe Shamu::Entities::ActiveRecord do
   use_active_record
@@ -35,6 +36,32 @@ describe Shamu::Entities::ActiveRecord do
 
       expect( relation.offset_value ).to eq 0
       expect( relation.limit_value ).to eq 25
+    end
+
+    it "filters by window paging" do
+      klass = Class.new( ActiveRecordSpec::FavoriteScope ) do
+        include Shamu::Entities::ListScope::WindowPaging
+      end
+
+      scope    = klass.new( first: 10, after: 30 )
+      relation = ActiveRecordSpec::Favorite.by_list_scope( scope )
+
+      expect( relation.offset_value ).to eq 30
+      expect( relation.limit_value ).to eq 10
+    end
+
+    it "filters by inverse window paging" do
+      klass = Class.new( ActiveRecordSpec::FavoriteScope ) do
+        include Shamu::Entities::ListScope::WindowPaging
+      end
+
+      scope = klass.new
+      expect( scope ).to receive( :reverse_sort! ).at_least( :once )
+      scope.assign_attributes( last: 10, before: 30 )
+      relation = ActiveRecordSpec::Favorite.by_list_scope( scope )
+
+      expect( relation.offset_value ).to eq 30
+      expect( relation.limit_value ).to eq 10
     end
 
     it "filters by dates" do

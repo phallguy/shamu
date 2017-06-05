@@ -7,7 +7,6 @@ module EntityPathSpec
 end
 
 describe Shamu::Entities::EntityPath do
-  include Shamu::Entities::EntityPath
 
   {
     "User[45]/Calendar[567]/Event[1]" => [
@@ -19,7 +18,7 @@ describe Shamu::Entities::EntityPath do
     "EntityPathSpec::Example[91]"     => [ [ "EntityPathSpec::Example", "91" ] ]
   }.each do |path, entities|
     it "decompose #{ path } to #{ entities }" do
-      expect( decompose_entity_path( path ) ).to eq entities
+      expect( Shamu::Entities::EntityPath.decompose_entity_path( path ) ).to eq entities
     end
   end
 
@@ -34,7 +33,7 @@ describe Shamu::Entities::EntityPath do
     "EntityPathSpec::Example[91]"     => [ EntityPathSpec::ExampleEntity.new( id: 91 ) ]
   }.each do |path, entities|
     it "composes #{ entities } to #{ path }" do
-      expect( compose_entity_path( entities ) ).to eq path
+      expect( Shamu::Entities::EntityPath.compose_entity_path( entities ) ).to eq path
     end
   end
 end

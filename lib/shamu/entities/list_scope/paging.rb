@@ -37,12 +37,12 @@ module Shamu
 
           base.attribute :page, coerce: :to_i
           base.attribute :per_page, coerce: :to_i, default: ->() { default_per_page }
-          base.attribute :default_per_page, coerce: :to_i, default: 25, serialize: false
+          base.attribute :default_per_page, coerce: :to_i, serialize: false
         end
 
         # @return [Boolean] true if the scope is paged.
         def paged?
-          !!page
+          !!page || !!per_page
         end
 
       end

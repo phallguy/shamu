@@ -46,7 +46,11 @@ module Shamu
           super
 
           validation_options = options.each_with_object({}) do |(key, value), opts|
-            opts[key] = value unless attribute_option_keys.include?( key )
+            next if attribute_option_keys.include?( key )
+
+            validator = "#{ key.to_s.camelize }Validator"
+            key = "shamu/attributes/validators/#{ key }" if Shamu::Attributes::Validators.const_defined?( validator.to_sym ) # rubocop:disable Metrics/LineLength
+            opts[ key ] = value
           end
           validates name, validation_options if validation_options.any?
         end
@@ -67,6 +71,14 @@ module Shamu
           @validated = true
           run_validations!
         end
+
+        private
+
+          def assign_attribute!( * )
+            # If any attribute changes we should re-run the validations
+            @validated = false
+            super
+          end
       end
 
     end

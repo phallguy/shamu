@@ -1,6 +1,24 @@
 AllCops:
   TargetRubyVersion: 2.3
 
+  Exclude:
+    - "bin/*"
+    - "vendor/bundle/**/*"
+
+Bundler/OrderedGems:
+  Enabled: false
+
+Style/EmptyMethod:
+  Enabled: false
+
+Style/ParallelAssignment:
+  Enabled: false
+
+Lint/AmbiguousBlockAssociation:
+  Enabled: false
+
+Lint/UselessAccessModifier:
+  Enabled: false
 
 Lint/AmbiguousRegexpLiteral:
   Enabled: false
@@ -10,7 +28,6 @@ Lint/AssignmentInCondition:
 
 Lint/UnusedMethodArgument:
   Enabled: false
-
 
 Metrics/ClassLength:
   Max: 500
@@ -33,22 +50,25 @@ Metrics/ModuleLength:
 Metrics/ParameterLists:
   CountKeywordArgs: false
 
+Metrics/BlockLength:
+  Enabled: false
+
 Style/Alias:
   Enabled: false
 
-Style/CommentIndentation:
+Layout/CommentIndentation:
   Enabled: false
 
-Style/EmptyLines:
+Layout/EmptyLines:
   Enabled: false
 
-Style/EmptyLinesAroundBlockBody:
+Layout/EmptyLinesAroundBlockBody:
   Enabled: false
 
-Style/EmptyLinesAroundClassBody:
+Layout/EmptyLinesAroundClassBody:
   Enabled: false
 
-Style/EmptyLinesAroundModuleBody:
+Layout/EmptyLinesAroundModuleBody:
   Enabled: false
 
 Style/FrozenStringLiteralComment:
@@ -66,26 +86,29 @@ Style/GuardClause:
 Style/HashSyntax:
   Enabled: false
 
-Style/IndentArray:
+Layout/IndentArray:
   Enabled: false
 
-Style/IndentationConsistency:
+Layout/IndentationConsistency:
   Enabled: false
 
-Style/IndentationWidth:
+Layout/IndentationWidth:
   Enabled: false
 
 Style/Lambda:
   Enabled: false
 
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
 Style/MultilineBlockChain:
   Enabled: false
 
-Style/OptionHash:
-  Enabled: true
-
-Style/ParallelAssignment:
+Style/NumericPredicate:
   Enabled: false
+
+Style/OptionHash:
+ Enabled: true
 
 Style/RegexpLiteral:
   Enabled: false
@@ -93,31 +116,43 @@ Style/RegexpLiteral:
 Style/SignalException:
   Enabled: false
 
-Style/SpaceAroundBlockParameters:
+Layout/SpaceAroundBlockParameters:
   Enabled: false
 
-Style/SpaceAroundOperators:
+Style/PercentLiteralDelimiters:
   Enabled: false
 
-Style/SpaceInsideBrackets:
+Layout/SpaceAroundOperators:
   Enabled: false
 
-Style/SpaceInsideParens:
+Layout/SpaceInsideBrackets:
   Enabled: false
 
-Style/SpaceInsideStringInterpolation:
+Layout/SpaceInsideParens:
+  Enabled: false
+
+Layout/SpaceInsideStringInterpolation:
   EnforcedStyle: space
+
+Layout/SpaceInsidePercentLiteralDelimiters:
+  Enabled: false
+
+Style/SpecialGlobalVars:
+  Enabled: false
+
+Style/SymbolArray:
+  Enabled: false
 
 Style/StringLiterals:
   EnforcedStyle: double_quotes
 
-Style/TrailingBlankLines:
+Layout/TrailingBlankLines:
   Enabled: false
 
 Style/TrailingCommaInLiteral:
   Enabled: false
 
-Style/TrivialAccessors:
+Style/WhileUntilModifier:
   Enabled: false
 
 Style/UnneededInterpolation:
