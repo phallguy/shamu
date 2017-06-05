@@ -10,7 +10,8 @@ module Shamu
       #
 
       # @!attribute
-      # @return [Array<Object>] the chain of user ids making the request.
+      # @return [Array<Object>] the chain of user ids from the
+      # {Security::Principal} in place at the time of the request.
       attribute :user_id_chain, presence: true
 
       # @!attribute
@@ -44,13 +45,17 @@ module Shamu
       # (see Services::Request#apply_to)
       def apply_to( model )
         super.tap do
-          model.changes_json = changes.to_json if changes.present?
+          assign_changes_to_model model
         end
       end
 
       private
 
         attr_reader :entities
+
+        def assign_changes_to_model( model )
+          model.changes_json = changes.to_json if changes.present?
+        end
 
     end
   end
