@@ -2,7 +2,6 @@ module Shamu
 
   # {include:file:lib/shamu/auditing/README.md}
   module Auditing
-    require "shamu/auditing/audit_record"
     require "shamu/auditing/auditing_service"
     require "shamu/auditing/logging_auditing_service"
     require "shamu/auditing/list_scope"

@@ -18,7 +18,7 @@ module Shamu
 
       # Records an auditable event in persistent storage.
       # @param [Transaction] transaction
-      # @return [AuditRecord] the persisted record.
+      # @return [Result] indicates if logging was successful
       def commit( transaction )
         fail NotImplementedError
       end
