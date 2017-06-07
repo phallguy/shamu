@@ -12,6 +12,12 @@ module Shamu
         public :assign_attributes
       end
 
+      # @param [Symbol] name of the attribute to assign.
+      # @param [Object] value to assign.
+      def []=( name, value )
+        send :"assign_#{ name }", value if attribute?( name )
+      end
+
       # @return [Array<Symbol>] the attributes that have been assigned.
       def assigned_attributes
         @assigned_attributes.to_a || []

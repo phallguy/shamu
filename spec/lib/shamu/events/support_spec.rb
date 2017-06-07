@@ -1,5 +1,19 @@
 require "spec_helper"
 
+module EventsSupportSpec
+  class Service < Shamu::Services::Service
+    include Shamu::Events::Support
+
+    public :event!
+  end
+
+  module Events
+    class Boom < Shamu::Events::Message
+      attribute :name
+    end
+  end
+end
+
 describe Shamu::Events::Support do
   describe "#event_channel" do
     {
@@ -27,18 +41,16 @@ describe Shamu::Events::Support do
   describe "event!" do
     hunt( :events_service, Shamu::Events::EventsService )
 
-    let( :klass ) do
-      Class.new( Shamu::Services::Service ) do
-        include Shamu::Events::Support
-
-        public :event!
-      end
-    end
-    let( :service ) { scorpion.new klass }
+    let( :service ) { scorpion.new EventsSupportSpec::Service }
 
     it "publishes message to events_service" do
       expect( events_service ).to receive( :publish )
       service.event! Shamu::Events::Message.new
+    end
+
+    it "creates message from attributes" do
+      expect( events_service ).to receive( :publish )
+      service.event! :boom, name: "Me"
     end
   end
 end

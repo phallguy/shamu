@@ -70,10 +70,10 @@ module Shamu
         #     end
         #   end
         def with_request( params, request_class, &block )
-          with_partial_request params, request_class do |request|
+          with_partial_request params, request_class do |request, *args|
             next unless request.valid?
 
-            yield request
+            yield request, *args
           end
         end
 
@@ -90,15 +90,10 @@ module Shamu
           request = request_class.coerce( params )
           sources = yield( request )
 
-          # Make sure the request captures errors even if the block doesn't
-          # check
-          request.valid?
+          result = Result.coerce( sources, request: request )
+          request.run_callbacks( result.valid? )
 
-          if sources.is_a?( Result )
-            sources
-          else
-            result( *Array.wrap( sources ), request: request )
-          end
+          result
         end
 
       # Static methods added to {RequestSupport}
