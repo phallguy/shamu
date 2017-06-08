@@ -54,33 +54,35 @@ module Shamu
 
       # Execute block if the request is satisfied by the service successfully.
       def on_success( &block )
-        @on_success_callbacks ||= []
-        @on_success_callbacks << block
+        @on_success_blocks ||= []
+        @on_success_blocks << block
       end
 
       # Execute block if the request is not satisfied by the service.
       def on_fail( &block )
-        @on_fail_callbacks ||= []
-        @on_fail_callbacks << block
+        @on_fail_blocks ||= []
+        @on_fail_blocks << block
       end
 
       # Execute block when the service is done processing the request.
       def on_complete( &block )
-        @on_complete_callbacks ||= []
-        @on_complete_callbacks << block
+        @on_complete_blocks ||= []
+        @on_complete_blocks << block
       end
 
-      # Run any {#on_success} or #{on_fail} callbacks.
+      # Mark the request as complete and run any {#on_success} or #{on_fail}
+      # callbacks.
+      #
       # @param [Boolean] success true if the request was completed
       # successfully.
-      def run_callbacks( success )
+      def complete( success )
         if success
-          @on_success_callbacks && @on_success_callbacks.each( &:call )
+          @on_success_blocks && @on_success_blocks.each( &:call )
         else
-          @on_fail_callbacks && @on_fail_callbacks.each( &:call )
+          @on_fail_blocks && @on_fail_blocks.each( &:call )
         end
 
-        @on_fail_callbacks && @on_fail_callbacks.each( &:call )
+        @on_complete_blocks && @on_complete_blocks.each( &:call )
       end
 
       class << self

@@ -111,7 +111,7 @@ module Shamu
               criteria = criteria.send scope_name, value if value.present?
             else
               # rubocop:disable Metrics/LineLength
-              fail ArgumentError, "Cannot apply '#{ name }' filter from #{ scope.class.name }. Add 'scope :#{ scope_name }, ->( #{ name } ) { ... }' to #{ criteria.class.name }"
+              fail ArgumentError, "Cannot apply '#{ name }' filter from #{ scope.class.name }. Add 'scope :#{ scope_name }, ->( #{ name } ) { ... }' to #{ self.name }"
             end
           end
 

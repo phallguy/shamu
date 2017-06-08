@@ -3,7 +3,7 @@ module Shamu
 
     # Used in specs and service to service delegated requests to effectively
     # offer no policy and permit all actions.
-    class NoPolicy
+    class NoPolicy < Policy
 
       # (see Policy#permit?)
       def permit?( * )

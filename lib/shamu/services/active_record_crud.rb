@@ -43,7 +43,7 @@ module Shamu
       extend ActiveSupport::Concern
 
       # Known DSL methods defined by {ActiveRecordCrud}.
-      DSL_METHODS = %i[ create update change destroy find list lookup finders ].freeze
+      DSL_METHODS = %i[ create update change destroy find list lookup finders crud ].freeze
 
       included do |base|
         base.include Shamu::Services::RequestSupport
@@ -120,7 +120,7 @@ module Shamu
           define_singleton_method( :model_class )  { model_class }
 
           ( Array( methods ) & DSL_METHODS ).each do |method|
-            send method
+            send :"define_#{ method }"
           end
 
           define_build_entities( &block )
