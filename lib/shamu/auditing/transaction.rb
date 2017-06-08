@@ -49,6 +49,12 @@ module Shamu
         end
       end
 
+      # @return [Boolean] true if entities have been added to the transaction.
+      def entities?
+        entities.present?
+      end
+
+
       private
 
         attr_reader :entities

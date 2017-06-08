@@ -47,10 +47,11 @@ module Shamu
       #     when applying the refinement.
       # @return [ActiveRecord::Relation] the refined relation.
       def refine_relation( action, relation, additional_context = nil )
+        resolve_permissions
         refined = false
 
         refinements.each do |refinement|
-          if refinement.match?( action, relation )
+          if refinement.match?( action, relation, additional_context )
             refined  = true
             relation = refinement.apply( relation, additional_context ) || relation
           end

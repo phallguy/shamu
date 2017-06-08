@@ -114,6 +114,29 @@ module Shamu
         self
       end
 
+      # Redact attributes on the entity.
+      #
+      # @param [Array<Symbol>,Hash] attributes to redact on the entity. Either
+      # a list of attributes to set to nil or a hash of attributes with their
+      # values.
+      def redact!( *attributes )
+        hash =
+          if attributes.first.is_a?( Symbol )
+            Hash[ attributes.zip( [ nil ] * attributes.length ) ]
+          else
+            attributes.first
+          end
+
+        assign_attributes hash
+        self
+      end
+
+      # @return [Entity] a modified version of the entity with the given
+      # attributes redacted.
+      def redact( attributes )
+        dup.redact!( attributes )
+      end
+
       private
 
         def serialize_attribute?( name, options )

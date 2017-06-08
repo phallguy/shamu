@@ -7,11 +7,11 @@ describe Shamu::Security::Policy do
   let( :klass ) do
     Class.new( Shamu::Security::Policy ) do
       role :super_user, inherits: :admin
-      role :admin, inherits: :user
-      role :user
+      role :admin, inherits: :authenticated
+      role :authenticated
 
       public :in_role?, :add_rule, :rules, :permit, :deny, :when_elevated,
-             :alias_action, :expand_aliases
+             :alias_action, :expand_aliases, :resource
     end
   end
 
@@ -40,16 +40,16 @@ describe Shamu::Security::Policy do
   end
 
   describe "#in_role?" do
-    it "is true for :user when principal is signed in" do
+    it "is true for :authenticated when principal is signed in" do
       allow( policy.principal ).to receive( :user_id ).and_return 1
 
-      expect( policy.in_role?( :user ) ).to be_truthy
+      expect( policy.in_role?( :authenticated ) ).to be_truthy
     end
 
-    it "is false for :user when principal is anonymous" do
+    it "is false for :authenticated when principal is anonymous" do
       allow( policy.principal ).to receive( :user_id ).and_return nil
 
-      expect( policy.in_role?( :user ) ).to be_falsy
+      expect( policy.in_role?( :authenticated ) ).to be_falsy
     end
 
     it "is true for an explicitly assigned role" do
@@ -110,11 +110,33 @@ describe Shamu::Security::Policy do
     it "adds a :maybe rule when defined within #when_elevated" do
       allow( policy ).to receive( :permissions ) do
         policy.when_elevated do
-          policy.permit :do, :stuff
+          policy.permit :do, :stuff, nil
         end
       end
 
       expect( policy.rules.first.result ).to eq :maybe
+    end
+  end
+
+  describe "#resource" do
+    it "fails if no resource block and resource omitted to permit" do
+      expect do
+        policy.permit :read
+      end.to raise_exception( /resource/ )
+    end
+
+    it "uses the dsl resource when omitted" do
+      expect( policy ).to receive( :add_rule ).with( [ :read ], Object, :yes )
+      policy.resource Object do
+        policy.permit :read
+      end
+    end
+
+    it "uses an explicit resource when provided" do
+      expect( policy ).to receive( :add_rule ).with( [ :read ], Symbol, :yes )
+      policy.resource Object do
+        policy.permit :read, Symbol
+      end
     end
   end
 

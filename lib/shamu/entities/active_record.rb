@@ -27,12 +27,12 @@ module Shamu
       # @return [ActiveRecord::Relation]
       def by_list_scope( scope )
         criteria = all
-        criteria = apply_custom_list_scope( criteria, scope )
         criteria = apply_paging_scope( criteria, scope )        if scope.respond_to?( :paged? )
         criteria = apply_scoped_paging_scope( criteria, scope ) if scope.respond_to?( :scoped_page? )
         criteria = apply_window_paging_scope( criteria, scope ) if scope.respond_to?( :window_paged? )
         criteria = apply_dates_scope( criteria, scope )         if scope.respond_to?( :dated? )
         criteria = apply_sorting_scope( criteria, scope )       if scope.respond_to?( :sorted? )
+        criteria = apply_custom_list_scope( criteria, scope )
         criteria
       end
 
@@ -106,12 +106,16 @@ module Shamu
         def apply_custom_list_scope( criteria, scope )
           custom_list_scope_attributes( scope ).each do |name|
             scope_name = :"by_#{ name }"
+            apply_name = :"apply_#{ name }_list_scope"
+
             if criteria.respond_to?( scope_name )
               value    = scope.send( name )
               criteria = criteria.send scope_name, value if value.present?
+            elsif criteria.respond_to?( apply_name )
+              criteria = criteria.send apply_name, criteria, scope
             else
               # rubocop:disable Metrics/LineLength
-              fail ArgumentError, "Cannot apply '#{ name }' filter from #{ scope.class.name }. Add 'scope :#{ scope_name }, ->( #{ name } ) { ... }' to #{ self.name }"
+              fail ArgumentError, "Cannot apply '#{ name }' filter from #{ scope.class.name }. Add 'scope :#{ scope_name }, ->( #{ name } ) { ... }' or 'def self.#{ apply_name }( criteria, scope )' to #{ self.name }"
             end
           end
 

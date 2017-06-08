@@ -434,7 +434,8 @@ describe Shamu::Services::ActiveRecordCrud do
     it "calls #authorize!" do
       expect( service ).to receive( :authorize! ).with(
         :destroy,
-        kind_of( ActiveRecordCrudSpec::FavoriteEntity )
+        kind_of( ActiveRecordCrudSpec::FavoriteEntity ),
+        kind_of( ActiveRecordCrudSpec::Request::Destroy )
       )
 
       service.destroy entity.id

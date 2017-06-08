@@ -23,7 +23,7 @@ module Shamu
 
       included do
         attr_dependency :security_principal, Security::Principal unless method_defined? :security_principal
-        attr_dependency :roles_service, Security::RolesService unless method_defined? :roles_service
+        attr_dependency :roles_service, Security::RolesService
       end
 
       # @return [Policy] the security {Policy} for the service.
@@ -78,6 +78,20 @@ module Shamu
         def service_policy_delegation?
           security_principal.service_delegate?
         end
+
+
+      class_methods do
+
+        # Define the {Policy} class to use when enforcing policy on the service
+        # methods.
+        def policy_class( klass )
+          define_method :policy_class do
+            klass
+          end
+
+          private :policy_class
+        end
+      end
 
     end
   end

@@ -51,7 +51,7 @@ module Shamu
         #     should call {Transaction#append_entity} to include any parent
         #     entities in the entity path.
         # @yieldreturn [Services::Result]
-        def audit_request( request, action: :smart, &block )
+        def audit_request( request, action: :smart, &block ) # rubocop:disable Metrics/PerceivedComplexity
           transaction = Transaction.new \
             user_id_chain: auditing_security_principal.user_id_chain,
             changes: request.to_attributes( only: request.assigned_attributes ),
@@ -63,7 +63,7 @@ module Shamu
           if result.valid?
             if result.entity
               transaction.append_entity result.entity
-            elsif request.respond_to?( :id ) && defined? entity_class
+            elsif !transaction.entities? && request.respond_to?( :id ) && defined? entity_class
               transaction.append_entity [ entity_class, request.id ]
             end
             auditing_service.commit( transaction )

@@ -236,7 +236,7 @@ module Shamu
 
             with_request params, klass do |request, *args|
               record = default_scope.find( request.id )
-              authorize! :destroy, build_entity( record )
+              authorize! :destroy, build_entity( record ), request
 
               instance_exec record, request, *args, &block if block_given?
               next record unless record.destroy
