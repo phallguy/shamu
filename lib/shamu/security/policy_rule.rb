@@ -33,6 +33,7 @@ module Shamu
       #
       # @return [Boolean] true if the rule is a match.
       def match?( action, resource, additional_context )
+        return true  if actions.include? :any
         return false unless actions.include? action
         return false unless resource_match?( resource )
 

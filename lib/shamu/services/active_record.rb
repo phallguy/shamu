@@ -4,8 +4,19 @@ module Shamu
     # Helper methods useful for services that interact with {ActiveRecord::Base}
     # models.
     module ActiveRecord
+      extend ActiveSupport::Concern
+
+      included do
+        # Override to make sure we always catch ActiveRecord not found errors.
+        def with_request( * )
+          wrap_not_found do
+            super
+          end
+        end
+      end
 
       private
+
 
         # @!visibility public
         #

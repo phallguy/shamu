@@ -74,7 +74,7 @@ describe Shamu::Services::ActiveRecordCrud do
 
     Shamu::Services::ActiveRecordCrud::DSL_METHODS.each do |method|
       it "defines standard DSL method `#{ method }` when passed via `:methods`" do
-        expect( klass ).to receive( method )
+        expect( klass ).to receive( :"define_#{ method }" )
         klass.resource( ActiveRecordCrudSpec::FavoriteEntity, ActiveRecordSpec::Favorite, methods: method )
       end
     end

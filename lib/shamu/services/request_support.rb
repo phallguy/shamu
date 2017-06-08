@@ -91,7 +91,7 @@ module Shamu
           sources = yield( request )
 
           result = Result.coerce( sources, request: request )
-          request.run_callbacks( result.valid? )
+          request.complete( result.valid? )
 
           result
         end

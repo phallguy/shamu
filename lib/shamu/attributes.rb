@@ -51,6 +51,11 @@ module Shamu
       end
     end
 
+    # @return [Hash] a hash with the keys for each of the given names.
+    def slice( *names )
+      to_attributes only: names
+    end
+
     # Indicates if the object has an attribute with the given name. Aliased to
     # {#key?} to make the object look like a Hash.
     def attribute?( name )
