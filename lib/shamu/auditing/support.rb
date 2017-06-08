@@ -20,50 +20,52 @@ module Shamu
         #
         # @!endgroup Dependencies
 
+        private
+
+          # Override {Shamu::Services::RequestSupport#with_partial_request} and to yield
+          # a {Transaction} as an additional argument to automatically
+          # {#audit_request audit the request}.
+          def with_partial_request( *args, &block )
+            super( *args ) do |request|
+              audit_request request do |transaction|
+                yield request, transaction
+              end
+            end
+          end
+
       end
 
       private
 
-        # @!visibility public
-        #
-        # Same as {#audit_request} but does not validate the request before
-        # yielding to the block.
-        def audit_partial_request( params, request_class, action: :smart, &block )
-          perform_audit_request( :with_partial_request, params, request_class, action: action, &block )
-        end
 
         # @!visibility public
         #
         # Audit the requested changes and report the request to the
         # {#auditing_service}.
         #
-        # See {Shamu::Services::RequestSupport#with_request}
-        #
-        # @param (see Shamu::Services::RequestSupport#with_request)
+        # @param [Services::Request] request the coerced request params.
         # @return (see Shamu::Services::RequestSupport#with_request)
-        # @yield (request, transaction)
-        # @yieldparam [Services::Request] request coerced from `params`.
+        # @yield (transaction)
         # @yieldparam [Transaction] transaction the audit transaction. Most fields
         #     will be populated automatically from the request but the block
         #     should call {Transaction#append_entity} to include any parent
         #     entities in the entity path.
-        def audit_request( params, request_class, action: :smart, &block )
-          perform_audit_request( :with_request, params, request_class, action: action, &block )
-        end
-
-        def perform_audit_request( method, params, request_class, action: :smart, &block )
+        # @yieldreturn [Services::Result]
+        def audit_request( request, action: :smart, &block )
           transaction = Transaction.new \
-            user_id_chain: auditing_security_principal.user_id_chain
+            user_id_chain: auditing_security_principal.user_id_chain,
+            changes: request.to_attributes( only: request.assigned_attributes ),
+            action: audit_request_action( request, action )
 
-          result = send method, params, request_class do |request|
-            transaction.action  = audit_request_action( request, action )
-            transaction.changes = request.to_attributes
-
-            yield request, transaction
-          end
+          result = yield transaction if block_given?
+          result = Services::Result.coerce( result, request: request )
 
           if result.valid?
-            transaction.append_entity result.entity if result.entity
+            if result.entity
+              transaction.append_entity result.entity
+            elsif request.respond_to?( :id ) && defined? entity_class
+              transaction.append_entity [ entity_class, request.id ]
+            end
             auditing_service.commit( transaction )
           end
 

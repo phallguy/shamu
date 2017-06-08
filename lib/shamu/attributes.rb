@@ -46,6 +46,7 @@ module Shamu
       self.class.attributes.each_with_object({}) do |(name, options), attrs|
         next if ( only && !match_attribute?( only, name ) ) || ( except && match_attribute?( except, name ) )
         next unless serialize_attribute?( name, options )
+
         attrs[name] = send( name )
       end
     end

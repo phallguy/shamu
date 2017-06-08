@@ -70,12 +70,13 @@ module Shamu
         def entity_path_name( entity )
           case entity
           when String then entity.sub( /Entity$/, "" )
-          when Class  then Class.model_name.name
+          when Class  then entity.model_name.name
           else             fail "Don't know how to compose #{ entity }"
           end
         end
 
         def build_composed_entity_path( name, id )
+          id = id.to_model_id if id.respond_to?( :to_model_id )
           "#{ name }[#{ id }]"
         end
 

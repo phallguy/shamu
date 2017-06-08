@@ -342,15 +342,6 @@ module Shamu
 
         # @!visibility public
         #
-        # @overload result( *values, request: nil, entity: nil )
-        # @param (see Result#initialize)
-        # @return [Result]
-        def result( *args )
-          Result.new( *args )
-        end
-
-        # @!visibility public
-        #
         # Return an error {#result} from a service request.
         # @overload error( attribute, message )
         # @param (see ErrorResult#initialize)

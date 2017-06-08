@@ -48,7 +48,7 @@ module Shamu
       #   the first {Request} object found in the `values`.
       # @param [Entities::Entity] entity submitted to the service. If :not_set,
       #   uses the first {Entity} object found in the `values`.
-      def initialize( *values, request: :not_set, entity: :not_set )
+      def initialize( *values, request: :not_set, entity: :not_set ) # rubocop:disable Metrics/LineLength, Metrics/MethodLength, Metrics/PerceivedComplexity
         @values = values
         @value  = values.first
 
@@ -60,6 +60,10 @@ module Shamu
         end
 
         unless request == :not_set
+          # Make sure the request captures errors even if the block doesn't
+          # check
+          request && request.valid?
+
           @request = request
           append_error_source request
         end
@@ -93,8 +97,16 @@ module Shamu
         self
       end
 
-      private
+      # @return [Result] the value coerced to a {Result}.
+      def self.coerce( value, **args )
+        if value.is_a?( Result )
+          value
+        else
+          Result.new( *Array.wrap( value ), **args )
+        end
+      end
 
+      private
 
         def append_error_source( source )
           return unless source.respond_to?( :errors )
@@ -103,6 +115,7 @@ module Shamu
             errors.add attr, message unless errors[attr].include? message
           end
         end
+
     end
   end
 end

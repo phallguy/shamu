@@ -33,10 +33,8 @@ module ActiveRecordCrudSpec
     include Shamu::Services::ActiveRecordCrud
 
     resource FavoriteEntity, ActiveRecordSpec::Favorite
-    create
-    change
-    finders
-    destroy
+    define_crud
+
   end
 
   class FavoriteListScope < Shamu::Entities::ListScope
@@ -46,6 +44,7 @@ end
 
 describe Shamu::Services::ActiveRecordCrud do
   use_active_record
+
   before( :all )  { Shamu::ToModelIdExtension.extend! }
 
   let( :klass )   { ActiveRecordCrudSpec::Service }
@@ -125,15 +124,6 @@ describe Shamu::Services::ActiveRecordCrud do
       service.create request
     end
 
-    it "calls apply_changes if present" do
-      expect( service ).to receive( :apply_changes )
-        .with(
-          request,
-          kind_of( ActiveRecord::Base )
-        )
-      service.create( request )
-    end
-
     it "returns a Result" do
       expect( service.create( request ) ).to be_a Shamu::Services::Result
     end
@@ -148,24 +138,27 @@ describe Shamu::Services::ActiveRecordCrud do
     it "yields if block given" do
       expect do |b|
         yield_klass = Class.new( klass ) do
-          create( &b )
+          define_create( &b )
         end
 
         scorpion.new( yield_klass ).create( request )
       end.to yield_with_args(
-        request,
-        kind_of( ActiveRecord::Base )
+        kind_of( ActiveRecord::Base ),
+        request
       )
     end
 
-    it "does not call apply_changes if block given" do
+    it "short-circuits if block yields a Services::Result" do
       yield_klass = Class.new( klass ) do
-        create { |_, _| }
+        define_create do
+          Shamu::Services::Result.new
+        end
       end
 
       service = scorpion.new( yield_klass )
-      expect( service ).not_to receive :apply_changes
-      service.create
+
+      expect( service ).not_to receive( :build_entity )
+      service.create request
     end
 
     it "calls #authorize!" do
@@ -198,37 +191,34 @@ describe Shamu::Services::ActiveRecordCrud do
       service.update entity, request
     end
 
-    it "calls apply_changes if present" do
-      expect( service ).to receive( :apply_changes )
-        .with(
-          kind_of( Shamu::Services::Request ),
-          kind_of( ::ActiveRecord::Base )
-        )
-      service.create( request )
-    end
-
     it "yields if block given" do
       entity = service.create.entity
 
       expect do |b|
         yield_klass = Class.new( klass ) do
-          change( :update, &b )
+          define_change( :update, &b )
         end
 
         scorpion.new( yield_klass ).update entity.id, request
-      end.to yield_with_args( request, kind_of( ::ActiveRecord::Base ) )
+      end.to yield_with_args( kind_of( ::ActiveRecord::Base ), request )
     end
 
-    it "does not call apply_changes if block given" do
-      entity = service.create.entity
+    it "short-circuits if block yields a Services::Result" do
+      entity
+      record  = service.class.model_class.all.first
+      records = [ record ]
+
+      expect( records ).to receive( :find ).and_return record
+      expect( record ).not_to receive( :save )
 
       yield_klass = Class.new( klass ) do
-        change( :update ) { |_, _| }
+        define_update records do
+          Shamu::Services::Result.new
+        end
       end
 
       service = scorpion.new( yield_klass )
-      expect( service ).not_to receive :apply_changes
-      service.update entity.id
+      service.update entity.id, request
     end
 
     it "calls #authorize!" do
@@ -241,19 +231,6 @@ describe Shamu::Services::ActiveRecordCrud do
       )
 
       service.update entity
-    end
-  end
-
-  describe ".apply_changes" do
-    it "defines an apply_changes method from the block" do
-      klass = Class.new( Shamu::Services::Service ) do
-        include Shamu::Services::ActiveRecordCrud
-
-        apply_changes do |record, request|
-        end
-      end
-
-      expect( klass.new.respond_to?( :apply_changes, true ) ).to be_truthy
     end
   end
 
@@ -279,7 +256,7 @@ describe Shamu::Services::ActiveRecordCrud do
       end
 
       it "excludes unwanted methods" do
-        klass.finders except: :list
+        klass.define_finders except: :list
 
         expect( klass.new ).to respond_to :find
         expect( klass.new ).to respond_to :lookup
@@ -287,7 +264,7 @@ describe Shamu::Services::ActiveRecordCrud do
       end
 
       it "includes only specific methods" do
-        klass.finders only: :list
+        klass.define_finders only: :list
 
         expect( klass.new ).not_to respond_to :find
         expect( klass.new ).not_to respond_to :lookup
@@ -307,7 +284,7 @@ describe Shamu::Services::ActiveRecordCrud do
     it "yields to block if block given" do
       find_klass = Class.new( klass )
       expect do |b|
-        find_klass.find do |_|
+        find_klass.define_find do |_|
           b.to_proc.call
           ActiveRecordSpec::Favorite.all.first
         end
@@ -353,7 +330,7 @@ describe Shamu::Services::ActiveRecordCrud do
     it "yields to block if given?" do
       expect do |b|
         yield_klass = Class.new( klass ) do
-          lookup( &b )
+          define_lookup( &b )
         end
 
         scorpion.new( yield_klass ).lookup entity.id
@@ -392,7 +369,7 @@ describe Shamu::Services::ActiveRecordCrud do
     it "yields if block given" do
       expect do |b|
         yield_klass = Class.new( klass ) do
-          list( &b )
+          define_list( &b )
         end
 
         scorpion.new( yield_klass ).list
@@ -438,6 +415,22 @@ describe Shamu::Services::ActiveRecordCrud do
       end.to change( ActiveRecordSpec::Favorite, :count ).by( -1 )
     end
 
+    it "short-circuits if block yields a Services::Result" do
+      record = klass.model_class.all.first
+      records = [ record ]
+
+      expect( records ).to receive( :find ).and_return record
+
+      yield_klass = Class.new( klass ) do
+        define_destroy records do
+          Shamu::Services::Result.new
+        end
+      end
+
+      service = scorpion.new( yield_klass )
+      service.destroy entity
+    end
+
     it "calls #authorize!" do
       expect( service ).to receive( :authorize! ).with(
         :destroy,
@@ -458,7 +451,7 @@ describe Shamu::Services::ActiveRecordCrud do
     let( :klass ) do
       ec = entity_class
       Class.new( super() ) do
-        build_entities do |records|
+        define_build_entities do |records|
           records.map do |record|
             scorpion.fetch ec, { record: record }, {}
           end

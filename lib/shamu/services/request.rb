@@ -25,7 +25,6 @@ module Shamu
     class Request
       include Shamu::Attributes
       include Shamu::Attributes::Assignment
-      include Shamu::Attributes::FluidAssignment
       include Shamu::Attributes::Validation
 
       # Applies the attributes of the request to the given model. Only handles
@@ -51,6 +50,37 @@ module Shamu
         else
           fail NotImplementedError, "override persisted? in #{ self.class.name }"
         end
+      end
+
+      # Execute block if the request is satisfied by the service successfully.
+      def on_success( &block )
+        @on_success_callbacks ||= []
+        @on_success_callbacks << block
+      end
+
+      # Execute block if the request is not satisfied by the service.
+      def on_fail( &block )
+        @on_fail_callbacks ||= []
+        @on_fail_callbacks << block
+      end
+
+      # Execute block when the service is done processing the request.
+      def on_complete( &block )
+        @on_complete_callbacks ||= []
+        @on_complete_callbacks << block
+      end
+
+      # Run any {#on_success} or #{on_fail} callbacks.
+      # @param [Boolean] success true if the request was completed
+      # successfully.
+      def run_callbacks( success )
+        if success
+          @on_success_callbacks && @on_success_callbacks.each( &:call )
+        else
+          @on_fail_callbacks && @on_fail_callbacks.each( &:call )
+        end
+
+        @on_fail_callbacks && @on_fail_callbacks.each( &:call )
       end
 
       class << self
