@@ -40,6 +40,17 @@ module Shamu
         # Exclude destroyed records by default.
         default_scope { except_destroyed }
 
+        # Apply list scoping that includes targeting `destroyed` state.
+        def self.apply_destroyed_list_scope( criteria, scope )
+          return criteria if scope.destroyed.nil?
+
+          if scope.destroyed
+            criteria.destroyed
+          else
+            criteria.except_destroyed
+          end
+        end
+
         #
         # @!endgroup Scopes
 

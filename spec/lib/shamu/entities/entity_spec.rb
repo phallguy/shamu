@@ -11,12 +11,32 @@ describe Shamu::Entities::Entity do
     end
   end
 
-  describe "#to_attributes" do
+  context "with instance" do
     let( :user )     { OpenStruct.new( name: "Heisenberg", email: "blue@rock.com" ) }
     let( :instance ) { klass.new( user: user ) }
 
-    it "does not include model attributes" do
-      expect( instance.to_attributes ).not_to have_key :user
+    describe "#to_attributes" do
+
+      it "does not include model attributes" do
+        expect( instance.to_attributes ).not_to have_key :user
+      end
+    end
+
+    describe "#redact" do
+      it "clears the assigned attribute" do
+        redacted = instance.redact( :name )
+        expect( redacted.name ).to be_nil
+      end
+
+      it "it returns instance of the same type" do
+        redacted = instance.redact( :name )
+        expect( redacted ).to be_a klass
+      end
+
+      it "assigns redacted values" do
+        redacted = instance.redact( name: "REDACTED" )
+        expect( redacted.name ).to eq "REDACTED"
+      end
     end
   end
 

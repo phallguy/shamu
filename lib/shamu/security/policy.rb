@@ -42,17 +42,24 @@ module Shamu
 
       # @!attribute
       # @return [Principal] principal holding user identity and access credentials.
-        attr_reader :principal
+      attr_reader :principal
 
       # @!attribute
       # @return [Array<Roles>] roles that have been granted to the {#principal}.
-        attr_reader :roles
+      attr_reader :roles
+
+      # @!attribute
+      # @return [Array<Integer>] additional user ids that the {#principal} is
+      # may act on behalf of.
+      attr_reader :related_user_ids
+
       #
       # @!endgroup Dependencies
 
-      def initialize( principal: nil, roles: nil )
-        @principal = principal || Principal.new
-        @roles     = roles || []
+      def initialize( principal: nil, roles: nil, related_user_ids: nil )
+        @principal        = principal || Principal.new
+        @roles            = roles || []
+        @related_user_ids = Array.wrap( related_user_ids )
       end
 
       # Authorize the given `action` on the given resource. If it is not
@@ -101,7 +108,7 @@ module Shamu
         def rules
           @rules ||= begin
             @rules = []
-            permissions
+            resolve_permissions
             @rules
           end
         end
@@ -123,9 +130,18 @@ module Shamu
         def principal_roles
           @principal_roles ||= begin
             expanded = self.class.expand_roles( *roles )
-            expanded << :user if principal.user_id && self.class.role_defined?( :user )
+            expanded << :authenticated if principal.user_id && self.class.role_defined?( :authenticated )
             expanded
           end
+        end
+
+        # @!visibility public
+        #
+        # @param [Integer] id of the candidate user.
+        # @return [Boolean] true if the given id is one of the authorized user
+        # ids on the principal.
+        def is_principal?( id ) # rubocop:disable Style/PredicateName
+          principal.try( :user_id ) == id || related_user_ids.include?( id )
         end
 
         # ============================================================================
@@ -166,6 +182,13 @@ module Shamu
           end
         end
 
+          # Makes sure the {#permissions} method is invoked only once.
+          def resolve_permissions
+            return if @permissions_resolved
+            @permissions_resolved = true
+            permissions
+          end
+
         # @!visibility public
         #
         # Permit one or more `actions` to be performed on a given `resource`.
@@ -175,6 +198,8 @@ module Shamu
         # called if the resource offered to {#permit?} is a Class or Module.
         #
         # @example
+          # end
+          # end
         #   permit :read, UserEntity
         #   permit :show, :dashboard
         #   permit :update, UserEntity do |user|
@@ -193,8 +218,9 @@ module Shamu
         # @yieldparam [Object] additional_context offered to {#permit?}.
         # @yieldreturn [:yes, :maybe, false] see {#permit?}.
         # @return [void]
-        def permit( *actions, resource, &block )
+        def permit( *actions, &block )
           result = @when_elevated ? :maybe : :yes
+          resource, actions = extract_resource( actions )
 
           add_rule( actions, resource, result, &block )
         end
@@ -208,7 +234,8 @@ module Shamu
         # @yield (see #permit)
         # @yieldparam (see #permit)
         # @yieldreturn [Boolean] true to deny the action.
-        def deny( *actions, resource, &block )
+        def deny( *actions, &block )
+          resource, actions = extract_resource( actions )
           add_rule( actions, resource, false, &block )
         end
 
@@ -255,8 +282,40 @@ module Shamu
           aliases[to] |= actions
         end
 
+        # @!visibility public
+        #
+        # Define the `resource` to {#permit} or {#deny} access to. Inside the
+        # block you can omit the `resource` param on DSL methods that expect
+        # it.
+        #
+        # @example
+        #   resource UserEntity do
+        #     permit :read
+        #     permit :update do |user|
+        #       user.id == principal.user_id
+        #     end
+        #
+        #     permit :chop, OtherKindOfEntity
+        #   end
+        def resource( resource )
+          last_resource = @dsl_resource
+          @dsl_resource = resource
+          yield
+        ensure
+          @dsl_resource = last_resource
+        end
+
         #
         # @!endgroup DSL
+
+        def dsl_resource
+          @dsl_resource || fail( "Provide a `resource` argument or use a #resource block to declare the protected resource." ) # rubocop:disable Metrics/LineLength
+        end
+
+        def extract_resource( actions )
+          resource = actions.last.is_a?( Symbol ) ? dsl_resource : actions.pop
+          [ resource, actions ]
+        end
 
         def add_rule( actions, resource, result, &block )
           rules.unshift PolicyRule.new( expand_aliases( actions ), resource, result, block )

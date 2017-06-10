@@ -53,6 +53,9 @@ module Shamu
         def resource_match?( candidate )
           return true if resource == candidate
           return true if resource.is_a?( Module ) && candidate.is_a?( resource )
+
+          # Allow 'doubles' to match in specs
+          true if defined?( RSpec::Mocks::Double ) && candidate.is_a?( RSpec::Mocks::Double )
         end
 
     end

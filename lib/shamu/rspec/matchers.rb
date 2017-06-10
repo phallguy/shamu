@@ -1,3 +1,25 @@
+RSpec::Matchers.define :raise_access_denied do |_expected|
+  def supports_block_expectations?
+    true
+  end
+
+  match do |actual|
+    begin
+      subject && subject.stub(:access_denied) do |exception|
+        raise exception
+      end
+
+      actual.call
+      false
+    rescue CanCan::AccessDenied
+      true
+    rescue Services::Security::AccessDeniedError
+      true
+    rescue
+      false
+    end
+  end
+end
 
 RSpec::Matchers.define :be_permitted_to do |*args|
 

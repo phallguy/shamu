@@ -27,7 +27,7 @@ module Shamu
         # @param [Array<Symbol>] roles
         # @return [Array<Symbol>] the expanded roles.
         def expand_roles( *roles )
-          expand_roles_into( roles, [] )
+          expand_roles_into( roles, Set.new ).to_a
         end
 
         # @param [Symbol] the role to check.
@@ -39,6 +39,8 @@ module Shamu
         private
 
           def expand_roles_into( roles, expanded )
+            raise "No roles defined for #{ name }" unless self.roles.present?
+
             roles.each do |name|
               name = name.to_sym
 

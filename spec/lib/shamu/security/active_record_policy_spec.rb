@@ -1,10 +1,17 @@
 require "spec_helper"
 require "shamu/active_record"
 
+module ActiveRecordPolicySpec
+  class Policy < Shamu::Security::ActiveRecordPolicy
+    def permissions
+    end
+  end
+end
+
 describe Shamu::Security::ActiveRecordPolicy do
   use_active_record
 
-  let( :policy ) { Shamu::Security::ActiveRecordPolicy.new }
+  let( :policy ) { ActiveRecordPolicySpec::Policy.new }
 
   describe "#refine_relation" do
     before( :each ) do

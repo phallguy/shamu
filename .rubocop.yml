@@ -39,7 +39,7 @@ Metrics/MethodLength:
   Max: 15
 
 Metrics/AbcSize:
-  Max: 20
+  Max: 24
 
 Metrics/CyclomaticComplexity:
   Max: 10
