@@ -33,6 +33,10 @@ module Shamu
       # Read-only access to Rack and host ENV toggle overrides.
       attr_dependency :env_store, Shamu::Features::EnvStore
 
+      # @!attribute
+      # @return [Shamu::Logger]
+      attr_dependency :logger, Shamu::Logger
+
       #
       # @!endgroup Dependencies
 

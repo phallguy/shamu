@@ -23,11 +23,13 @@ module Shamu
 
     class ServiceRequestFailedError < Error
       attr_reader :result
+      attr_reader :full_messages
 
       def initialize( result )
         @result = result
+        @full_messages = result.errors.full_messages.join( ", " )
 
-        super translate( :service_request_failed, errors: result.errors.full_messages.join( ", " ) )
+        super translate( :service_request_failed, errors: @full_messages )
       end
     end
   end

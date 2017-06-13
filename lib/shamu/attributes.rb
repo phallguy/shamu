@@ -117,6 +117,8 @@ module Shamu
       def build_value( build, value )
         if build.is_a?( Class )
           build.new( value )
+        elsif build.is_a?( Symbol )
+          value.send( build )
         else
           build.call( value )
         end

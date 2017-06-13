@@ -4,6 +4,17 @@ module Shamu
     # Writes audit logs to the {Shamu::Logger}.
     class LoggingAuditingService < AuditingService
 
+      # ============================================================================
+      # @!group Dependencies
+      #
+
+      # @!attribute
+      # @return [Shamu::Logger]
+      attr_dependency :logger, Shamu::Logger
+
+      #
+      # @!endgroup Dependencies
+
       # Records an auditable event in persistent storage.
       # @param [Transaction] transaction
       # @return [AuditRecord] the persisted record.

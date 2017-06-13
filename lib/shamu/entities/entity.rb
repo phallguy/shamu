@@ -204,6 +204,7 @@ module Shamu
           def model( name, **args, &block )
             attribute( name, **args, &block )
             attributes[name][:model] = true
+            attributes[name][:ignore_equality] = true
             private name
           end
 

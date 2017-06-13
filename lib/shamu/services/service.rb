@@ -1,5 +1,4 @@
 require "scorpion"
-require "shamu/logger"
 
 module Shamu
   module Services
@@ -61,17 +60,6 @@ module Shamu
 
       # Support dependency injection for related services.
       include Scorpion::Object
-
-      # ============================================================================
-      # @!group Dependencies
-      #
-
-      # @!attribute
-      # @return [Shamu::Logger] the IO to dump logging info to.
-      attr_dependency :logger, Shamu::Logger
-
-      #
-      # @!endgroup Dependencies
 
       initialize do
       end

@@ -11,8 +11,10 @@ module Shamu
       end
 
       # @param [Principal] principal of the currently logged in user.
+      # @param [Boolean] reload to reload the roles from storage and bypass any
+      # caching.
       # @return [Array<Symbol>] the roles granted to the principal.
-      def roles_for( principal )
+      def roles_for( principal, reload: false )
         []
       end
 

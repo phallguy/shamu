@@ -21,12 +21,24 @@ module Shamu
           helper_method :permit?
           helper_method :current_user
         end
+
+        # In `included` block so that it overrides Scorpion controller method.
+
+        def prepare_scorpion( scorpion )
+          super
+
+          scorpion.prepare do |s|
+            s.hunt_for Shamu::Security::Principal do
+              security_principal
+            end
+          end
+        end
       end
 
       private
 
         # The currently logged in user. Must respond to #id when logged in.
-        def current_user
+        def current_user_id
         end
 
         # @!visibility public
@@ -67,7 +79,7 @@ module Shamu
         def security_principal
           @security_principal ||= begin
             Shamu::Security::Principal.new \
-              user_id: current_user && current_user.id,
+              user_id: current_user_id,
               remote_ip: remote_ip,
               elevated: session_elevated?
           end
@@ -89,15 +101,6 @@ module Shamu
         def session_elevated?
         end
 
-        def prepare_scorpion( scorpion )
-          super
-
-          scorpion.prepare do |s|
-            s.hunt_for Shamu::Security::Principal do
-              security_principal
-            end
-          end
-        end
 
       class_methods do
 
