@@ -8,7 +8,7 @@ describe Shamu::Attributes::Equality do
       include Shamu::Attributes::Equality
 
       attribute :name
-      attribute :random, ignore_inequality: true
+      attribute :random, ignore_equality: true
     end
   end
 

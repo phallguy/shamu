@@ -26,6 +26,10 @@ describe Shamu::Security::Roles do
       end
     end
 
+    it "returns all roles for :all" do
+      expect( klass.expand_roles( :all ) ).to eq [ :admin, :manager, :user ]
+    end
+
     it "includes base roles" do
       expect( klass.expand_roles( :user ) ).to include :user
     end

@@ -115,7 +115,14 @@ module Shamu
 
         # Mapping of action names to aliases.
         def aliases
-          @aliases ||= {}
+          @aliases ||= default_aliases
+        end
+
+        def default_aliases
+          {
+            view: [ :read, :list ],
+            change: [ :create, :update, :destroy ]
+          }
         end
 
         # @!visibility public
