@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    shamu (0.0.20)
+    shamu (0.0.21)
       activemodel (>= 5.0)
       activesupport (>= 5.0)
       crc32 (~> 1)
@@ -104,7 +104,7 @@ GEM
     loofah (2.0.3)
       nokogiri (>= 1.5.9)
     lumberjack (1.0.12)
-    mail (2.6.5)
+    mail (2.6.6)
       mime-types (>= 1.16, < 4)
     method_source (0.8.2)
     mime-types (3.1)
