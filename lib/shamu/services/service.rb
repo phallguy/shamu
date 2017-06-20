@@ -340,14 +340,6 @@ module Shamu
           end
         end
 
-        # @param [String,Integer,#to_model_id] value
-        # @return [Boolean] true if the value looks like an ID.
-        def model_id?( value )
-          case Array( value ).first
-          when Integer then true
-          when String  then ToModelIdExtension::Strings::NUMERIC_PATTERN =~ value
-          end
-        end
     end
   end
 end

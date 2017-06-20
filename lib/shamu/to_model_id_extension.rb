@@ -6,6 +6,15 @@ module Shamu
   # models by id.
   module ToModelIdExtension
 
+    # @param [String,Integer,#to_model_id] value
+    # @return [Boolean] true if the value looks like an ID.
+    def self.model_id?( value )
+      case Array( value ).first
+      when Integer then true
+      when String  then ToModelIdExtension::Strings::NUMERIC_PATTERN =~ value
+      end
+    end
+
     # Extend common classes to add `to_model_id` method.
     def self.extend!
       Integer.include Integers
