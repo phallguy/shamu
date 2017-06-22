@@ -151,6 +151,16 @@ module Shamu
           principal.try( :user_id ) == id || related_user_ids.include?( id )
         end
 
+        # @return [Boolean] true if {#principal} has authenticated.
+        def authenticated?
+          principal.try( :user_id )
+        end
+
+        # @return [Boolean] true if the {#principal} has not authenticated.
+        def anonymous?
+          !authenticated?
+        end
+
         # ============================================================================
         # @!group DSL
         #
@@ -205,8 +215,6 @@ module Shamu
         # called if the resource offered to {#permit?} is a Class or Module.
         #
         # @example
-          # end
-          # end
         #   permit :read, UserEntity
         #   permit :show, :dashboard
         #   permit :update, UserEntity do |user|

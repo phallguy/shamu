@@ -143,6 +143,17 @@ module Shamu
           super && !options[:model]
         end
 
+        def attribute_eql?( other, name )
+          value = send( name )
+          other_value = other.send( name )
+
+          if value.is_a?( Entity ) || other_value.is_a?( Entity )
+            return value.id.eql?( other_value.id )
+          else
+            value.eql?( other_value )
+          end
+        end
+
       class << self
 
         # @return [ActiveModel::Name] used by url_helpers etc when generating

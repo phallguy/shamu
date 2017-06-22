@@ -92,6 +92,10 @@ module Shamu
           relation
         end
 
+        def not_found!( id = :not_set )
+          raise Shamu::NotFoundError, id: id, resource: entity_class
+        end
+
       class_methods do
 
         # Declare the entity and resource classes used by the service.
@@ -183,7 +187,7 @@ module Shamu
         # overridden {#with_request} method.
         # @return [Result] the result of the request.
         # @return [void]
-        def define_change( method, default_scope = model_class, &block ) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/PerceivedComplexity, Metrics/LineLength
+        def define_change( method, default_scope = model_class, &block ) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/LineLength
           define_method method do |id, params = nil|
             klass = request_class( method )
 

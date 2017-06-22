@@ -208,8 +208,13 @@ module Shamu
         #   end
         def find_by_lookup( id )
           entity = lookup( id ).first
-          raise Shamu::NotFoundError unless entity.present?
+          not_found!( id ) unless entity.present?
           entity
+        end
+
+        # @exception [Shamu::NotFoundError]
+        def not_found!( id = :not_set )
+          raise Shamu::NotFoundError, id: id
         end
 
         # @!visibility public
@@ -221,22 +226,23 @@ module Shamu
         #
         # @param [Object] id of the associated {Entities::Entity} to find.
         # @param [Service] service used to locate the associated resource.
+        # @param [IdentityCache] cache to store found associations.
         # @return [Entity] the found entity or a {Entities::NullEntity} if the
         #     association doesn't exist.
         #
         # @example
         #
-        #   def build_entity( record, records = nil )
-        #     owner = lookup_association record.owner_id, users_service do
+        #   def build_entities( records )
+        #     cache = cache_for( entity: users_service )
+        #     owner = lookup_association record.owner_id, users_service, cache do
         #               records.pluck( :owner_id ) if records
         #             end
         #
         #     scorpion.fetch UserEntity, { record: record, owner: owner }, {}
         #   end
-        def lookup_association( id, service, &block )
+        def lookup_association( id, service, cache, &block )
           return unless id
 
-          cache = cache_for( entity: service )
           cache.fetch( id ) || begin
             if block_given? && ( ids = yield )
               service.lookup( *ids ).map do |entity|
@@ -253,20 +259,33 @@ module Shamu
 
         # @!visibility public
         #
-        # Perform a lazy {#lookup_association} and only load the entity if its
-        # actually dereferenced by the caller.
+        # Build a proxy object that delays yielding to the block until a method
+        # on the association is invoked.
         #
-        # @param (see #lookup_association)
+        # @example
+        #   user = lazy_association 10, Users::UserEntity do
+        #            expensive_lookup_user.find( 10 )
+        #          end
+        #
+        #   user.id   # => 10 expensive lookup not performed
+        #   user.name # => "Trump" expensive lookup executed, cached, then
+        #             #    method invoked on real object
+        #
+        # @param [Integer] id of the resource.
+        # @param [Class] entity_class of the resource.
         # @return [LazyAssociation<Entity>]
-        def lazy_association( id, service, &block )
-          LazyAssociation.new( id ) do
-            lookup_association id, service, &block
-          end
+        def lazy_association( id, entity_class, &block )
+          return nil if id.nil?
+
+          LazyAssociation.class_for( entity_class ).new( id, &block )
         end
 
         # @!visibility public
         #
         # Get the {Entities::IdentityCache} for the given {Entities::Entity} class.
+        # @param [Service#entity_class] dependency_service the dependent
+        #   {Service} to cache results from. Must respond to `#entity_class` that
+        #   returns the {Entities::Entity} class to cache.
         # @param [Class] entity the type of entity that will be cached. Only
         #     required if the service manages multiple entities.
         # @param [Symbol,#call] key the attribute on the entity, or a custom
@@ -275,8 +294,10 @@ module Shamu
         #     to the same type (eg :to_i). If not set, automatically uses :to_i
         #     if key is an 'id' attribute.
         # @return [Entities::IdentityCache]
-        def cache_for( key: :id, entity: nil, coerce: :not_set )
+        def cache_for( dependency_service = nil, key: :id, entity: nil, coerce: :not_set )
           coerce = coerce_method( coerce, key )
+          entity ||= dependency_service
+          entity = entity.entity_class if entity.respond_to?( :entity_class )
 
           cache_key        = [ entity, key, coerce ]
           @entity_caches ||= {}

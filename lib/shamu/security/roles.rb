@@ -38,7 +38,7 @@ module Shamu
 
         private
 
-          def expand_roles_into( roles, expanded ) # rubocop:disable Metrics/MethodLength
+          def expand_roles_into( roles, expanded )
             raise "No roles defined for #{ name }" unless self.roles.present?
 
             roles.each do |name|

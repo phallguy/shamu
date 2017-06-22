@@ -7,8 +7,6 @@ module Shamu
 
         self.verbose = false
 
-        # rubocop:disable Metrics/MethodLength
-
         def up
           return if data_source_exists? Message.table_name
 

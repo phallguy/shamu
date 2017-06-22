@@ -24,6 +24,7 @@ module ServiceSpec
     public :cached_lookup
     public :lookup_association
     public :lazy_association
+    public :cache_for
 
     def build_entities( records )
       records.map do |record|
@@ -269,50 +270,38 @@ describe Shamu::Services::Service do
       end
     end
 
+    let( :cache ) { service.cache_for( entity: service ) }
+
     it "returns nil if id is nil" do
-      expect( service.lookup_association( nil, service ) ).to be_nil
+      expect( service.lookup_association( nil, service, cache ) ).to be_nil
     end
 
     it "yields to get all association links" do
       expect do |b|
-        service.lookup_association( 1, service, &b )
+        service.lookup_association( 1, service, cache, &b )
       end.to yield_control
     end
 
     it "finds assocation from cache" do
-      service.lookup_association( 1, service ) do
+      service.lookup_association( 1, service, cache ) do
         [ 1, 2 ]
       end
 
       expect do |b|
-        service.lookup_association( 1, service, &b )
+        service.lookup_association( 1, service, cache, &b )
       end.not_to yield_control
     end
 
     it "returns the found entity with no records" do
-      result = service.lookup_association( 1, service )
+      result = service.lookup_association( 1, service, cache )
       expect( result ).to be_a ServiceSpec::Entity
     end
 
     it "returns the found entity with bulk records" do
-      result = service.lookup_association( 1, service ) do
+      result = service.lookup_association( 1, service, cache ) do
         [ 1, 2 ]
       end
       expect( result ).to be_a ServiceSpec::Entity
     end
-  end
-
-  describe "#lazy_association" do
-    before( :each ) do
-      allow( service ).to receive( :lookup ) do |*ids|
-        ids.map { |id| ServiceSpec::Entity.null_entity.new( id: id ) }
-      end
-    end
-
-    it "gets a lazy association" do
-      expect( service.lazy_association( 1, service ) ).to be_a Shamu::Services::LazyAssociation
-    end
-
-
   end
 end

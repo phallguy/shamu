@@ -17,8 +17,29 @@ module Shamu
 
   # The resource was not found.
   class NotFoundError < Error
-    def initialize( message = :not_found )
-      super translate( message )
+    attr_reader :id
+    attr_reader :resource
+
+    def initialize( message = :not_found, id: :not_set, resource: :not_set )
+      @id = id
+      @resource = resource
+
+      if message == :not_found
+        message =
+          if id != :not_set
+            if resource != :not_set
+              :resource_not_found_with_id
+            else
+              :not_found_with_id
+            end
+          elsif resource != :not_set
+            :resource_not_found
+          else
+            :not_found
+          end
+      end
+
+      super translate( message, id: id, resource: resource )
     end
   end
 
