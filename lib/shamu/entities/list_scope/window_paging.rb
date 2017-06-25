@@ -35,7 +35,7 @@ module Shamu
         #
         # @!endgroup Attributes
 
-        def self.included( base ) # rubocop:disable Metrics/MethodLength
+        def self.included( base )
           super
 
           base.attribute :first, coerce: :to_i, default: ->() { default_first }

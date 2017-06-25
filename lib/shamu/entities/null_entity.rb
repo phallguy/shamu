@@ -50,14 +50,20 @@ module Shamu
         AUTO_FORMATTED_ATTRIBUTES.each do |attr|
           next unless base.attributes.key?( attr )
 
-          base_name ||= begin
-            name = base.name || "Resource"
-            name.split( "::" )
-                .last
-                .sub( /Entity/, "" )
-                .gsub( /(.)([[:upper:]])/, '\1 \2' )
-          end
+          base_name ||=
+            begin
+              name = base.superclass.name || "Resource"
+              name.split( "::" )
+                  .last
+                  .sub( /Entity/, "" )
+                  .gsub( /(.)([[:upper:]])/, '\1 \2' )
+            end
           base.attribute attr, default: "Unknown #{ base_name }"
+        end
+
+        # Make sure the null version has the model name.
+        def base.model_name
+          superclass.model_name
         end
       end
 
@@ -73,11 +79,11 @@ module Shamu
         end
 
         unless null_klass
-          null_klass = Class.new( entity_class ) do
-            include ::Shamu::Entities::NullEntity
-          end
-
+          null_klass = Class.new( entity_class )
           entity_class.const_set :NullEntity, null_klass
+
+          # After const_set so we have name and inheritance
+          null_klass.include ::Shamu::Entities::NullEntity
         end
 
         null_klass

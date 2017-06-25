@@ -90,5 +90,10 @@ describe Shamu::Entities::NullEntity do
     it "inherits from the entity class" do
       expect( Shamu::Entities::NullEntity.for( klass ) ).to be < klass
     end
+
+    it "uses same model name" do
+      expect( Shamu::Entities::NullEntity.for( klass ).model_name ).to be klass.model_name
+    end
+
   end
 end

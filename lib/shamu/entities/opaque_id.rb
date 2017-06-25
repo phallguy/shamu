@@ -9,8 +9,8 @@ module Shamu
     module OpaqueId
       module_function
 
-      PREFIX  = "::".freeze
-      PATTERN = %r{\A#{ PREFIX }[a-zA-Z0-9+/]+={0,3}\z}
+      PATTERN = %r{\A[a-zA-Z0-9+/]+={0,3}\z}
+      NUMERICAL = %r{\A[0-9]+\z}
 
       # @return [String] an opaque value that uniquely identifies the
       # entity.
@@ -21,7 +21,7 @@ module Shamu
                  Entity.compose_entity_path( [ entity ] )
                end
 
-        "#{ PREFIX }#{ Base64.strict_encode64( path ) }"
+        "#{ Base64.strict_encode64( path ).chomp( '=' ) }"
       end
 
       # @return [String,Integer] the encoded raw record id.
@@ -36,18 +36,19 @@ module Shamu
 
       # @return [Array<[String, String]>] decodes the id to it's {EntityPath}.
       def to_entity_path( opaque_id )
-        return nil unless opaque_id && opaque_id.start_with?( PREFIX )
+        return nil unless opaque_id && NUMERICAL !~ opaque_id
 
-        id = opaque_id[ PREFIX.length..-1 ]
-        id = Base64.strict_decode64( id )
-        id
+        id = opaque_id
+        id += "=" * ( 4 - id.length % 4 ) if id.length % 4 > 0
+
+        Base64.strict_decode64( id )
       end
 
       # @param [String] value candidate value
       # @return [Boolean] true if the given value is an opaque id.
       def opaque_id?( value )
         return unless value
-        PATTERN =~ value
+        PATTERN =~ value && NUMERICAL !~ value
       end
     end
   end

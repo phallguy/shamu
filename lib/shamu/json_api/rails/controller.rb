@@ -249,7 +249,7 @@ module Shamu
             payload
           end
 
-          def map_json_resource_payload( resource ) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+          def map_json_resource_payload( resource ) # rubocop:disable Metrics/AbcSize
             payload = resource[ :attributes ] ? resource[ :attributes ].dup : {}
             payload[ :id ] = resource[ :id ] if resource.key?( :id )
 

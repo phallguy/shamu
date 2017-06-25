@@ -87,6 +87,9 @@ module Shamu
           name = base_name.sub /(Entity)?$/, "ListScope"
           begin
             return name.constantize
+
+            # Rescuing instead of using const_defined? so that active record can
+            # do it's auto-loading magic.
           rescue NameError # rubocop:disable Lint/HandleExceptions
           end
 

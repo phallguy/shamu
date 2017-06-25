@@ -2,6 +2,9 @@ en:
   shamu:
     errors:
         not_found: The resource was not found.
+        resource_not_found_with_id: The %{resource} with id %{id} was not found.
+        not_found_with_id: The resource with id %{id} was not found.
+        resource_not_found: The %{resource} was not found.
         not_implemented: The method has not been implemented.
 
     warnings:
