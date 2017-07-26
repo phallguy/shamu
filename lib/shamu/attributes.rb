@@ -76,6 +76,16 @@ module Shamu
       instance_variable_defined? :"@#{ attribute }"
     end
 
+    # @return [Hash] the assigned attributes as a hash for JSON serialization.
+    def as_json( options = {} ) # rubocop:disable Styles/OptionHash
+      to_attributes( options.slice( :only, :except ) ).as_json
+    end
+
+    # @return [String] JSON encoded version of the assigned attributes.
+    def to_json( options = {} ) # rubocop:disable Styles/OptionHash
+      as_json( options ).to_json
+    end
+
     private
 
       def match_attribute?( pattern, name )
