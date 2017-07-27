@@ -156,6 +156,11 @@ describe Shamu::Services::RequestSupport do
 
       expect( result.request.errors ).not_to be_empty
     end
+
+    it "updates the cache after change" do
+      expect( service ).to receive( :recache_entity )
+      service.partial_process( request_params )
+    end
   end
 
   describe "#request_for" do

@@ -106,6 +106,55 @@ module Shamu
         end
       end
 
+      # @return [String] debug friendly string
+      def inspect # rubocop:disable Metrics/AbcSize
+        result = "#<#{ self.class } valid: #{ valid? }"
+        result << ", errors: #{ errors.inspect }" if errors.any?
+        result << ", entity: #{ entity.inspect }" if entity
+        result << ", value: #{ value.inspect }"   if value && value != entity
+        result << ", values: #{ values.inspect }" if values.length > 1
+        result << ">"
+        result
+      end
+
+      # @return [String] even friendlier debug string.
+      def pretty_print( pp ) # rubocop:disable Metrics/AbcSize
+        pp.object_address_group( self ) do
+          pp.breakable " "
+          pp.text "valid: "
+          pp.pp valid?
+
+          if errors.any?
+            pp.comma_breakable
+            pp.text "errors:"
+            pp.breakable " "
+            pp.pp errors
+          end
+
+          if entity
+            pp.comma_breakable
+            pp.text "entity:"
+            pp.breakable " "
+            pp.pp entity
+          end
+
+          if !value.nil? && value != entity
+            pp.comma_breakable
+            pp.text "value:"
+            pp.breakable " "
+            pp.pp value
+          end
+
+          if values.length > 1
+            pp.comma_breakable
+            pp.text "values:"
+            pp.breakable " "
+            pp.pp values - [ value ]
+          end
+        end
+      end
+
+
       private
 
         def append_error_source( source )

@@ -168,13 +168,19 @@ module Shamu
           Entities::List.new( matched )
         end
 
+          ID_MATCHER = ->( record ) { record && record.id }
+
           def entity_lookup_list_matcher( match )
             if !match.is_a?( Symbol ) && match.respond_to?( :call )
               match
             elsif match == :id
-              ->( record ) { record && record.id }
+              ID_MATCHER
             else
-              ->( record ) { record && record.send( match ) }
+              @@matcher_proc_cache ||= Hash.new do |hash, key| # rubocop:disable Style/ClassVars
+                hash[ key ] = ->( record ) { record && record.send( key ) }
+              end
+
+              @@matcher_proc_cache[ match ]
             end
           end
 
@@ -347,6 +353,17 @@ module Shamu
                 end
               end
             end
+          end
+
+          # After a mutation method call to make sure the cache for the entity
+          # is updated to reflect the new entity state.
+          #
+          # @param [Entity] entity in the new modified state.
+          def recache_entity( entity, match: :id )
+            matcher = entity_lookup_list_matcher( match )
+            cache = cache_for( key: match )
+
+            cache.add( matcher.call( entity ), entity )
           end
 
         # @!visibility public

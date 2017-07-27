@@ -92,6 +92,7 @@ module Shamu
 
           result = Result.coerce( sources, request: request )
           request.complete( result.valid? )
+          recache_entity( result.entity ) if result.valid? && result.entity
 
           result
         end

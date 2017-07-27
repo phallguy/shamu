@@ -86,6 +86,22 @@ module Shamu
       as_json( options ).to_json
     end
 
+    def pretty_print( pp )
+      attributes = to_attributes
+
+      pp.object_address_group( self ) do
+        pp.seplist( attributes.keys, -> { pp.text "," } ) do |name|
+          pp.breakable " "
+          pp.group( 1 ) do
+            pp.text name.to_s
+            pp.text ":"
+            pp.breakable " "
+            pp.pp attributes[ name ]
+          end
+        end
+      end
+    end
+
     private
 
       def match_attribute?( pattern, name )
