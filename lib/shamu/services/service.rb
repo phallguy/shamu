@@ -355,27 +355,17 @@ module Shamu
             end
           end
 
-          # After a mutation method call to make sure the cache for the entity
-          # is updated to reflect the new entity state.
-          #
-          # @param [Entity] entity in the new modified state.
-          def recache_entity( entity, match: :id )
-            matcher = entity_lookup_list_matcher( match )
-            cache = cache_for( key: match )
-
-            cache.add( matcher.call( entity ), entity )
-          end
-
-        # @!visibility public
+        # @!visbility public
         #
-        # Return an error {#result} from a service request.
-        # @overload error( attribute, message )
-        # @param (see ErrorResult#initialize)
-        # @return [ErrorResult]
-        def error( *args )
-          Result.new.tap do |r|
-            r.errors.add( *args )
-          end
+        # After a mutation method call to make sure the cache for the entity
+        # is updated to reflect the new entity state.
+        #
+        # @param [Entity] entity in the new modified state.
+        def recache_entity( entity, match: :id )
+          matcher = entity_lookup_list_matcher( match )
+          cache = cache_for( key: match )
+
+          cache.add( matcher.call( entity ), entity )
         end
 
     end

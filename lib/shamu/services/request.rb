@@ -85,6 +85,18 @@ module Shamu
         @on_complete_blocks && @on_complete_blocks.each( &:call )
       end
 
+      # Adds an error to {#errors} and returns self. Used when performing an
+      # early return in a service method
+      #
+      # @example
+      #   next request.error( :title, "should be clever" ) unless title_is_clever?
+      #
+      # @return [self]
+      def error( *args )
+        errors.add( *args )
+        self
+      end
+
       class << self
         # Coerces a hash or params object to a proper {Request} object.
         # @param [Object] params to be coerced.

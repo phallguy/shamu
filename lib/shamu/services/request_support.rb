@@ -58,7 +58,7 @@ module Shamu
         #       order = Models::Order.find( request.id )
         #
         #       # Custom validation
-        #       next error( :base, "can't do that" ) if order.state == 'processed'
+        #       next request.error( :base, "can't do that" ) if order.state == 'processed'
         #
         #       request.apply_to( order )
         #

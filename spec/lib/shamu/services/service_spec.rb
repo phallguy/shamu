@@ -8,7 +8,7 @@ module ServiceSpec
     def process( params )
       with_request( params, Request::Change ) do |request|
         request_hook
-        next error( :base, "nope" ) if request.level < 0
+        next request.error( :base, "nope" ) if request.level < 0
 
         record = OpenStruct.new( request.to_attributes )
         scorpion.fetch ServiceSpec::Entity, { record: record }, {}
