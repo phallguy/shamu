@@ -97,6 +97,27 @@ module Shamu
           result
         end
 
+        # Support convenient calling convention on update/delete style methods
+        # that might pass an id and params or a single params hash with
+        # associated id.
+        #
+        # @example
+        #   users.update user, name: "Changed"  # Backend service
+        #   users.update id: 1, name: "Changed" # HTTP request params
+        #
+        def extract_params( id, params )
+          if !params && !id.respond_to?( :to_model_id )
+            params, id = id, id[ :id ] || id[ "id" ]
+          end
+
+          if params
+            params = params.symbolize_keys
+            params[ :id ] ||= id
+          end
+
+          [ id, params ]
+        end
+
       # Static methods added to {RequestSupport}
       class_methods do
 

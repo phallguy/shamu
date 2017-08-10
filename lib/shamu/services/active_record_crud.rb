@@ -187,12 +187,11 @@ module Shamu
         # overridden {#with_request} method.
         # @return [Result] the result of the request.
         # @return [void]
-        def define_change( method, default_scope = model_class, &block ) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/LineLength
+        def define_change( method, default_scope = model_class, &block )
           define_method method do |id, params = nil|
             klass = request_class( method )
 
-            params, id = id, id[ :id ] if !params && !id.respond_to?( :to_model_id )
-            params[ :id ] ||= id       if params
+            id, params = extract_params( id, params )
 
             with_partial_request params, klass do |request, *args|
               record = default_scope.find( id.to_model_id || request.id )
