@@ -12,7 +12,7 @@ module RequestSupportSpec
         next request.error( :base, "nope" ) if request.level < 0
 
         record = OpenStruct.new( request.to_attributes )
-        scorpion.fetch RequestSupportSpec::Entity, { record: record }, {}
+        scorpion.fetch RequestSupportSpec::Entity, record: record
       end
     end
 
@@ -21,7 +21,7 @@ module RequestSupportSpec
         request_hook
 
         record = OpenStruct.new( request.to_attributes )
-        scorpion.fetch RequestSupportSpec::Entity, { record: record }, {}
+        scorpion.fetch RequestSupportSpec::Entity, record: record
       end
     end
 
@@ -206,7 +206,7 @@ describe Shamu::Services::RequestSupport do
 
     it "supports entity as first param" do
       record = OpenStruct.new( id: 5 )
-      entity = scorpion.fetch RequestSupportSpec::Entity, { record: record }, {}
+      entity = scorpion.fetch RequestSupportSpec::Entity, record: record
 
       id, params = service.extract_params( entity, nil )
 

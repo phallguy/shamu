@@ -9,7 +9,7 @@ module Shamu
       # to handle events coming in on a separate thread.
       class AsyncService < InMemory::Service
 
-        initialize do
+        def initialize
           ObjectSpace.define_finalizer self do
             threads = mutex.synchronize do
               channels.map do |_, state|
@@ -20,6 +20,8 @@ module Shamu
 
             ThreadsWait.all_waits( *threads )
           end
+
+          super
         end
 
         # (see Service#dispatch)

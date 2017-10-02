@@ -51,8 +51,10 @@ module Shamu
 
       # @param [String] private_key the private key used to verify cookie
       #     values.
-      initialize do |private_key = Shamu::Security.private_key, **|
+      def initialize( private_key = Shamu::Security.private_key )
         @private_key = private_key
+
+        super()
       end
 
       # (see SessionStore#fetch)

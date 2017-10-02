@@ -5,8 +5,8 @@ module Shamu
     # requests.
     module SessionStore
 
-      def self.create( scorpion, *args, **dependencies, &block )
-        return scorpion.fetch Shamu::Sessions::CookieStore, *args, **dependencies, &block if defined? Rack
+      def self.create( scorpion, *args, &block )
+        return scorpion.fetch Shamu::Sessions::CookieStore, *args, &block if defined? Rack
 
         fail "Configure a Shamu::Sessions::SessionStore in your scorpion setup."
       end

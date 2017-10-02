@@ -43,8 +43,10 @@ module Shamu
       # @!method initialize( config_path )
       # @param
       # @return [FeaturesService]
-      initialize do |config_path = nil, **|
+      def initialize( config_path = nil )
         @config_path = config_path || self.class.default_config_path
+
+        super()
       end
 
       # Indicates if the feature is enabled for the current request/session.

@@ -10,8 +10,8 @@ end
 describe Shamu::Entities::StaticRepository do
   let( :entities ) do
     [
-      scorpion.fetch( StaticRepositorySpec::Entity, { id: 10, name: "First" }, {} ),
-      scorpion.fetch( StaticRepositorySpec::Entity, { id: 20, name: "Last" }, {} ),
+      scorpion.fetch( StaticRepositorySpec::Entity, id: 10, name: "First" ),
+      scorpion.fetch( StaticRepositorySpec::Entity, id: 20, name: "Last" ),
     ]
   end
   let( :repository ) do

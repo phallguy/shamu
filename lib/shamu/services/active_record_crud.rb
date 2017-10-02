@@ -7,7 +7,7 @@ module Shamu
     # @example
     #
     #   class UsersService < Shamu::Services::Service
-    #     include Shamu::Services::Crud
+    #     include Shamu::Services::ActievRecordCrud
     #
     #     # Define the resource that the service will manage
     #     resource UserEntity, Models::User
@@ -35,7 +35,7 @@ module Shamu
     #                    records.pluck( :parent_id )
     #                  end
     #
-    #         scorpion.fetch UserEntity, { parent: parent }, {}
+    #         scorpion.fetch UserEntity, { parent: parent }
     #       end
     #     end
     #   end
@@ -272,9 +272,10 @@ module Shamu
         # @return [void]
         def define_find( default_scope = model_class.all, &block )
           if block_given?
+            define_method :_find_block, &block
             define_method :find do |id|
               wrap_not_found do
-                record = yield( id )
+                record = _find_block( id )
                 authorize! :read, build_entity( record )
               end
             end
@@ -298,9 +299,17 @@ module Shamu
         #     underlying resource.
         # @return [void]
         def define_lookup( default_scope = model_class.all, &block )
+          if block_given?
+            define_method :_lookup_block, &block
+          else
+            define_method :_lookup_block do |ids|
+              default_scope.where( id: ids )
+            end
+          end
+
           define_method :lookup do |*ids|
             cached_lookup( ids ) do |uncached_ids|
-              records = block_given? ? yield( uncached_ids ) : default_scope.where( id: uncached_ids )
+              records = _lookup_block( uncached_ids )
               records = authorize_relation :read, records
               entity_lookup_list records, uncached_ids, entity_class.null_entity
             end
@@ -322,8 +331,14 @@ module Shamu
             list_scope = Entities::ListScope.for( entity_class ).coerce( params )
             authorize! :list, entity_class, list_scope
 
-            records    = block_given? ? yield( scope ) : scope_relation( default_scope, list_scope )
-            records    = authorize_relation( :read, records, list_scope )
+            records =
+              if block_given?
+                instance_exec( list_scope, &block )
+              else
+                scope_relation( default_scope, list_scope )
+              end
+
+            records = authorize_relation( :read, records, list_scope )
 
             entity_list records
           end
@@ -349,7 +364,7 @@ module Shamu
           else
             define_method :build_entities do |records|
               records.map do |record|
-                entity = scorpion.fetch( entity_class, { record: record }, {} )
+                entity = scorpion.fetch( entity_class, record: record )
                 authorize! :read, entity
               end
             end

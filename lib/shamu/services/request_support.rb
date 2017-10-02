@@ -66,7 +66,7 @@ module Shamu
         #       next order unless order.save
         #
         #       # All good, return an entity for the order
-        #       scorpion.fetch OrderEntity, { order: order }, {}
+        #       scorpion.fetch OrderEntity, { order: order }
         #     end
         #   end
         def with_request( params, request_class, &block )
@@ -111,7 +111,7 @@ module Shamu
           end
 
           if params
-            params = params.symbolize_keys
+            params = params.symbolize_keys if params.respond_to?( :symbolize_keys )
             params[ :id ] ||= id
           end
 

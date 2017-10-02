@@ -25,7 +25,7 @@ module Shamu
     #
     #     def list
     #       entity_list policy.refine_relation( :list, Model::User.all ) do |record|
-    #         scorpion.fetch UserEntity, { record: record }, {}
+    #         scorpion.fetch UserEntity, record: record
     #       end
     #     end
     #

@@ -8,5 +8,7 @@ module Shamu
     require "shamu/services/result"
     require "shamu/services/lazy_transform"
     require "shamu/services/lazy_association"
+    require "shamu/services/observable_support"
+    require "shamu/services/observed_request"
   end
 end

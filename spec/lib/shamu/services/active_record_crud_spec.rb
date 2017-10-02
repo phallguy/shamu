@@ -31,6 +31,7 @@ module ActiveRecordCrudSpec
 
   class Service < Shamu::Services::Service
     include Shamu::Services::ActiveRecordCrud
+    include Shamu::Services::ObservableSupport
 
     resource FavoriteEntity, ActiveRecordSpec::Favorite
     define_crud
@@ -170,6 +171,14 @@ describe Shamu::Services::ActiveRecordCrud do
 
       service.create
     end
+
+    it "is observable" do
+      expect do |b|
+        service.observe( &b )
+
+        service.create request
+      end.to yield_control
+    end
   end
 
   describe ".change" do
@@ -232,6 +241,14 @@ describe Shamu::Services::ActiveRecordCrud do
 
       service.update entity
     end
+
+    it "is observable" do
+      expect do |b|
+        service.observe( &b )
+
+        service.update entity
+      end.to yield_control
+    end
   end
 
   describe ".finders" do
@@ -284,8 +301,8 @@ describe Shamu::Services::ActiveRecordCrud do
     it "yields to block if block given" do
       find_klass = Class.new( klass )
       expect do |b|
-        find_klass.define_find do |_|
-          b.to_proc.call
+        find_klass.define_find do |id|
+          b.to_proc.call id
           ActiveRecordSpec::Favorite.all.first
         end
         scorpion.new( find_klass ).find( entity.id )
@@ -311,6 +328,11 @@ describe Shamu::Services::ActiveRecordCrud do
     end
 
     it "uses entity_lookup_list" do
+      # #create caches the result so bypass the cache
+      expect( service ).to receive( :cached_lookup ) do |ids, &block|
+        block.call( ids )
+      end
+
       expect( service ).to receive( :entity_lookup_list ).and_call_original
       service.lookup( entity.id )
     end
@@ -347,6 +369,11 @@ describe Shamu::Services::ActiveRecordCrud do
     end
 
     it "calls #authorize_relation" do
+      # #create caches the result so bypass the cache
+      expect( service ).to receive( :cached_lookup ) do |ids, &block|
+        block.call( ids )
+      end
+
       expect( service ).to receive( :authorize_relation ).with(
         :read,
         kind_of( ActiveRecord::Relation )
@@ -440,6 +467,14 @@ describe Shamu::Services::ActiveRecordCrud do
 
       service.destroy entity.id
     end
+
+    it "is observable" do
+      expect do |b|
+        service.observe( &b )
+
+        service.destroy entity
+      end.to yield_control
+    end
   end
 
   describe ".build_entities" do
@@ -454,7 +489,7 @@ describe Shamu::Services::ActiveRecordCrud do
       Class.new( super() ) do
         define_build_entities do |records|
           records.map do |record|
-            scorpion.fetch ec, { record: record }, {}
+            scorpion.fetch ec, record: record
           end
         end
         public :build_entities

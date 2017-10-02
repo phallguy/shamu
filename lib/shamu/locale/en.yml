@@ -22,6 +22,7 @@ en:
         incomplete_setup: Security has been enabled but is not yet configured.
         no_actiev_record_policy_checks: Don't check for policy on ActiveRecord resources. Check their projected Entity instead.
         no_policy_impersonation: Impersonation is not supported by this principal.
+
     events:
       errors:
         unknown_runner: Unknown runner. Each process should offer a consitent but unique runner_id.
@@ -35,3 +36,12 @@ en:
         incomplete_resource: "`identifier` was not called to define the type and id of the resource."
         no_presenter: No presenter available for %{class} objects. Looked in %{namespaces}.
         no_json_body: "Missing `data` node for JSON API body. Override `json_request_payload` if no body is expected."
+
+en:
+  activemodel:
+    errors:
+      models:
+        shamu/services/service:
+          attributes:
+            base:
+              canceled: Request was canceled

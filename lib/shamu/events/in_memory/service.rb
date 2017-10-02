@@ -12,9 +12,11 @@ module Shamu
       class Service < EventsService
         include ChannelStats
 
-        initialize do
+        def initialize
           @mutex    = Thread::Mutex.new
           @channels = {}
+
+          super
         end
 
         # (see EventsService#publish)

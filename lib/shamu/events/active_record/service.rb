@@ -27,10 +27,12 @@ module Shamu
           Migration.new.migrate( :up )
         end
 
-        initialize do
+        def initialize
           self.class.ensure_records!
           @channels ||= {}
           @mutex    ||= Mutex.new
+
+          super
         end
 
         # (see EventsService#publish)
