@@ -6,7 +6,7 @@ module LoadEntitySpec
     include Shamu::Services::RequestSupport
 
     def find( id )
-      scorpion.fetch ExampleEntity, { id: id }, {}
+      scorpion.fetch ExampleEntity, id: id
     end
 
     def list( params = nil )

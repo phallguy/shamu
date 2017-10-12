@@ -11,7 +11,7 @@ group :test do
   gem "responders", "~> 2.1.2"
   gem "kaminari", "~> 0.16.3", require: false
 
-  gem "byebug"
+  gem "byebug", "9.0.6"
   gem "pry-byebug"
 
   gem "sqlite3", "~> 1.3.11"
@@ -29,6 +29,8 @@ group :test do
   gem "simplecov", "~> 0.14"
   gem "ruby_gntp", "~> 0.3.4"
   gem "awesome_print"
+
+  gem "nokogiri", "1.8.0"
 
   gem "codeclimate-test-reporter", "~> 1.0 ", group: :test, require: nil
   gem "rspec_junit_formatter", "~> 0.2.2", platforms: :mri

@@ -66,7 +66,7 @@ module Shamu
         #       next order unless order.save
         #
         #       # All good, return an entity for the order
-        #       scorpion.fetch OrderEntity, { order: order }, {}
+        #       scorpion.fetch OrderEntity, { order: order }
         #     end
         #   end
         def with_request( params, request_class, &block )
@@ -95,6 +95,27 @@ module Shamu
           recache_entity( result.entity ) if result.valid? && result.entity
 
           result
+        end
+
+        # Support convenient calling convention on update/delete style methods
+        # that might pass an id and params or a single params hash with
+        # associated id.
+        #
+        # @example
+        #   users.update user, name: "Changed"  # Backend service
+        #   users.update id: 1, name: "Changed" # HTTP request params
+        #
+        def extract_params( id, params )
+          if !params && !id.respond_to?( :to_model_id )
+            params, id = id, id[ :id ] || id[ "id" ]
+          end
+
+          if params
+            params = params.symbolize_keys if params.respond_to?( :symbolize_keys )
+            params[ :id ] ||= id
+          end
+
+          [ id, params ]
         end
 
       # Static methods added to {RequestSupport}

@@ -4,6 +4,7 @@ require "shamu/services"
 module RequestSupportSpec
   class Service < Shamu::Services::Service
     include Shamu::Services::RequestSupport
+    public :extract_params
 
     def process( params )
       with_request( params, Request::Change ) do |request|
@@ -11,13 +12,16 @@ module RequestSupportSpec
         next request.error( :base, "nope" ) if request.level < 0
 
         record = OpenStruct.new( request.to_attributes )
-        scorpion.fetch RequestSupportSpec::Entity, { record: record }, {}
+        scorpion.fetch RequestSupportSpec::Entity, record: record
       end
     end
 
     def partial_process( params )
-      with_partial_request( params, Request::Change ) do |_|
+      with_partial_request( params, Request::Change ) do |request|
         request_hook
+
+        record = OpenStruct.new( request.to_attributes )
+        scorpion.fetch RequestSupportSpec::Entity, record: record
       end
     end
 
@@ -159,6 +163,7 @@ describe Shamu::Services::RequestSupport do
 
     it "updates the cache after change" do
       expect( service ).to receive( :recache_entity )
+
       service.partial_process( request_params )
     end
   end
@@ -169,4 +174,45 @@ describe Shamu::Services::RequestSupport do
       expect( request ).to be_a Shamu::Services::Request
     end
   end
+
+  describe "#extract_params" do
+    it "supports string hash as only param" do
+      id, params = service.extract_params( { "id" => 5 }, nil )
+
+      expect( id ).to eq 5
+      expect( params ).to eq id: 5
+    end
+
+    it "supports string hash as second param" do
+      id, params = service.extract_params( 9, "id" => 5 )
+
+      expect( id ).to eq 9
+      expect( params ).to eq id: 5
+    end
+
+    it "supports symbol hash as only param" do
+      id, params = service.extract_params( { id: 5 }, nil )
+
+      expect( id ).to eq 5
+      expect( params ).to eq id: 5
+    end
+
+    it "supports symbol hash as second param" do
+      id, params = service.extract_params( 9, id: 5 )
+
+      expect( id ).to eq 9
+      expect( params ).to eq id: 5
+    end
+
+    it "supports entity as first param" do
+      record = OpenStruct.new( id: 5 )
+      entity = scorpion.fetch RequestSupportSpec::Entity, record: record
+
+      id, params = service.extract_params( entity, nil )
+
+      expect( id ).to eq entity
+      expect( params ).to be_nil
+    end
+  end
+
 end

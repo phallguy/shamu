@@ -53,16 +53,13 @@ module Shamu
     #     ```
     #     def report( report_scope = nil )
     #       report_scope = UserReportScope.coerce! report_scope
-    #       scorpion.fetch UserReport, report_scope, {}
+    #       scorpion.fetch UserReport, report_scope
     #     end
     #     ```
     class Service
 
       # Support dependency injection for related services.
       include Scorpion::Object
-
-      initialize do
-      end
 
       private
 
@@ -133,7 +130,7 @@ module Shamu
         #   def lookup( *ids )
         #     records = Models::Favorite.all.where( id: ids )
         #     entity_lookup_list records, ids, NullEntity.for( FavoriteEntity ) do |record|
-        #       scorpion.fetch FavoriteEntity, { record: record }, {}
+        #       scorpion.fetch FavoriteEntity, { record: record }
         #     end
         #   end
         #
@@ -141,7 +138,7 @@ module Shamu
         #     records = Models::Favorite.all.where( :name.in( names ) )
         #
         #     entity_lookup_list records, names, NullEntity.for( FavoriteEntity ), match: :name do |record|
-        #       scorpion.fetch FavoriteEntity, { record: record }, {}
+        #       scorpion.fetch FavoriteEntity, { record: record }
         #     end
         #   end
         #
@@ -150,7 +147,7 @@ module Shamu
         #     matcher = ->( record ) { record.name.downcase }
         #
         #     entity_lookup_list records, names, NullEntity.for( FavoriteEntity ), match: matcher do |record|
-        #       scorpion.fetch FavoriteEntity, { record: record }, {}
+        #       scorpion.fetch FavoriteEntity, { record: record }
         #     end
         #   end
         #
@@ -162,7 +159,7 @@ module Shamu
 
           list = entity_list records, &transformer
           matched = ids.map do |id|
-            list.find { |e| matcher.call( e ) == id } || scorpion.fetch( null_class, { id: id }, {} )
+            list.find { |e| matcher.call( e ) == id } || scorpion.fetch( null_class, id: id )
           end
 
           Entities::List.new( matched )
@@ -244,7 +241,7 @@ module Shamu
         #               records.pluck( :owner_id ) if records
         #             end
         #
-        #     scorpion.fetch UserEntity, { record: record, owner: owner }, {}
+        #     scorpion.fetch UserEntity, { record: record, owner: owner }
         #   end
         def lookup_association( id, service, cache, &block )
           return unless id

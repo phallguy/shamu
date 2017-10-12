@@ -11,7 +11,7 @@ module ServiceSpec
         next request.error( :base, "nope" ) if request.level < 0
 
         record = OpenStruct.new( request.to_attributes )
-        scorpion.fetch ServiceSpec::Entity, { record: record }, {}
+        scorpion.fetch ServiceSpec::Entity, record: record
       end
     end
 
@@ -28,7 +28,7 @@ module ServiceSpec
 
     def build_entities( records )
       records.map do |record|
-        scorpion.fetch ServiceSpec::Entity, { record: record }, {}
+        scorpion.fetch ServiceSpec::Entity, record: record
       end
     end
   end
@@ -122,7 +122,7 @@ describe Shamu::Services::Service do
 
     it "matches on id by default" do
       list = service.entity_lookup_list( records, [record.id], ServiceSpec::NullEntity ) do |records|
-        records.map { |r| scorpion.fetch ServiceSpec::Entity, { record: r }, {} }
+        records.map { |r| scorpion.fetch ServiceSpec::Entity, record: r }
       end
 
       expect( list.first ).to be_present
@@ -130,7 +130,7 @@ describe Shamu::Services::Service do
 
     it "matches on id with string numbers" do
       list = service.entity_lookup_list( records, [record.id.to_s], ServiceSpec::NullEntity ) do |records|
-        records.map { |r| scorpion.fetch ServiceSpec::Entity, { record: r }, {} }
+        records.map { |r| scorpion.fetch ServiceSpec::Entity, record: r }
       end
 
       expect( list.first ).to be_present
@@ -138,7 +138,7 @@ describe Shamu::Services::Service do
 
     it "matches on a custom field" do
       list = service.entity_lookup_list( records, [record.amount], ServiceSpec::NullEntity, match: :amount ) do |records| # rubocop:disable Metrics/LineLength
-        records.map { |r| scorpion.fetch ServiceSpec::Entity, { record: r }, {} }
+        records.map { |r| scorpion.fetch ServiceSpec::Entity, record: r }
       end
 
       expect( list.first ).to be_present
@@ -147,7 +147,7 @@ describe Shamu::Services::Service do
     it "matches with a custom proc" do
       matcher = ->( record ) { record.amount }
       list = service.entity_lookup_list( records, [record.amount], ServiceSpec::NullEntity, match: matcher ) do |records| # rubocop:disable Metrics/LineLength
-        records.map { |r| scorpion.fetch ServiceSpec::Entity, { record: r }, {} }
+        records.map { |r| scorpion.fetch ServiceSpec::Entity, record: r }
       end
 
       expect( list.first ).to be_present

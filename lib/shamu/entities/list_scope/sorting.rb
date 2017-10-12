@@ -42,7 +42,12 @@ module Shamu
         def self.included( base )
           super
 
-          base.attribute :sort_by, as: :order, coerce: ->( *values ) { parse_sort_by( values ) }
+          base.attribute :default_sort_by, as: :default_order,
+                                           coerce: ->( *values ) { parse_sort_by( values ) }
+
+          base.attribute :sort_by, as: :order,
+                                   coerce: ->( *values ) { parse_sort_by( values ) },
+                                   default: ->() { default_sort_by }
         end
 
         # @return [Boolean] true if the scope is paged.

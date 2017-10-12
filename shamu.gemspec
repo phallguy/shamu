@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "activemodel", ">= 5.0"
   spec.add_dependency "activesupport", ">= 5.0"
-  spec.add_dependency "scorpion-ioc", "~> 0.6"
+  spec.add_dependency "scorpion-ioc", "~> 1.0.1"
   spec.add_dependency "multi_json", "~> 1.11"
   spec.add_dependency "rack", ">= 1"
   spec.add_dependency "listen", "~> 3"

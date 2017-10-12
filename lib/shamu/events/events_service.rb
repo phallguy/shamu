@@ -116,7 +116,7 @@ module Shamu
         def deserialize( raw )
           hash = MultiJson.load( raw )
           message_class = hash["class"].constantize
-          scorpion.fetch message_class, hash["attributes"], {}
+          scorpion.fetch message_class, hash["attributes"]
         end
 
         def fetch_channel( name )

@@ -5,7 +5,7 @@ require_relative "entity_lookup_models"
 describe Shamu::Entities::EntityLookupService do
 
   let( :service ) do
-    scorpion.new( Shamu::Entities::EntityLookupService, { "Water" => EntityLookupServiceSpecs::CustomService }, {} )
+    scorpion.new( Shamu::Entities::EntityLookupService, "Water" => EntityLookupServiceSpecs::CustomService )
   end
 
   describe "#service_class_for" do

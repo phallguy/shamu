@@ -38,6 +38,12 @@ module Shamu
         value
       end
 
+      # @return [Array<Result>] results from calling dependent assemblies that
+      # may have caused the request to fail.
+      def nested_results
+        @nested_results ||= []
+      end
+
       #
       # @!endgroup Attributes
 
@@ -97,6 +103,12 @@ module Shamu
         self
       end
 
+      # Joins a dependency's result to the result of the request.
+      def join( result )
+        nested_results << result
+        append_error_source result
+      end
+
       # @return [Result] the value coerced to a {Result}.
       def self.coerce( value, **args )
         if value.is_a?( Result )
@@ -118,7 +130,7 @@ module Shamu
       end
 
       # @return [String] even friendlier debug string.
-      def pretty_print( pp ) # rubocop:disable Metrics/AbcSize
+      def pretty_print( pp ) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
         pp.object_address_group( self ) do
           pp.breakable " "
           pp.text "valid: "

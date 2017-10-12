@@ -40,7 +40,7 @@ describe Shamu::Entities::ListScope::Paging do
   end
 
   it "includes sorting values in to_param" do
-    expect( klass.new( sort_by: :name ).params ).to eq sort_by: { name: :asc }
+    expect( klass.new( sort_by: :name ).params ).to include sort_by: { name: :asc }
   end
 
   it "is not sorted with defaults" do
