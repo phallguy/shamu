@@ -159,17 +159,18 @@ module Shamu
         # @yieldparam [Array] args any additional arguments injected by an
         # overridden {#with_request} method.
         # @return [void]
-        def define_create( &block )
-          define_method :create do |params = nil|
-            with_request params, request_class( :create ) do |request, *args|
+        def define_create( method = :create, &block )
+          define_method method do |params = nil|
+            with_request params, request_class( method ) do |request, *args|
               record = request.apply_to( model_class.new )
 
               if block_given?
                 result = instance_exec record, request, *args, &block
                 next result if result.is_a?( Services::Result )
+                next unless request.valid?
               end
 
-              authorize! :create, build_entity( record ), request
+              authorize! method, build_entity( record ), request
 
               next record unless record.save
               build_entity record
@@ -207,6 +208,7 @@ module Shamu
               if block_given?
                 result = instance_exec record, request, *args, &block
                 next result if result.is_a?( Services::Result )
+                next unless request.valid?
               end
 
               next record unless record.save
@@ -231,17 +233,21 @@ module Shamu
         # @param [ActiveRecord::Relation] default_scope to use when finding
         #     records.
         # @return [void]
-        def define_destroy( default_scope = model_class, &block )
-          define_method :destroy do |params|
-            klass = request_class( :destroy )
+        def define_destroy( method = :destroy, default_scope = model_class, &block )
+          define_method method do |params|
+            klass = request_class( method )
 
             params = { id: params } if params.respond_to?( :to_model_id )
 
             with_request params, klass do |request, *args|
               record = default_scope.find( request.id )
-              authorize! :destroy, build_entity( record ), request
+              authorize! method, build_entity( record ), request
 
-              instance_exec record, request, *args, &block if block_given?
+              if block_given?
+                instance_exec record, request, *args, &block
+                next unless request.valid?
+              end
+
               next record unless record.destroy
             end
           end

@@ -449,7 +449,7 @@ describe Shamu::Services::ActiveRecordCrud do
       expect( records ).to receive( :find ).and_return record
 
       yield_klass = Class.new( klass ) do
-        define_destroy records do
+        define_destroy :destroy, records do
           Shamu::Services::Result.new
         end
       end

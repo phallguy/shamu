@@ -41,7 +41,8 @@ module Shamu
 
           ::ActiveRecord::Base.transaction options do
             result = yield
-            raise ::ActiveRecord::Rollback if result && !result.valid?
+            success = result && ( result.respond_to?( :valid? ) ? result.valid? : true )
+            raise ::ActiveRecord::Rollback unless success
           end
 
           result

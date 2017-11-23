@@ -28,14 +28,20 @@ module Shamu
         attr_reader :elevated
         alias_method :elevated?, :elevated
 
+      # @!attribute
+      # @return [Array<Symbol>] security scopes the principal may be used to
+      # authenticate against. When empty, no limits are imposed.
+        attr_reader :scopes
+
       #
       # @!endgroup Attributes
 
-      def initialize( user_id: nil, parent_principal: nil, remote_ip: nil, elevated: false )
+      def initialize( user_id: nil, parent_principal: nil, remote_ip: nil, elevated: false, scopes: nil )
         @user_id          = user_id
         @parent_principal = parent_principal
         @remote_ip        = remote_ip
         @elevated         = elevated
+        @scopes           = scopes
       end
 
       # @return [Array<Object>] all of the user ids in the security principal
@@ -71,6 +77,20 @@ module Shamu
       #     another and requesting that the downstream service delegate security
       #     checks to the calling service.
       def service_delegate?
+      end
+
+      # @param [Symbol] scope
+      # @return [Boolean] true if the principal is scoped to authenticate the
+      # user for the given scope.
+      def scoped?( scope )
+        scopes.nil? || scopes.include?( scope )
+      end
+
+      # @!attribute
+      # @return [Boolean] true if there is no user associated with the
+      # principal.
+      def anonymous?
+        !user_id
       end
 
     end
