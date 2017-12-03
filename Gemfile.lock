@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    shamu (0.0.23)
+    shamu (0.0.24)
       activemodel (>= 5.0)
       activesupport (>= 5.0)
       crc32 (~> 1)
