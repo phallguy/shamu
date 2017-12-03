@@ -18,9 +18,10 @@ module Shamu
         # @param [Symbol] name of the role.
         # @param [Array<Symbol>] inherits additional roles that are
         #     automatically inherited when the named role is granted.
+        # @param [Array<Symbol>] scopes that the role may be granted in.
         # @return [void]
-        def role( name, inherits: nil )
-          roles[ name.to_sym ] = { inherits: Array( inherits ) }
+        def role( name, inherits: nil, scopes: nil )
+          roles[ name.to_sym ] = { inherits: Array( inherits ), scopes: Array( scopes ) }
         end
 
         # Expand the given roles to include the roles that they have inherited.

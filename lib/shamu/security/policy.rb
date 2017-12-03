@@ -138,7 +138,9 @@ module Shamu
           @principal_roles ||= begin
             expanded = self.class.expand_roles( *roles )
             expanded << :authenticated if principal.user_id && self.class.role_defined?( :authenticated )
-            expanded
+            expanded.select do |role|
+              principal.scoped?( role )
+            end
           end
         end
 
@@ -189,7 +191,7 @@ module Shamu
         # @return [void]
         def permissions
           if respond_to?( :anonymous_permissions, true ) && respond_to?( :authenticated_permissions, true )
-            if principal.user_id
+            if in_role?( :authenticated )
               authenticated_permissions
             else
               anonymous_permissions
