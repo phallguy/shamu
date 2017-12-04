@@ -16,7 +16,7 @@ module Shamu
         entities.each( &block )
       end
 
-      delegate :first, :last, :count, :empty?, :index, to: :raw_entities
+      delegate :first, :last, :count, :empty?, to: :raw_entities
 
       alias_method :size, :count
       alias_method :length, :count
@@ -40,6 +40,26 @@ module Shamu
             entities.find { |e| e.send( field ) == key }
           end
         entity || fail( Shamu::NotFoundError )
+      end
+
+      def inspect
+        if @entities
+          format( "#<%s: {%s}>", self.class.name, to_a.inspect )
+        else
+          format( "#<%s: ...>", self.class.name )
+        end
+      end
+
+      def pretty_print(pp)
+        if @entities
+          pp.text format( "#<%s: {", self.class.name )
+          pp.nest(1) do
+            pp.seplist(self) { |o| pp.pp o }
+          end
+          pp.text "}>"
+        else
+          pp.text format( "#<%s: ...>", self.class.name )
+        end
       end
 
       private

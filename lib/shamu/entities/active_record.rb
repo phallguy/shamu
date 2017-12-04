@@ -114,8 +114,7 @@ module Shamu
             elsif criteria.respond_to?( apply_name )
               criteria = criteria.send apply_name, criteria, scope
             else
-              # rubocop:disable Metrics/LineLength
-              fail ArgumentError, "Cannot apply '#{ name }' filter from #{ scope.class.name }. Add 'scope :#{ scope_name }, ->( #{ name } ) { ... }' or 'def self.#{ apply_name }( criteria, scope )' to #{ self.name }"
+              fail ArgumentError, "Cannot apply '#{ name }' filter from #{ scope.class.name }. Add 'scope :#{ scope_name }, ->( #{ name } ) { ... }' or 'def self.#{ apply_name }( criteria, scope )' to #{ self.name }" # rubocop:disable Metrics/LineLength
             end
           end
 

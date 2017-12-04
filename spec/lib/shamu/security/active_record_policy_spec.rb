@@ -4,6 +4,7 @@ require "shamu/active_record"
 module ActiveRecordPolicySpec
   class Policy < Shamu::Security::ActiveRecordPolicy
     def permissions
+      refine :none, ActiveRecord::Base
     end
   end
 end

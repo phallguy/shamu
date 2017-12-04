@@ -154,14 +154,14 @@ describe Shamu::Attributes::Assignment do
 
       it "coerces nnn_at to timestamps" do
         value = double
-        expect( value ).to receive( :to_datetime )
+        expect( value ).to receive( :to_time )
 
         instance.updated_at = value
       end
 
       it "coerces nnn_on to timestamps" do
         value = double
-        expect( value ).to receive( :to_datetime )
+        expect( value ).to receive( :to_time )
 
         instance.expire_on = value
       end

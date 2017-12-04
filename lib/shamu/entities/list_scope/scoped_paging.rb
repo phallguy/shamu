@@ -47,7 +47,7 @@ module Shamu
 
           # @!attribute
           # @return [Integer] the size of each page.
-          attribute :size, coerce: :to_i, default: ->() { default_size }
+          attribute :size, coerce: :to_i, default: -> { default_size }
 
           # @!attribute
           # @return [Integer] the default page size if not specified.

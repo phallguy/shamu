@@ -96,6 +96,20 @@ module Shamu
           raise Shamu::NotFoundError, id: id, resource: entity_class
         end
 
+        # Hook to all service to redact attributes from the entities that
+        # should not be exposed based on the current security principal.
+        #
+        # @param [Enumerable<Shamu::Entities::Entity>] entities to redact
+        # @return [Enumerable<Shamu::Entities::Entity>] the redacted
+        # entities.
+        def redact_entities( entities )
+          entities
+        end
+
+        def redact_entity( entity )
+          redact_entities([ entity ]).first
+        end
+
       class_methods do
 
         # Declare the entity and resource classes used by the service.
@@ -173,7 +187,7 @@ module Shamu
               authorize! method, build_entity( record ), request
 
               next record unless record.save
-              build_entity record
+              redact_entity( build_entity( record ) )
             end
           end
         end
@@ -212,7 +226,7 @@ module Shamu
               end
 
               next record unless record.save
-              build_entity record
+              redact_entity( build_entity( record ) )
             end
           end
         end
@@ -220,6 +234,46 @@ module Shamu
         # Defines an #update method. See {#define_change} for details.
         def define_update( default_scope = model_class, &block )
           define_change :update, default_scope, &block
+        end
+
+        # Define an command `method` on the service that takes a request that
+        # does not identify a record by id and performs some action.
+        #
+        # @param [Symbol] method name to give the new method.
+        # @param [#call] record_lookup a callable that receives the request
+        # object and returns the record to be modified.
+        # @yield ( request, *args )
+        # @yieldparam [Services::Request] request object.
+        # @yieldparam [Array] args any additional arguments injected by an
+        # overridden {#with_request} method.
+        # @return [Result] the result of the request.
+        # @return [void]
+        def define_command( method, record_lookup, &block )
+          lookup_name = :"_lookup_#{ method }_record"
+          define_method lookup_name, &record_lookup
+          define_method method do |params|
+            klass = request_class( method )
+
+            with_request params, klass do |request, *args|
+              if record = send( lookup_name, request )
+                entity = build_entity( record )
+                authorize! method, entity, request
+
+                request.apply_to( record )
+              else
+                authorize! method, entity_class, request
+              end
+
+              if block_given?
+                result = instance_exec record, request, *args, &block
+                next result if result.is_a?( Services::Result )
+                next unless request.valid?
+              end
+
+              next record unless record.save
+              redact_entity( build_entity( record ) )
+            end
+          end
         end
 
         # Define a `destroy( id )` method that takes an {Entities::Entity} {Entities::Entity#id}
@@ -241,7 +295,8 @@ module Shamu
 
             with_request params, klass do |request, *args|
               record = default_scope.find( request.id )
-              authorize! method, build_entity( record ), request
+              entity = build_entity( record )
+              authorize! method, entity, request
 
               if block_given?
                 instance_exec record, request, *args, &block
@@ -249,6 +304,7 @@ module Shamu
               end
 
               next record unless record.destroy
+              entity
             end
           end
         end
@@ -258,12 +314,16 @@ module Shamu
         # @param [ActiveRecord::Relation] default_scope to use when finding
         #     records.
         # @return [void]
-        def define_finders( default_scope = model_class.all, only: nil, except: nil )
+        def define_finders( default_scope: model_class.all, list_scope: nil, only: nil, except: nil )
           methods = Array( only || [ :find, :lookup, :list ] )
           methods -= Array( except ) if except
 
           methods.each do |method|
-            send :"define_#{ method }", default_scope
+            if method == :list
+              send :"define_#{ method }", default_scope: default_scope, list_scope: list_scope
+            else
+              send :"define_#{ method }", default_scope: default_scope
+            end
           end
         end
 
@@ -276,13 +336,13 @@ module Shamu
         # @yield (id)
         # @yieldreturn (ActiveRecord::Base) the found record.
         # @return [void]
-        def define_find( default_scope = model_class.all, &block )
+        def define_find( default_scope: model_class.all, &block )
           if block_given?
             define_method :_find_block, &block
             define_method :find do |id|
               wrap_not_found do
                 record = _find_block( id )
-                authorize! :read, build_entity( record )
+                redact_entity( authorize!( :read, build_entity( record ) ) )
               end
             end
           else
@@ -304,7 +364,7 @@ module Shamu
         # @yieldreturn [ActiveRecord::Relation] records for ids found in the
         #     underlying resource.
         # @return [void]
-        def define_lookup( default_scope = model_class.all, &block )
+        def define_lookup( default_scope: model_class.all, &block )
           if block_given?
             define_method :_lookup_block, &block
           else
@@ -314,11 +374,13 @@ module Shamu
           end
 
           define_method :lookup do |*ids|
-            cached_lookup( ids ) do |uncached_ids|
-              records = _lookup_block( uncached_ids )
-              records = authorize_relation :read, records
-              entity_lookup_list records, uncached_ids, entity_class.null_entity
-            end
+            redact_entities(
+              cached_lookup( ids ) do |uncached_ids|
+                records = _lookup_block( uncached_ids )
+                records = authorize_relation :read, records
+                entity_lookup_list records, uncached_ids, entity_class.null_entity
+              end
+            )
           end
         end
 
@@ -332,21 +394,22 @@ module Shamu
         # @yieldparam [ListScope] scope to apply.
         # @yieldreturn [ActiveRecord::Relation] records matching the given scope.
         # @return [void]
-        def define_list( default_scope = model_class.all, &block )
+        def define_list( default_scope: model_class.all, list_scope: nil, &block )
           define_method :list do |params = nil|
-            list_scope = Entities::ListScope.for( entity_class ).coerce( params )
-            authorize! :list, entity_class, list_scope
+            list_scope_class = list_scope || Entities::ListScope.for( entity_class )
+            scope = list_scope_class.coerce( params )
+            authorize! :list, entity_class, scope
 
             records =
               if block_given?
-                instance_exec( list_scope, &block )
+                instance_exec( scope, &block )
               else
-                scope_relation( default_scope, list_scope )
+                scope_relation( default_scope, scope )
               end
 
-            records = authorize_relation( :read, records, list_scope )
+            records = authorize_relation( :read, records, scope )
 
-            entity_list records
+            redact_entities( entity_list( records ) )
           end
         end
 

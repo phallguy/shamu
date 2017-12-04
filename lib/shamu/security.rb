@@ -7,6 +7,7 @@ module Shamu
     require "shamu/security/policy"
     require "shamu/security/policy_rule"
     require "shamu/security/no_policy"
+    require "shamu/security/redacted_list"
     require "shamu/security/support"
     require "shamu/security/roles"
     require "shamu/security/roles_service"

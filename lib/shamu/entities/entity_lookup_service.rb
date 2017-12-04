@@ -131,6 +131,13 @@ module Shamu
                          ].join( "::" )
 
           service_name.constantize
+        rescue NameError
+          service_name = [
+                           namespace,
+                           "#{ type }Service"
+                         ].join( "::" )
+
+          service_name.constantize
         end
     end
   end

@@ -21,7 +21,7 @@ module Shamu
       # @return [Integer] a hash computed from the attributes of the object.
       def hash
         self.class.attributes.map do |key, _|
-          send( key )
+          attribute_equality_value( send( key ) )
         end.hash
       end
 
@@ -41,9 +41,27 @@ module Shamu
         # @return [Boolean] true if the value of the given attribute is equal
         # on the current object and the other object.
         def attribute_eql?( other, attr )
-          send( attr ).eql?( other.send( attr ) )
+          value       = attribute_equality_value( send( attr ) )
+          other_value = attribute_equality_value( other.send( attr ) )
+
+          value.eql?( other_value )
         end
 
+        def attribute_equality_value( value )
+          # When round-tripping to the database time often looses millisecond
+          # precision so always normalize to seconds.
+          if time_like_value?( value )
+            value.to_time.to_i
+          else
+            value
+          end
+        end
+
+        def time_like_value?( value )
+          case value
+          when Time, DateTime, ActiveSupport::TimeWithZone then true
+          end
+        end
     end
   end
 end

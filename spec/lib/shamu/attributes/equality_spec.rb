@@ -5,10 +5,12 @@ describe Shamu::Attributes::Equality do
   let( :klass ) do
     Class.new do
       include Shamu::Attributes
+      include Shamu::Attributes::Assignment
       include Shamu::Attributes::Equality
 
       attribute :name
       attribute :random, ignore_equality: true
+      attribute :time
     end
   end
 
@@ -44,6 +46,13 @@ describe Shamu::Attributes::Equality do
 
     expect( value ).to eq derived
     expect( derived ).to eq value
+  end
+
+  it "is eql for time like values with very close times" do
+    value.time = Time.at( 1_514_709_141.299816 )
+    same.time = Time.at( 1_514_709_141.299817 )
+
+    expect( value ).to eq same
   end
 
   it "has the same hash for the same attributes" do

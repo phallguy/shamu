@@ -60,7 +60,7 @@ module Shamu
         #     include Shamu::Attributes
         #     include Shamu::Attributes::Assignment
         #
-        #     attribute :created_at, coerce: :to_datetime
+        #     attribute :created_at, coerce: :to_time
         #     attribute :count, coerce: :to_i
         #     attribute :label, coerce: ->(value){ value.upcase.to_sym }
         #     attribute :tags, coerce: :to_s, array: true
@@ -80,58 +80,76 @@ module Shamu
           def define_attribute_assignment( name, coerce: :smart, array: false, ** )
             super
 
-            class_eval <<-RUBY, __FILE__, __LINE__ + 1
-              def assign_#{ name }( *values )
-                assigned_attribute!( :#{ name } )
-                @#{ name } = coerce_#{ name }#{ array ? '_array' : '' }( *values )
-              end
-            RUBY
-            private :"assign_#{ name }"
+            mod = Module.new do
+              module_eval <<-RUBY, __FILE__, __LINE__ + 1
+                private def assign_#{ name }( *values )
+                  assigned_attribute!( :#{ name } )
+                  super coerce_#{ name }#{ array ? '_array' : '' }( *values )
+                end
+              RUBY
+            end
 
-            define_attribute_coercion( name, coerce )
-            define_attribute_array( name ) if array
+
+            define_attribute_coercion( mod, name, coerce )
+            define_attribute_array( mod, name ) if array
+
+            include mod
           end
 
-          def define_attribute_array( name )
-            class_eval <<-RUBY, __FILE__, __LINE__ + 1
-              def coerce_#{ name }_array( value )
+          def define_attribute_array( mod, name )
+            mod.module_eval <<-RUBY, __FILE__, __LINE__ + 1
+              private def coerce_#{ name }_array( value )
                 value && Array( value ).map do |v|
                   coerce_#{ name }( v )
                 end
               end
             RUBY
-
-            private :"coerce_#{ name }_array"
           end
 
-          def define_attribute_coercion( name, coerce ) # rubocop:disable Metrics/PerceivedComplexity
+          def define_attribute_coercion( mod, name, coerce ) # rubocop:disable Metrics/PerceivedComplexity
             coerce = cource_method( name, coerce )
 
             if coerce.is_a?( Class )
-              define_method :"coerce_#{ name }" do |value|
+              mod.send :define_method, :"coerce_#{ name }_value" do |value|
                 coerce.new( value ) if value
               end
             elsif !coerce || coerce.is_a?( Symbol )
-              class_eval <<-RUBY, __FILE__, __LINE__ + 1
-                def coerce_#{ name }( value )
+              mod.module_eval <<-RUBY, __FILE__, __LINE__ + 1
+                def coerce_#{ name }_value( value )
                   value#{ coerce && ".#{ coerce }" }
                 end
               RUBY
             elsif coerce
-              define_method :"coerce_#{ name }", coerce
+              mod.send :define_method, :"coerce_#{ name }_value", coerce
             end
 
-            private :"coerce_#{ name }"
+            mod.send :private, :"coerce_#{ name }_value"
+
+            mod.module_eval <<-RUBY, __FILE__, __LINE__ + 1
+              def coerce_#{ name }( value )
+                clean_#{ name }( coerce_#{ name }_value( value ) )
+              end
+            RUBY
           end
 
           def cource_method( name, coerce )
             if coerce == :smart
               case name
-              when /_at$/, /_on$/ then :to_datetime
+              when /_at$/, /_on$/ then method(:coerce_time_like_value)
               when /(^|_)ids?$/   then :to_model_id
               end
             else
               coerce
+            end
+          end
+
+          def coerce_time_like_value(value)
+            case value
+            when Time, DateTime, ActiveSupport::TimeWithZone then value.to_time
+            when Numeric then Time.at( value )
+            else
+              return value.to_time if value.respond_to?( :to_time )
+              raise ArgumentError, "Cannot coerce time like value"
             end
           end
 

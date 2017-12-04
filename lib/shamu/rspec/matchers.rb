@@ -15,9 +15,8 @@ RSpec::Matchers.define :raise_access_denied do |_expected|
       true
     rescue Services::Security::AccessDeniedError
       true
-    rescue
-      false
     end
+      false
   end
 end
 

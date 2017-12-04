@@ -25,6 +25,7 @@ module Shamu
     class Request
       include Shamu::Attributes
       include Shamu::Attributes::Assignment
+      include Shamu::Attributes::TrimStrings
       include Shamu::Attributes::Validation
 
       # Applies the attributes of the request to the given model. Only handles
@@ -34,7 +35,7 @@ module Shamu
       # @param [Object] model or object to apply the attributes to.
       # @return [model]
       def apply_to( model )
-        self.class.attributes.each do |name, _|
+        self.class.attributes.each_key do |name|
           method = :"#{ name }="
           model.send method, send( name ) if model.respond_to?( method ) && set?( name )
         end

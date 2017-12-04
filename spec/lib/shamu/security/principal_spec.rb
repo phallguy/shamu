@@ -13,7 +13,7 @@ describe Shamu::Security::Principal do
     it "is true for given scope" do
       principal = Shamu::Security::Principal.new scopes: [ :admin ]
 
-      expect( principal ).to     be_scoped :admin
+      expect( principal ).to be_scoped :admin
     end
 
     it "is false for ungiven scope" do

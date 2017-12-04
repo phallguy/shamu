@@ -27,15 +27,15 @@ module Shamu
 
         # Limit the records to those that have been soft destroyed.
         # @return [ActiveRecord::Relation]
-        scope :destroyed, ->() { unscope( where: :destroyed_at ).where( arel_table[ :destroyed_at ].not_eq( nil ) ) }
+        scope :destroyed, -> { unscope( where: :destroyed_at ).where( arel_table[ :destroyed_at ].not_eq( nil ) ) }
 
         # Limit the records to those that have not been destroyed.
         # @return [ActiveRecord::Relation]
-        scope :except_destroyed, ->() { unscope( where: :destroyed_at ).where( arel_table[ :destroyed_at ].eq( nil ) ) }
+        scope :except_destroyed, -> { unscope( where: :destroyed_at ).where( arel_table[ :destroyed_at ].eq( nil ) ) }
 
         # Include live and soft destroyed records.
         # @return [ActiveRecord::Relation]
-        scope :including_destroyed, ->() { unscope( where: :destroyed_at ) }
+        scope :including_destroyed, -> { unscope( where: :destroyed_at ) }
 
         # Exclude destroyed records by default.
         default_scope { except_destroyed }

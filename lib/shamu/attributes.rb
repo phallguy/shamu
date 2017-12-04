@@ -31,6 +31,7 @@ module Shamu
     require "shamu/attributes/equality"
     require "shamu/attributes/camel_case"
     require "shamu/attributes/html_sanitation"
+    require "shamu/attributes/trim_strings"
 
     def initialize( *attributes )
       assign_attributes( attributes.last )
@@ -77,19 +78,30 @@ module Shamu
     end
 
     # @return [Hash] the assigned attributes as a hash for JSON serialization.
-    def as_json( options = {} ) # rubocop:disable Styles/OptionHash
+    def as_json( options = {} ) # rubocop:disable Style/OptionHash
       to_attributes( options.slice( :only, :except ) ).as_json
     end
 
     # @return [String] JSON encoded version of the assigned attributes.
-    def to_json( options = {} ) # rubocop:disable Styles/OptionHash
+    def to_json( options = {} ) # rubocop:disable Style/OptionHash
       as_json( options ).to_json
+    end
+
+    def inspect
+      result = "<#{ self.class.name }:0x#{ object_id.to_s( 16 ) }"
+      attributes = to_attributes
+      attributes.keys.map do |name|
+        result << " #{ name }=#{ attributes[ name ].inspect }"
+      end
+      result << ">"
+      result
     end
 
     def pretty_print( pp )
       attributes = to_attributes
 
       pp.object_address_group( self ) do
+        pretty_print_custom( pp )
         pp.seplist( attributes.keys, -> { pp.text "," } ) do |name|
           pp.breakable " "
           pp.group( 1 ) do
@@ -103,6 +115,9 @@ module Shamu
     end
 
     private
+
+      def pretty_print_custom( pp )
+      end
 
       def match_attribute?( pattern, name )
         Array( pattern ).any? do |matcher|
@@ -301,11 +316,19 @@ module Shamu
         end
 
         def define_attribute_assignment( name, ** )
-          class_eval <<-RUBY, __FILE__, __LINE__ + 1
-            def assign_#{ name }( value )                           # assign_attribute( value )
-              @#{ name } = value                                    #   @attribute = value
-            end                                                     # end
-          RUBY
+          mod = Module.new do
+            module_eval <<-RUBY, __FILE__, __LINE__ + 1
+              private def assign_#{ name }( value )                   # assign_attribute( value )
+                @#{ name } = clean_#{ name }( value  )                #   @attribute = clean_attribute( value )
+              end                                                     # end
+
+              private def clean_#{ name }( value )                    # clean_attribute( value )
+                value                                                 #   value
+              end                                                     # end
+            RUBY
+          end
+
+          include mod
         end
 
     end

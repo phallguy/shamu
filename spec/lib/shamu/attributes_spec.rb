@@ -147,7 +147,7 @@ describe Shamu::Attributes do
         include Shamu::Attributes
 
         attribute :version
-        attribute :opened, default: ->() { version > 5 }
+        attribute :opened, default: -> { version > 5 }
       end
 
       instance = klass.new( version: 18 )

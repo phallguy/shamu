@@ -10,6 +10,10 @@ module Shamu
         :yes
       end
 
+      def refine_relation( action, relation, additional_context = nil )
+        relation
+      end
+
     end
   end
 end

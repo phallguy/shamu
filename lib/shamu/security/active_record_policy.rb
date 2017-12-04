@@ -50,6 +50,10 @@ module Shamu
         resolve_permissions
         refined = false
 
+        if refinements.blank?
+          fail IncompleteSetupError, "Refinements have not been defined. Add refinements in the permission definitions of #{ self.class.name }" # rubocop:disable Metrics/LineLength
+        end
+
         refinements.each do |refinement|
           if refinement.match?( action, relation, additional_context )
             refined  = true

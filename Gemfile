@@ -16,7 +16,7 @@ group :test do
 
   gem "sqlite3", "~> 1.3.11"
   gem "guard", "~> 2.12.8"
-  gem "rubocop", "~> 0.49.0"
+  gem "rubocop", "~> 0.49"
   gem "guard-rubocop"
   gem "spring"
   gem "guard-rspec"

@@ -79,6 +79,26 @@ module Shamu
           security_principal.service_delegate?
         end
 
+        # Hook method for services to redact cached entities before returning
+        # them to caller
+        #
+        # @param [Entities::List] list to be redacted
+        # @return [Enumerable<Entities::Entity>] the redacted entities
+        def redact_list( list )
+          list.map do |entity|
+            policy.redact( entity )
+          end
+        end
+
+        def redact_entities( entities )
+          Shamu::Security::RedactedList.new( entities ) do |list|
+            redact_list( list )
+          end
+        end
+
+        def authorize_relation( *args )
+          policy.refine_relation( *args )
+        end
 
       class_methods do
 
