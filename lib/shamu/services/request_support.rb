@@ -106,9 +106,7 @@ module Shamu
         #   users.update id: 1, name: "Changed" # HTTP request params
         #
         def extract_params( id, params )
-          if !params && !id.respond_to?( :to_model_id )
-            params, id = id, id[ :id ] || id[ "id" ]
-          end
+          params, id = id, id[ :id ] || id[ "id" ] if !params && !id.respond_to?( :to_model_id )
 
           if params
             params = params.symbolize_keys if params.respond_to?( :symbolize_keys )

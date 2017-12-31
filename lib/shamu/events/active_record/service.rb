@@ -1,5 +1,3 @@
-require "thread"
-
 module Shamu
   module Events
     module ActiveRecord
@@ -80,9 +78,7 @@ module Shamu
           queue   = Message.where( channel_id: channel[:id] )
 
           if runner_id && ( runner = create_runner( runner_id ) )
-            if runner.last_processed_id
-              queue = queue.where( Message.arel_table[ :id ].gt( runner.last_processed_id ) )
-            end
+            queue = queue.where( Message.arel_table[ :id ].gt( runner.last_processed_id ) ) if runner.last_processed_id
           end
 
           {

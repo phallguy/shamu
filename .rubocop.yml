@@ -56,6 +56,12 @@ Metrics/BlockLength:
 Style/Alias:
   Enabled: false
 
+Style/SafeNavigation:
+  Enabled: false
+
+Style/FormatStringToken:
+  Enabled: false
+
 Layout/CommentIndentation:
   Enabled: false
 
@@ -69,6 +75,12 @@ Layout/EmptyLinesAroundClassBody:
   Enabled: false
 
 Layout/EmptyLinesAroundModuleBody:
+  Enabled: false
+
+Layout/SpaceInsideArrayLiteralBrackets:
+  Enabled: false
+
+Layout/SpaceInsideReferenceBrackets:
   Enabled: false
 
 Style/FrozenStringLiteralComment:
@@ -122,10 +134,10 @@ Layout/SpaceAroundBlockParameters:
 Style/PercentLiteralDelimiters:
   Enabled: false
 
-Layout/SpaceAroundOperators:
+Layout/EmptyLinesAroundArguments:
   Enabled: false
 
-Layout/SpaceInsideBrackets:
+Layout/SpaceAroundOperators:
   Enabled: false
 
 Layout/SpaceInsideParens:

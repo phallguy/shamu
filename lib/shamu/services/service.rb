@@ -61,7 +61,34 @@ module Shamu
       # Support dependency injection for related services.
       include Scorpion::Object
 
+      def inspect
+        result = "<#{ self.class.name }:0x#{ object_id.to_s( 16 ) }"
+        self.class.injected_attributes.map do |attr|
+          result << " #{ attr.name }=#{ send( attr.name ).inspect }"
+        end
+        result << ">"
+        result
+      end
+
+      def pretty_print( pp )
+        pp.object_address_group( self ) do
+          pretty_print_custom( pp )
+          pp.seplist( self.class.injected_attributes, -> { pp.text "," } ) do |attr|
+            pp.breakable " "
+            pp.group( 1 ) do
+              pp.text attr.name.to_s
+              pp.text ":"
+              pp.breakable " "
+              pp.pp send( attr.name )
+            end
+          end
+        end
+      end
+
       private
+
+        def pretty_print_custom( pp )
+        end
 
         # Maps a single record to an entity. Requires a `build_entities` method
         # that maps an enumerable set of records to entities.
@@ -162,7 +189,7 @@ module Shamu
             list.find { |e| matcher.call( e ) == id } || scorpion.fetch( null_class, id: id )
           end
 
-          Entities::List.new( matched )
+          build_entity_list matched
         end
 
           ID_MATCHER = ->( record ) { record && record.id }

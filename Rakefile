@@ -7,7 +7,7 @@ end
 
 desc "Run linters on the codebase"
 task :lint do
-  system "rubocop"
+  system "bundle exec rubocop -S -D --config .rubocop.yml"
 end
 
 task :default => [ :lint, :specs ]

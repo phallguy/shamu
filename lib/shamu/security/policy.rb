@@ -102,6 +102,15 @@ module Shamu
         false
       end
 
+      # Redact any attributes on the entity that are not publicly readable by
+      # the {#principal}
+      #
+      # @param [Entities::Entity] entity to redact.
+      # @return [Entities::Entity] the redacted entity.
+      def redact( entity )
+        entity
+      end
+
       private
 
         # The rules that have been defined.
@@ -149,7 +158,7 @@ module Shamu
         # @param [Integer] id of the candidate user.
         # @return [Boolean] true if the given id is one of the authorized user
         # ids on the principal.
-        def is_principal?( id ) # rubocop:disable Style/PredicateName
+        def is_principal?( id ) # rubocop:disable Naming/PredicateName
           principal.try( :user_id ) == id || related_user_ids.include?( id )
         end
 
@@ -294,7 +303,7 @@ module Shamu
         # @param [Array<Symbol>] actions to alias.
         # @param [Symbol] to the action that should permit all the listed aliases.
         # @return [void]
-        def alias_action( *actions, to: fail ) # bug in rubocop chokes on trailing required keyword
+        def alias_action( *actions, to: fail )
           aliases[to] ||= []
           aliases[to] |= actions
         end

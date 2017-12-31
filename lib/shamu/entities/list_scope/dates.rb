@@ -40,9 +40,9 @@ module Shamu
 
           coerce = Time.instance_method( :to_time ) ? :to_time : nil
 
-          base.attribute :since, coerce: coerce, default: ->() { default_since }
+          base.attribute :since, coerce: coerce, default: -> { default_since }
           base.attribute :default_since, coerce: coerce, serialize: false
-          base.attribute :until, coerce: coerce, default: ->() { default_until }
+          base.attribute :until, coerce: coerce, default: -> { default_until }
           base.attribute :default_until, coerce: coerce, serialize: false
         end
 

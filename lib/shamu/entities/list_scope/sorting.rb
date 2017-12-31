@@ -47,7 +47,7 @@ module Shamu
 
           base.attribute :sort_by, as: :order,
                                    coerce: ->( *values ) { parse_sort_by( values ) },
-                                   default: ->() { default_sort_by }
+                                   default: -> { default_sort_by }
         end
 
         # @return [Boolean] true if the scope is paged.

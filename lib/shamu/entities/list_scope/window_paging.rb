@@ -38,12 +38,12 @@ module Shamu
         def self.included( base )
           super
 
-          base.attribute :first, coerce: :to_i, default: ->() { default_first }
+          base.attribute :first, coerce: :to_i, default: -> { default_first }
           base.attribute :default_first, coerce: :to_i, serialize: false
 
           base.attribute :after, coerce: :to_i
 
-          base.attribute :last, default: ->() { default_last }, coerce: ->( value ) do
+          base.attribute :last, default: -> { default_last }, coerce: ->( value ) do
             ensure_includes_sorting!
             reverse_sort!
 

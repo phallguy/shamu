@@ -93,6 +93,38 @@ module Shamu
         !user_id
       end
 
+      def inspect
+        result = "<#{ self.class.name }:0x#{ object_id.to_s( 16 ) }"
+        [ :user_id, :scopes, :elevated, :remote_ip, :parent_principal ].map do |name|
+          value = send( name )
+          result << " #{ name }=#{ send( name ).inspect }" if value
+        end
+        result << ">"
+        result
+      end
+
+      def pretty_print( pp )
+        attributes = [ :user_id, :scopes, :elevated, :remote_ip, :parent_principal ]
+        attributes = attributes.reject! { |a| send(a).nil? }
+
+        pp.object_address_group( self ) do
+          pretty_print_custom( pp )
+          pp.seplist( attributes, -> { pp.text "," } ) do |name|
+            value = send( name )
+
+            pp.breakable " "
+            pp.group( 1 ) do
+              pp.text name.to_s
+              pp.text ":"
+              pp.breakable " "
+              pp.pp value
+            end
+          end
+        end
+      end
+
+      def pretty_print_custom( pp )
+      end
     end
   end
 end

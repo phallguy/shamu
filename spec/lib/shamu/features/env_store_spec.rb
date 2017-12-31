@@ -19,7 +19,7 @@ describe Shamu::Features::EnvStore do
     packed = codec.pack( "buy_now" => true )
     env    = {
       "rack.input" => StringIO.new,
-      "QUERY_STRING" => "#{ Shamu::Features::EnvStore::RACK_PARAMS_KEY }=#{ URI.escape( packed ) }"
+      "QUERY_STRING" => "#{ Shamu::Features::EnvStore::RACK_PARAMS_KEY }=#{ CGI.escape( packed ) }"
     }
     scorpion.hunt_for Scorpion::Rack::Env, return: env
 

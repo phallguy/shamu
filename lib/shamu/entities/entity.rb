@@ -128,6 +128,7 @@ module Shamu
           end
 
         assign_attributes hash
+        @redacted = true
         self
       end
 
@@ -138,6 +139,10 @@ module Shamu
       end
 
       private
+
+        def pretty_print_custom( pp )
+          pp.text " [REDACTED] " if @redacted
+        end
 
         def serialize_attribute?( name, options )
           super && !options[:model]
@@ -150,7 +155,7 @@ module Shamu
           if value.is_a?( Entity ) || other_value.is_a?( Entity )
             return value.id.eql?( other_value.id )
           else
-            value.eql?( other_value )
+            super
           end
         end
 

@@ -50,7 +50,10 @@ module Shamu
             def respond_to_missing?( method, include_private = false )
               __getobj__.respond_to?( method, include_private ) || super
             end
+          end
 
+          lazy_class.define_singleton_method :model_name do
+            klass.model_name
           end
 
           klass.const_set( :Lazy_, lazy_class )

@@ -36,7 +36,7 @@ module Shamu
           super
 
           base.attribute :page, coerce: :to_i
-          base.attribute :per_page, coerce: :to_i, default: ->() { default_per_page }
+          base.attribute :per_page, coerce: :to_i, default: -> { default_per_page }
           base.attribute :default_per_page, coerce: :to_i, serialize: false
         end
 

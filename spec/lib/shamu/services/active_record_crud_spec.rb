@@ -23,6 +23,10 @@ module ActiveRecordCrudSpec
       attribute :id
     end
 
+    class Command < Change
+      attribute :name
+    end
+
     class Destroy < Change
       attribute :id
     end
@@ -35,7 +39,11 @@ module ActiveRecordCrudSpec
 
     resource FavoriteEntity, ActiveRecordSpec::Favorite
     define_crud
+    define_command :command, ->(request) { lookup_record( request ) }
 
+    def lookup_record( request )
+      ActiveRecordSpec::Favorite.find_by( name: request.name )
+    end
   end
 
   class FavoriteListScope < Shamu::Entities::ListScope
@@ -247,6 +255,66 @@ describe Shamu::Services::ActiveRecordCrud do
         service.observe( &b )
 
         service.update entity
+      end.to yield_control
+    end
+  end
+
+  describe ".command" do
+    let( :request ) { ActiveRecordCrudSpec::Request::Command.new( name: entity.name ) }
+    let( :entity )  { service.create( name: "Example", label: "Books" ).entity! }
+
+    it "calls lookup method" do
+      expect( service ).to receive( :lookup_record ).and_call_original
+      service.command request
+    end
+
+    it "calls request.apply_to" do
+      expect( request ).to receive( :apply_to ).and_call_original
+      service.command request
+    end
+
+    it "yields if block given" do
+      expect do |b|
+        yield_klass = Class.new( klass ) do
+          define_command( :command, ->( request ) { lookup_record( request ) }, &b )
+        end
+
+        scorpion.new( yield_klass ).command request
+      end.to yield_with_args( kind_of( ::ActiveRecord::Base ), request )
+    end
+
+    it "short-circuits if block yields a Services::Result" do
+      entity
+      record  = service.class.model_class.all.first
+      expect( record ).not_to receive( :save )
+
+      yield_klass = Class.new( klass ) do
+        define_command :command, ->( _request ) { record } do
+          Shamu::Services::Result.new
+        end
+      end
+
+      service = scorpion.new( yield_klass )
+      service.command request
+    end
+
+    it "calls #authorize!" do
+      entity
+
+      expect( service ).to receive( :authorize! ).with(
+        :command,
+        kind_of( ActiveRecordCrudSpec::FavoriteEntity ),
+        kind_of( ActiveRecordCrudSpec::Request::Command )
+      )
+
+      service.command request
+    end
+
+    it "is observable" do
+      expect do |b|
+        service.observe( &b )
+
+        service.command request
       end.to yield_control
     end
   end
