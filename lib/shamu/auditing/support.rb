@@ -22,14 +22,24 @@ module Shamu
 
         private
 
+          alias_method :with_unaudited_partial_request, :with_partial_request
+
           # Override {Shamu::Services::RequestSupport#with_partial_request} and to yield
           # a {Transaction} as an additional argument to automatically
           # {#audit_request audit the request}.
           def with_partial_request( *args, &block )
-            super( *args ) do |request|
+            with_unaudited_partial_request( *args ) do |request|
               audit_request request do |transaction|
                 yield request, transaction
               end
+            end
+          end
+
+          def with_unaudited_request( *args, &block )
+            with_unaudited_partial_request( *args ) do |request, *other_args|
+              next unless request.valid?
+
+              yield request, *other_args
             end
           end
 
@@ -54,17 +64,19 @@ module Shamu
         def audit_request( request, action: :smart, &block ) # rubocop:disable Metrics/PerceivedComplexity
           transaction = Transaction.new \
             user_id_chain: auditing_security_principal.user_id_chain,
-            changes: request.to_attributes( only: request.assigned_attributes ),
+            params: request.to_attributes( only: request.assigned_attributes ),
             action: audit_request_action( request, action )
 
           result = yield transaction if block_given?
           result = Services::Result.coerce( result, request: request )
 
           if result.valid?
-            if result.entity
-              transaction.append_entity result.entity
-            elsif !transaction.entities? && request.respond_to?( :id ) && defined? entity_class
-              transaction.append_entity [ entity_class, request.id ]
+            unless transaction.entities?
+              if result.entity
+                transaction.append_entity result.entity
+              elsif request.respond_to?( :id ) && defined? entity_class
+                transaction.append_entity [ entity_class, request.id ]
+              end
             end
             auditing_service.commit( transaction )
           end

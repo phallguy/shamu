@@ -1,2 +1,3 @@
 --color
---format Fuubar
+--format RSpec::Instafail
+--format progress

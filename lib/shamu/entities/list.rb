@@ -16,7 +16,7 @@ module Shamu
         entities.each( &block )
       end
 
-      delegate :first, :last, :count, :empty?, to: :raw_entities
+      delegate :first, :last, :count, :[], :empty?, to: :raw_entities
 
       alias_method :size, :count
       alias_method :length, :count
@@ -35,6 +35,7 @@ module Shamu
       def get( key, field: key_attribute )
         entity =
           if field == :id
+            key = key.to_model_id
             entities.find { |e| e.id == key }
           else
             entities.find { |e| e.send( field ) == key }
