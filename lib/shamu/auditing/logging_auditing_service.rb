@@ -19,7 +19,7 @@ module Shamu
       # @param [Transaction] transaction
       # @return [AuditRecord] the persisted record.
       def commit( transaction )
-        logger.unknown "AUDIT TRANSACTION action: #{ transaction.action } entity: #{ transaction.entity_path } by user: #{ transaction.user_id_chain } changes: #{ filter_changes( transaction.changes ) }" # rubocop:disable Metrics/LineLength
+        logger.unknown "AUDIT TRANSACTION action: #{ transaction.action } entity: #{ transaction.entity_path } by user: #{ transaction.user_id_chain } params: #{ filter_params( transaction.params ) }" # rubocop:disable Metrics/LineLength
       end
 
     end

@@ -89,32 +89,33 @@ module Shamu
 
     def inspect
       result = "<#{ self.class.name }:0x#{ object_id.to_s( 16 ) }"
-      attributes = to_attributes
-      attributes.keys.map do |name|
-        result << " #{ name }=#{ attributes[ name ].inspect }"
+      inspectable_attributes.map do |name|
+        result << " #{ name }=#{ send( name ).inspect }"
       end
       result << ">"
       result
     end
 
     def pretty_print( pp )
-      attributes = to_attributes
-
       pp.object_address_group( self ) do
         pretty_print_custom( pp )
-        pp.seplist( attributes.keys, -> { pp.text "," } ) do |name|
+        pp.seplist( inspectable_attributes, -> { pp.text "," } ) do |name|
           pp.breakable " "
           pp.group( 1 ) do
             pp.text name.to_s
             pp.text ":"
             pp.breakable " "
-            pp.pp attributes[ name ]
+            pp.pp send( name )
           end
         end
       end
     end
 
     private
+
+      def inspectable_attributes
+        to_attributes.keys
+      end
 
       def pretty_print_custom( pp )
       end

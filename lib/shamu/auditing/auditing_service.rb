@@ -17,7 +17,8 @@ module Shamu
           :password_confirmation,
           :access_token,
           :auth_token,
-          :token
+          :token,
+          :code
       ].freeze
 
       def self.create( scorpion, *args )
@@ -32,16 +33,17 @@ module Shamu
       end
 
       # @!return [Array<Symbol>] the list of keys that should be filtered in
-      # the logged changes.
+      # the logged params.
       def filter_keys
         STANDARD_FILTER_KEYS
       end
 
       private
 
-        def filter_changes( changes )
-          filter_keys.each_with_object( changes.dup ) do |key, filtered|
-            filtered[ key ] = "FILTERED" if filter_key?( key )
+        def filter_params( params )
+          return unless params
+          filter_keys.each_with_object( params.dup ) do |key, filtered|
+            filtered[ key ] = "FILTERED" if filter_key?( key ) && params.key?( key )
           end
         end
 

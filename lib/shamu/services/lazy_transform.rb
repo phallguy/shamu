@@ -25,6 +25,18 @@ module Shamu
         self
       end
 
+      # Transforms the source and returns the full results as an array.
+      # @return [Array]
+      def to_a
+        transformed.to_a
+      end
+
+      # @attribute [Integer] index
+      # @return [Object] the transformed object at the given index.
+      def []( index )
+        transformed[ index ]
+      end
+
       # (see Enumerable#count)
       # @return [Integer]
       def count( *args )

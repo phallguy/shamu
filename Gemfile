@@ -11,11 +11,11 @@ group :test do
   gem "responders", "~> 2.1.2"
   gem "kaminari", "~> 0.16.3", require: false
 
-  gem "byebug", "9.0.6"
+  gem "byebug", "~> 9.0"
   gem "pry-byebug"
 
   gem "sqlite3", "~> 1.3.11"
-  gem "guard", "~> 2.12.8"
+  gem "guard", "~> 2.12"
   gem "rubocop", "~> 0.49"
   gem "guard-rubocop"
   gem "spring"
@@ -23,14 +23,14 @@ group :test do
   gem "rspec-its"
   gem "rspec-wait"
   gem "rspec-rails", require: false
-  gem "fuubar"
+  gem "rspec-instafail"
   gem "yard"
   gem "yard-activesupport-concern"
   gem "simplecov", "~> 0.14"
   gem "ruby_gntp", "~> 0.3.4"
   gem "awesome_print"
 
-  gem "nokogiri", "1.8.0"
+  gem "nokogiri", "~> 1.8.0"
 
   gem "codeclimate-test-reporter", "~> 1.0 ", group: :test, require: nil
   gem "rspec_junit_formatter", "~> 0.2.2", platforms: :mri

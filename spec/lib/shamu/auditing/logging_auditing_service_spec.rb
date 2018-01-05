@@ -9,7 +9,7 @@ describe Shamu::Auditing::LoggingAuditingService do
     transaction = Shamu::Auditing::Transaction.new \
       user_id_chain: [1, 2, 3],
       action: :change,
-      changes: { name: "Mr Penguin" }
+      params: { name: "Mr Penguin" }
 
     transaction.append_entity [ "User", 45 ]
 
@@ -25,7 +25,7 @@ describe Shamu::Auditing::LoggingAuditingService do
     transaction = Shamu::Auditing::Transaction.new \
       user_id_chain: [1, 2, 3],
       action: :change,
-      changes: { name: "Mr Penguin", password: "I'm a secret" }
+      params: { name: "Mr Penguin", password: "I'm a secret" }
 
     transaction.append_entity [ "User", 45 ]
 

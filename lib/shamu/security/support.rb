@@ -29,9 +29,9 @@ module Shamu
       # @return [Policy] the security {Policy} for the service.
       def policy
         @policy ||= _policy_class.new(
-          principal: security_principal,
+          principal: security_principal.freeze,
           roles: roles_service.roles_for( security_principal )
-        )
+        ).freeze
       end
 
       # @!method authorize!( action, resource, additional_context = nil )
