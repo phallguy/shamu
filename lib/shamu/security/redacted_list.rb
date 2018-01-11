@@ -25,6 +25,11 @@ module Shamu
         entity && redactor.call([ entity ]).first
       end
 
+      # Make sure redacted lists can delegate to paged lists.
+      delegate :empty?, :total_count, :limit, :offset, :current_page,
+               :paged?, :next?, :last?, :first?, :previous?,
+               to: :list
+
       private
 
         attr_reader :list

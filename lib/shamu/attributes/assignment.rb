@@ -127,7 +127,7 @@ module Shamu
 
             mod.module_eval <<-RUBY, __FILE__, __LINE__ + 1
               def coerce_#{ name }( value )
-                clean_#{ name }( coerce_#{ name }_value( value ) )
+                clean_#{ name }_attribute( coerce_#{ name }_value( value ) )
               end
             RUBY
           end
@@ -145,8 +145,9 @@ module Shamu
 
           def coerce_time_like_value(value)
             case value
+            when nil                                         then value
             when Time, DateTime, ActiveSupport::TimeWithZone then value.to_time
-            when Numeric then Time.at( value )
+            when Numeric                                     then Time.at( value )
             else
               return value.to_time if value.respond_to?( :to_time )
               raise ArgumentError, "Cannot coerce time like value"

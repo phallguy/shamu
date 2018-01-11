@@ -63,7 +63,7 @@ module Shamu
         # @yieldreturn [Services::Result]
         def audit_request( request, action: :smart, &block ) # rubocop:disable Metrics/PerceivedComplexity
           transaction = Transaction.new \
-            user_id_chain: auditing_security_principal.user_id_chain,
+            principal: auditing_security_principal,
             params: request.to_attributes( only: request.assigned_attributes ),
             action: audit_request_action( request, action )
 

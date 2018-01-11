@@ -49,8 +49,8 @@ module Shamu
       attr_reader :roles
 
       # @!attribute
-      # @return [Array<Integer>] additional user ids that the {#principal} is
-      # may act on behalf of.
+      # @return [Array<Integer>] additional user ids that the {#principal} may
+      # act on behalf of.
       attr_reader :related_user_ids
 
       #
@@ -162,6 +162,15 @@ module Shamu
           principal.try( :user_id ) == id || related_user_ids.include?( id )
         end
 
+        # @!visibility public
+        #
+        # @return [Array<Integer>] the ids of the {#principal} and the
+        # {#related_user_ids} that the policy can use to refine access to
+        # entities.
+        def principal_user_ids
+          @authorized_user_ids ||= [ principal.try( :user_id ), related_user_ids ].flatten.compact
+        end
+
         # @return [Boolean] true if {#principal} has authenticated.
         def authenticated?
           principal.try( :user_id )
@@ -171,6 +180,7 @@ module Shamu
         def anonymous?
           !authenticated?
         end
+
 
         # ============================================================================
         # @!group DSL

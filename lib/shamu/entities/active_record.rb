@@ -88,10 +88,10 @@ module Shamu
         def apply_window_paging_scope( criteria, scope )
           if scope.window_paged?
             criteria = criteria.page( 1 )
-            criteria = criteria.per( scope.first )      if scope.first
-            criteria = criteria.padding( scope.after )  if scope.after
-            criteria = criteria.per( scope.last )       if scope.last
-            criteria = criteria.padding( scope.before ) if scope.before
+            criteria = criteria.per( scope.first )     if scope.first
+            criteria = criteria.offset( scope.after )  if scope.after
+            criteria = criteria.per( scope.last )      if scope.last
+            criteria = criteria.offset( scope.before ) if scope.before
           end
 
           criteria
