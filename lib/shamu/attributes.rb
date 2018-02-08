@@ -320,10 +320,10 @@ module Shamu
           mod = Module.new do
             module_eval <<-RUBY, __FILE__, __LINE__ + 1
               private def assign_#{ name }( value )                   # assign_attribute( value )
-                @#{ name } = clean_#{ name }( value  )                #   @attribute = clean_attribute( value )
+                @#{ name } = clean_#{ name }_attribute( value  )      #   @attribute = clean_attribute_attribute( value )
               end                                                     # end
 
-              private def clean_#{ name }( value )                    # clean_attribute( value )
+              private def clean_#{ name }_attribute( value )          # clean_attribute( value )
                 value                                                 #   value
               end                                                     # end
             RUBY

@@ -69,7 +69,7 @@ module Shamu
             if body.present?
               mod = Module.new do
                 module_eval <<-RUBY, __FILE__, __LINE__ + 1
-                  private def clean_#{ name }( value )
+                  private def clean_#{ name }_attribute( value )
                     #{ body.join( $/ ) }
                     super value
                   end

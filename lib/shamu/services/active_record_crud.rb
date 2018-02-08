@@ -402,7 +402,7 @@ module Shamu
 
             records =
               if block_given?
-                instance_exec( scope, &block )
+                instance_exec( default_scope, scope, &block )
               else
                 scope_relation( default_scope, scope )
               end

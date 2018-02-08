@@ -12,15 +12,6 @@ module Shamu
     # > {Security::Policy} but delegates the actual reading and writing.
     class AuditingService < Services::Service
 
-      STANDARD_FILTER_KEYS = [
-          :password,
-          :password_confirmation,
-          :access_token,
-          :auth_token,
-          :token,
-          :code
-      ].freeze
-
       def self.create( scorpion, *args )
         scorpion.fetch Shamu::Auditing::NullAuditingService, *args
       end
@@ -31,25 +22,6 @@ module Shamu
       def commit( transaction )
         fail NotImplementedError
       end
-
-      # @!return [Array<Symbol>] the list of keys that should be filtered in
-      # the logged params.
-      def filter_keys
-        STANDARD_FILTER_KEYS
-      end
-
-      private
-
-        def filter_params( params )
-          return unless params
-          filter_keys.each_with_object( params.dup ) do |key, filtered|
-            filtered[ key ] = "FILTERED" if filter_key?( key ) && params.key?( key )
-          end
-        end
-
-        def filter_key?( key )
-          filter_keys.include?( key.to_sym )
-        end
 
     end
   end
