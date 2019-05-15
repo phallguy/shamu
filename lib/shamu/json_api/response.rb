@@ -80,7 +80,7 @@ module Shamu
 
       # (see BaseBuilder#compile)
       def compile
-        @compiled ||= begin
+        @compile ||= begin
           compiled = output.dup
           compiled[:jsonapi] = { version: "1.0" }
           if params_meta = context.params_meta

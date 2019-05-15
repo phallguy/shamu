@@ -34,6 +34,7 @@ module Shamu
       # Fetch a value from the environment.
       def fetch( key, &block )
         return env_fetch( key, &block ) unless defined? Rack
+
         rack_params_fetch( key, &block )
       end
 

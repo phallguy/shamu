@@ -9,6 +9,7 @@ module Shamu
 
       included do |base|
         raise "Must include Shamu::Attributes first." unless base < Shamu::Attributes
+
         public :assign_attributes
       end
 
@@ -66,7 +67,7 @@ module Shamu
         #     attribute :tags, coerce: :to_s, array: true
         #   end
         def attribute( name, *args, **options, &block )
-          super( name, *args, **options )
+          super
           define_attribute_assignment( name, **options )
           define_attribute_writer( name, **options )
         end
@@ -150,6 +151,7 @@ module Shamu
             when Numeric                                     then Time.at( value )
             else
               return value.to_time if value.respond_to?( :to_time )
+
               raise ArgumentError, "Cannot coerce time like value"
             end
           end

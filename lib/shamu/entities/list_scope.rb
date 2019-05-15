@@ -72,6 +72,7 @@ module Shamu
         def coerce!( params )
           coerced = coerce( params )
           raise ArgumentError unless coerced.valid?
+
           coerced
         end
 

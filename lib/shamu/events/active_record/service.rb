@@ -63,6 +63,7 @@ module Shamu
         #     dispatched on each channel.
         def dispatch( runner_id, *names, limit: nil )
           fail UnknownRunnerError unless runner_id.present?
+
           names = channels.keys unless channels.present?
 
           names.each_with_object( {} ) do |name, dispatched|
@@ -104,6 +105,7 @@ module Shamu
           def dispatch_channel( state, runner_id, limit )
             mutex.synchronize do
               return if state[:dispatching]
+
               state[ :dispatching ] = true
             end
 

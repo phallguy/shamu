@@ -9,8 +9,8 @@ module Shamu
     module OpaqueId
       module_function
 
-      PATTERN = %r{\A[a-zA-Z0-9+/]+={0,3}\z}
-      NUMERICAL = %r{\A[0-9]+\z}
+      PATTERN = %r{\A[a-zA-Z0-9+/]+={0,3}\z}.freeze
+      NUMERICAL = %r{\A[0-9]+\z}.freeze
 
       # @return [String] an opaque value that uniquely identifies the
       # entity.
@@ -48,6 +48,7 @@ module Shamu
       # @return [Boolean] true if the given value is an opaque id.
       def opaque_id?( value )
         return unless value
+
         PATTERN =~ value && NUMERICAL !~ value
       end
     end

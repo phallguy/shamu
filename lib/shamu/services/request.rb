@@ -44,7 +44,7 @@ module Shamu
       end
 
       # Entities are always immutable - so they are considered persisted. Use a
-      # {Services::ChangeRequest} to back a form instead.
+      # {Services::Request} to back a form instead.
       def persisted?
         if respond_to?( :id )
           !!id
@@ -121,10 +121,11 @@ module Shamu
         def coerce!( params )
           coerced = coerce( params )
           raise ArgumentError unless coerced.valid?
+
           coerced
         end
 
-        REQUEST_ACTION_PATTERN = /(Create|Update|New|Change|Delete)?(Request)?$/
+        REQUEST_ACTION_PATTERN = /(Create|Update|New|Change|Delete)?(Request)?$/.freeze
 
         # @return [ActiveModel::Name] used by url_helpers or form_helpers etc.
         #   when generating model specific names for this request.

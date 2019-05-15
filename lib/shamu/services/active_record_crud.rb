@@ -187,6 +187,7 @@ module Shamu
               authorize! method, build_entity( record ), request
 
               next record unless record.save
+
               redact_entity( build_entity( record ) )
             end
           end
@@ -226,6 +227,7 @@ module Shamu
               end
 
               next record unless record.save
+
               redact_entity( build_entity( record ) )
             end
           end
@@ -271,6 +273,7 @@ module Shamu
               end
 
               next record unless record.save
+
               redact_entity( build_entity( record ) )
             end
           end
@@ -304,6 +307,7 @@ module Shamu
               end
 
               next record unless record.destroy
+
               entity
             end
           end
@@ -457,6 +461,7 @@ module Shamu
             parts = ( name || "Resource" ).split( "::" )
             parts.pop
             return "" if parts.empty?
+
             parts.join( "::" ) << "::"
           end
 

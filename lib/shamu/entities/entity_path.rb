@@ -7,7 +7,7 @@ module Shamu
     # Entity paths can be used to identify polymorphic relationships between
     # entities managed by difference services.
     module EntityPath
-      extend self # rubocop:disable Style/ModuleFunction
+      extend self
 
       # Composes an array of entities describing the path from the root entity
       # to the leaf into a string.

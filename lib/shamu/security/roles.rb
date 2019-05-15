@@ -51,6 +51,7 @@ module Shamu
               end
 
               next unless role = self.roles[ name ]
+
               expanded << name
 
               role[ :inherits ].each do |inherited|

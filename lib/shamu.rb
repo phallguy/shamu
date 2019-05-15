@@ -1,6 +1,6 @@
 require "i18n"
 
-I18n.load_path += Dir[ File.expand_path( "../shamu/locale/*.yml", __FILE__ ) ]
+I18n.load_path += Dir[ File.expand_path( "shamu/locale/*.yml", __dir__ ) ]
 
 # {include:file:README.md}
 module Shamu

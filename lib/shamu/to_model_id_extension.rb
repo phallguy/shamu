@@ -27,7 +27,7 @@ module Shamu
 
     # Add `to_model_id` to String types.
     module Strings
-      NUMERIC_PATTERN = /\A\s*[0-9]+\z/
+      NUMERIC_PATTERN = /\A\s*[0-9]+\z/.freeze
 
       def to_model_id
         self =~ NUMERIC_PATTERN ? to_i : nil

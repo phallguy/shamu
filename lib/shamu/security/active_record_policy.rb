@@ -97,6 +97,7 @@ module Shamu
         # @return [void]
         def refine( *actions, model_class, &block )
           fail "No actions defined" if actions.blank?
+
           refinements << PolicyRefinement.new( expand_aliases( actions ), model_class, block )
         end
 

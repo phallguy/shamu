@@ -79,6 +79,7 @@ module Shamu
       def initialize( attributes )
         fail ArgumentError, "Must provide a retire_at attribute for '#{ attributes[ 'name' ] }' toggle." unless attributes["retire_at"] # rubocop:disable Metrics/LineLength
         fail ArgumentError, "Type must be one of #{ TYPES } for '#{ attributes[ 'name' ] }' toggle." unless TYPES.include?( attributes["type"] ) # rubocop:disable Metrics/LineLength
+
         super
       end
 
@@ -137,6 +138,7 @@ module Shamu
           # it's children themselves may be toggles.
           def toggle?( node )
             return unless node.is_a? Hash
+
             node.keys.all? { |k| TOGGLE_KEYS.include?( k ) }
           end
 

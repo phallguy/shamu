@@ -58,6 +58,7 @@ module Shamu
           super
         else
           return @first if defined? @first
+
           @first = begin
             value = source.first
             raise_if_not_transformed( transformer.call( [ value ] ) ).first unless value.nil?
@@ -74,6 +75,7 @@ module Shamu
           transformed.last( *args )
         else
           return @last if defined? @last
+
           @last = begin
             value = source.last
             raise_if_not_transformed( transformer.call( [ value ] ) ).last unless value.nil?
@@ -138,6 +140,7 @@ module Shamu
 
         def raise_if_not_transformed( transformed )
           raise "Block to LazyTransform did not return an enumerable value" unless transformed.is_a? Enumerable
+
           transformed
         end
     end

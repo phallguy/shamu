@@ -10,7 +10,7 @@ module FeaturesServiceSpec
 end
 
 describe Shamu::Features::FeaturesService do
-  let( :config_path ) { File.expand_path( "../features.yml", __FILE__ ) }
+  let( :config_path ) { File.expand_path( "features.yml", __dir__ ) }
   let( :service )     { scorpion.new Shamu::Features::FeaturesService, config_path }
   let( :codec )       { scorpion.new Shamu::Features::ToggleCodec }
 

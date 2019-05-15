@@ -72,6 +72,7 @@ module Shamu
           def dispatch_channel( state )
             mutex.synchronize do
               return if state[:dispatching]
+
               state[ :dispatching ] = true
             end
 

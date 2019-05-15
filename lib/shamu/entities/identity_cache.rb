@@ -57,6 +57,7 @@ module Shamu
 
         def coerce_key( key )
           return key unless coercion
+
           coercion.call( key )
         end
     end

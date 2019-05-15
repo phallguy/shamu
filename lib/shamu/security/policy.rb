@@ -168,7 +168,7 @@ module Shamu
         # {#related_user_ids} that the policy can use to refine access to
         # entities.
         def principal_user_ids
-          @authorized_user_ids ||= [ principal.try( :user_id ), related_user_ids ].flatten.compact
+          @principal_user_ids ||= [ principal.try( :user_id ), related_user_ids ].flatten.compact
         end
 
         # @return [Boolean] true if {#principal} has authenticated.
@@ -223,6 +223,7 @@ module Shamu
           # Makes sure the {#permissions} method is invoked only once.
           def resolve_permissions
             return if @permissions_resolved
+
             @permissions_resolved = true
             permissions
           end

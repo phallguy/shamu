@@ -70,6 +70,7 @@ module Shamu
         if prefix.present?
           toggles.each_with_object({}) do |(name, toggle), result|
             next unless name.start_with?( prefix )
+
             result[name] = toggle
           end
         else
