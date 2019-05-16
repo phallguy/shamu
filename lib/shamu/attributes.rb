@@ -9,7 +9,6 @@ module Shamu
   # To add additional attribute functionality see
   #
   # - {Attributes::Assignment}
-  # - {Attributes::FluidAssignment}
   # - {Attributes::Validation}
   # - {Attributes::Equality}
   # - {Attributes::HtmlSanitation}
@@ -25,7 +24,6 @@ module Shamu
     extend ActiveSupport::Concern
 
     require "shamu/attributes/assignment"
-    require "shamu/attributes/fluid_assignment"
     require "shamu/attributes/validation"
     require "shamu/attributes/validators"
     require "shamu/attributes/equality"
@@ -145,6 +143,7 @@ module Shamu
         self.class.attributes.each do |key, options|
           as = options[ :as ] # Alias support
           next unless attributes.key?( key ) || ( as && attributes.key?( as ) )
+
           value = attributes[ key ]
           value ||= attributes[ as ] if as
 

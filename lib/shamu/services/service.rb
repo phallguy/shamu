@@ -119,8 +119,10 @@ module Shamu
         # @return [Entities::List]
         def entity_list( records, &transformer )
           return Entities::List.new [] unless records
+
           unless transformer
             fail "Either provide a block or add a private method `def build_entities( records )` to #{ self.class.name }." unless respond_to?( :build_entities, true ) # rubocop:disable Metrics/LineLength
+
             transformer ||= method( :build_entities )
           end
 
@@ -210,6 +212,7 @@ module Shamu
 
           def coerce_method( coerce, match )
             return coerce unless coerce == :not_set
+
             :to_model_id if match.is_a?( Symbol ) && match =~ /(^|_)ids?$/
           end
 

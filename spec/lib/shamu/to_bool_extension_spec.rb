@@ -8,19 +8,19 @@ describe Shamu::ToBoolExtension do
 
   describe Shamu::ToBoolExtension::Strings do
     {
-      "1"     => true,
-      "0"     => false,
-      "true"  => true,
+      "1" => true,
+      "0" => false,
+      "true" => true,
       "false" => false,
-      ""      => false,
-      "True"  => true,
+      "" => false,
+      "True" => true,
       "False" => false,
-      "T"     => true,
-      "F"     => false,
-      "Yes"   => true,
-      "No"    => false,
-      "Y"     => true,
-      "N"     => false,
+      "T" => true,
+      "F" => false,
+      "Yes" => true,
+      "No" => false,
+      "Y" => true,
+      "N" => false,
     }.each do |candidate, expected|
       it "converts '#{ candidate }' to #{ expected }" do
         expect( candidate.to_bool ).to eq expected
@@ -34,8 +34,8 @@ describe Shamu::ToBoolExtension do
 
   describe Shamu::ToBoolExtension::Integers do
     {
-      1    => true,
-      0    => false
+      1 => true,
+      0 => false
     }.each do |candidate, expected|
       it "converts '#{ candidate }' to #{ expected }" do
         expect( candidate.to_bool ).to eq expected
@@ -49,7 +49,7 @@ describe Shamu::ToBoolExtension do
 
   describe Shamu::ToBoolExtension::Boolean do
     {
-      true  => true,
+      true => true,
       false => false,
     }.each do |candidate, expected|
       it "converts '#{ candidate }' to #{ expected }" do

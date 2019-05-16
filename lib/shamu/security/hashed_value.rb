@@ -41,6 +41,7 @@ module Shamu
         # @return [String] packed string with hash and original value.
         def hash_value( string )
           return nil unless string
+
           "#{ hash_digest( string ) }$#{ string }"
         end
 

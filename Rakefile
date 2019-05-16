@@ -5,10 +5,20 @@ task :specs do
   system "rspec"
 end
 
-desc "Run linters on the codebase"
-task :lint do
-  system "bundle exec rubocop -S -D --config .rubocop.yml"
+namespace :lint do
+  desc "Run linters on the codebase"
+  task :run do
+    system "bundle exec rubocop -S -D --config .rubocop.yml"
+  end
+
+  desc "Run linters on the codebase and auto correct is possible"
+  task :clean do
+    system "bundle exec rubocop -S -D --safe-auto-correct --config .rubocop.yml"
+  end
 end
+
+desc "Run linters on the codebase"
+task :lint => "lint:run"
 
 task :default => [ :lint, :specs ]
 task :release => [ :default ]

@@ -14,8 +14,8 @@ describe Shamu::Entities::EntityPath do
                                            [ "Calendar", "567" ],
                                            [ "Event", "1" ]
                                          ],
-    "User[45]"                        => [ [ "User", "45" ] ],
-    "EntityPathSpec::Example[91]"     => [ [ "EntityPathSpec::Example", "91" ] ]
+    "User[45]" => [ [ "User", "45" ] ],
+    "EntityPathSpec::Example[91]" => [ [ "EntityPathSpec::Example", "91" ] ]
   }.each do |path, entities|
     it "decompose #{ path } to #{ entities }" do
       expect( Shamu::Entities::EntityPath.decompose_entity_path( path ) ).to eq entities
@@ -28,9 +28,9 @@ describe Shamu::Entities::EntityPath do
                                            [ "Calendar", "567" ],
                                            [ "Event", "1" ]
                                          ],
-    "User[45]"                        => [ [ "User", "45" ] ],
-    "User[37]"                        => [ "User[37]" ],
-    "EntityPathSpec::Example[91]"     => [ EntityPathSpec::ExampleEntity.new( id: 91 ) ]
+    "User[45]" => [ [ "User", "45" ] ],
+    "User[37]" => [ "User[37]" ],
+    "EntityPathSpec::Example[91]" => [ EntityPathSpec::ExampleEntity.new( id: 91 ) ]
   }.each do |path, entities|
     it "composes #{ entities } to #{ path }" do
       expect( Shamu::Entities::EntityPath.compose_entity_path( entities ) ).to eq path

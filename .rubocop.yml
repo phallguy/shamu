@@ -8,6 +8,9 @@ AllCops:
 Bundler/OrderedGems:
   Enabled: false
 
+Style/AccessModifierDeclarations:
+  Enabled: false
+
 Style/EmptyMethod:
   Enabled: false
 
@@ -98,7 +101,7 @@ Style/GuardClause:
 Style/HashSyntax:
   Enabled: false
 
-Layout/IndentArray:
+Layout/IndentFirstArrayElement:
   Enabled: false
 
 Layout/IndentationConsistency:
@@ -108,9 +111,6 @@ Layout/IndentationWidth:
   Enabled: false
 
 Style/Lambda:
-  Enabled: false
-
-Style/FrozenStringLiteralComment:
   Enabled: false
 
 Style/MultilineBlockChain:
@@ -161,7 +161,10 @@ Style/StringLiterals:
 Layout/TrailingBlankLines:
   Enabled: false
 
-Style/TrailingCommaInLiteral:
+Style/TrailingCommaInArrayLiteral:
+  Enabled: false
+
+Style/TrailingCommaInHashLiteral:
   Enabled: false
 
 Style/WhileUntilModifier:
@@ -174,4 +177,7 @@ Style/CaseEquality:
   Enabled: false
 
 Style/WordArray:
+  Enabled: false
+
+Naming/UncommunicativeMethodParamName:
   Enabled: false

@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe Shamu::Features::Toggle do
-  let( :path )    { File.expand_path( "../features.yml", __FILE__ ) }
+  let( :path )    { File.expand_path( "features.yml", __dir__ ) }
   let( :toggles ) { Shamu::Features::Toggle.load( path ) }
 
   it "collapses path to name" do

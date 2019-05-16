@@ -35,7 +35,7 @@ module Shamu
       include Shamu::Security::HashedValue
 
       # How long cookies should be kept.
-      TTL = ( 30 * 24 * 60 * 60 ).freeze
+      TTL = ( 30 * 24 * 60 * 60 )
 
       # ============================================================================
       # @!group Dependencies

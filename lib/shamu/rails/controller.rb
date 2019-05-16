@@ -54,7 +54,7 @@ module Shamu
         # @return [Array<Services::Service>] the list of services that can
         #     determine permissions for the controller.
         def secure_services
-          @services ||= services.select { |s| s.respond_to?( :permit? ) }
+          @secure_services ||= services.select { |s| s.respond_to?( :permit? ) }
         end
 
         # @!visibility public

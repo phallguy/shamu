@@ -78,6 +78,7 @@ module Shamu
         ids.each do |composed|
           path = EntityPath.decompose_entity_path( composed )
           fail "Only root entities can be restored" unless path.size == 1
+
           type, id = path.first
 
           types[ type ] ||= { paths: [], ids: [] }

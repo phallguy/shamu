@@ -14,6 +14,7 @@ module Shamu
       def ==( other )
         return true if other.object_id == object_id
         return false unless other.is_a?( self.class ) || is_a?( other.class )
+
         attributes_eql?( other )
       end
       alias_method :eql?, :==
@@ -32,6 +33,7 @@ module Shamu
         def attributes_eql?( other )
           self.class.attributes.all? do |key, attr|
             next true if attr[:ignore_equality]
+
             attribute_eql?( other, key )
           end
         end

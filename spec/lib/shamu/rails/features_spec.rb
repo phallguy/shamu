@@ -11,7 +11,7 @@ describe Shamu::Rails::Features, type: :controller do
   end
 
   hunt( :features_service, Shamu::Features::FeaturesService ) do
-    scorpion.new Shamu::Features::FeaturesService, File.expand_path( "../features.yml", __FILE__ )
+    scorpion.new Shamu::Features::FeaturesService, File.expand_path( "features.yml", __dir__ )
   end
 
   hunt( :session_store, Shamu::Sessions::CookieStore )

@@ -3,7 +3,7 @@ module Shamu
 
     # Lazily look up an associated resource
     module LazyAssociation
-      EXCLUDE_PATTERN = /\A(block_given\?|id|send|public_send|iterator|object_id|to_model_id|binding|class|kind_of\?|is_a\?|instance_of\?|respond_to\?|p.+_methods|__.+__)\z/ # rubocop:disable Metrics/LineLength
+      EXCLUDE_PATTERN = /\A(block_given\?|id|send|public_send|iterator|object_id|to_model_id|binding|class|kind_of\?|is_a\?|instance_of\?|respond_to\?|p.+_methods|__.+__)\z/.freeze # rubocop:disable Metrics/LineLength
       MUTEX = Mutex.new
 
       def self.class_for( klass ) # rubocop:disable Metrics/MethodLength, Metrics/PerceivedComplexity
@@ -20,6 +20,7 @@ module Shamu
             # with #method_missing.
             klass.public_instance_methods.each do |method|
               next if EXCLUDE_PATTERN =~ method
+
               undef_method method
             end
 

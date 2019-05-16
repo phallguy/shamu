@@ -100,6 +100,7 @@ module Shamu
       # @raise [ServiceRequestFailedError] if the result was not valid.
       def valid!
         raise ServiceRequestFailedError, self unless valid?
+
         self
       end
 

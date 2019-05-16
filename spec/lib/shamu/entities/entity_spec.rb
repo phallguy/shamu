@@ -41,10 +41,10 @@ describe Shamu::Entities::Entity do
   end
 
   {
-    "SetEntity"                     => "Set",
-    "Set"                           => "Set",
-    "Domain::SetEntity"             => "Domain::Set",
-    "Domain::SubDomain::SetEntity"  => "Domain::SubDomain::Set",
+    "SetEntity" => "Set",
+    "Set" => "Set",
+    "Domain::SetEntity" => "Domain::Set",
+    "Domain::SubDomain::SetEntity" => "Domain::SubDomain::Set",
     "Domain::SubDomain::SetsEntity" => "Domain::SubDomain::Set",
   }.each do |full_name, expected|
 

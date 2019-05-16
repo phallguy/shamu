@@ -9,7 +9,7 @@ module Shamu
         extend ActiveSupport::Concern
 
         # Pattern to identify request params that hold 'ids'
-        ID_PATTERN = /\A(id|.+_id)\z/
+        ID_PATTERN = /\A(id|.+_id)\z/.freeze
 
         included do
           before_action do

@@ -7,7 +7,7 @@ module Shamu
 
         # Render the response as JSON
         # @return [String]
-        def to_json
+        def to_json(*_args)
           if has_errors?
             display_errors
           elsif get?

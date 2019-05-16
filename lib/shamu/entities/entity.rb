@@ -50,7 +50,7 @@ module Shamu
     #     end
     #
     #     attribute :last_login_at do
-    #       user.login_reccords.last
+    #       user.login_records.last
     #     end
     #
     #     # Project another model
@@ -104,7 +104,7 @@ module Shamu
       end
 
       # Entities are always immutable - so they are considered persisted. Use a
-      # {Services::ChangeRequest} to back a form instead.
+      # {Services::Request} to back a form instead.
       def persisted?
         true
       end
@@ -132,10 +132,22 @@ module Shamu
         self
       end
 
+      # Redact attributes on the entity.
+      #
+      # @param [Array<Symbol>,Hash] attributes to redact on the entity. Either
+      # a list of attributes to set to nil or a hash of attributes with their
+      # values.
       # @return [Entity] a modified version of the entity with the given
       # attributes redacted.
-      def redact( attributes )
-        dup.redact!( attributes )
+      def redact( *attributes )
+        hash =
+          if attributes.first.is_a?( Symbol )
+            Hash[ attributes.zip( [ nil ] * attributes.length ) ]
+          else
+            attributes.first
+          end
+
+        self.class.new( to_attributes.merge( hash ) )
       end
 
       private

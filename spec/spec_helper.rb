@@ -10,7 +10,7 @@ require "scorpion/rspec"
 require "rspec/wait"
 require "rspec/its"
 
-root_path = File.expand_path( "../..", __FILE__ )
+root_path = File.expand_path( "..", __dir__ )
 
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.

@@ -8,6 +8,7 @@ module Shamu
       # @param [Enumerable] entities the raw list of entities.
       def initialize( entities )
         fail ArgumentError, "missing entities" if entities.nil?
+
         @raw_entities = entities
       end
 

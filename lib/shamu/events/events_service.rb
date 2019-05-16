@@ -48,7 +48,7 @@ module Shamu
       #
       # @return [EventsService]
       def self.create( scorpion, *args, &block )
-        @events_service ||= scorpion.fetch InMemory::Service
+        @events_service ||= scorpion.fetch InMemory::Service # rubocop:disable Naming/MemoizedInstanceVariableName
       end
 
       # Publish a well-defined {Message} to a known channel so that any client
