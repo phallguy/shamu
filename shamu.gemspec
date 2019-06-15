@@ -29,7 +29,7 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", "~> 1.6"
   spec.add_development_dependency "combustion", "~> 0.5"
-  spec.add_development_dependency "i18n", "~> 0.7"
+  spec.add_development_dependency "i18n", "~> 1.6"
   spec.add_development_dependency "rake", "~> 10"
   spec.add_development_dependency "rspec", "~> 3.00"
 end
