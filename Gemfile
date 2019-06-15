@@ -30,7 +30,7 @@ group :test do
   gem "ruby_gntp", "~> 0.3.4"
   gem "awesome_print"
 
-  gem "nokogiri", "~> 1.8.0"
+  gem "nokogiri", "~> 1.10.3"
 
   gem "codeclimate-test-reporter", "~> 1.0 ", group: :test, require: nil
   gem "rspec_junit_formatter", "~> 0.2.2", platforms: :mri
