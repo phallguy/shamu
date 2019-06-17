@@ -1,15 +1,14 @@
 PATH
   remote: .
   specs:
-    shamu (0.0.24)
+    shamu (0.0.25)
       activemodel (>= 5.0)
       activesupport (>= 5.0)
       crc32 (~> 1)
-      listen (~> 3)
       loofah (~> 2)
       multi_json (~> 1.11)
       rack (>= 1)
-      scorpion-ioc (~> 1.0.1)
+      scorpion-ioc (~> 1.0)
 
 GEM
   remote: https://rubygems.org/
@@ -55,11 +54,9 @@ GEM
     ast (2.4.0)
     awesome_print (1.8.0)
     builder (3.2.3)
-    byebug (9.1.0)
-    codeclimate-test-reporter (1.0.7)
-      simplecov
+    byebug (11.0.1)
     coderay (1.1.2)
-    combustion (0.9.1)
+    combustion (1.1.0)
       activesupport (>= 3.0.0)
       railties (>= 3.0.0)
       thor (>= 0.14.6)
@@ -67,9 +64,8 @@ GEM
     crass (1.0.4)
     crc32 (1.0.1)
     diff-lcs (1.3)
-    docile (1.3.1)
     erubis (2.7.0)
-    ffi (1.10.0)
+    ffi (1.11.1)
     formatador (0.2.5)
     globalid (0.4.2)
       activesupport (>= 4.2.0)
@@ -87,13 +83,9 @@ GEM
       guard (~> 2.1)
       guard-compat (~> 1.1)
       rspec (>= 2.99.0, < 4.0)
-    guard-rubocop (1.3.0)
-      guard (~> 2.0)
-      rubocop (~> 0.20)
-    i18n (0.9.5)
+    i18n (1.6.0)
       concurrent-ruby (~> 1.0)
     jaro_winkler (1.5.2)
-    json (2.2.0)
     kaminari (0.16.3)
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
@@ -109,13 +101,13 @@ GEM
       mini_mime (>= 0.1.1)
     method_source (0.9.2)
     mini_mime (1.0.1)
-    mini_portile2 (2.3.0)
+    mini_portile2 (2.4.0)
     minitest (5.11.3)
     multi_json (1.13.1)
     nenv (0.3.0)
     nio4r (2.3.1)
-    nokogiri (1.8.5)
-      mini_portile2 (~> 2.3.0)
+    nokogiri (1.10.3)
+      mini_portile2 (~> 2.4.0)
     notiffany (0.1.1)
       nenv (~> 0.1)
       shellany (~> 0.0)
@@ -125,8 +117,8 @@ GEM
     pry (0.12.2)
       coderay (~> 1.1.0)
       method_source (~> 0.9.0)
-    pry-byebug (3.5.1)
-      byebug (~> 9.1)
+    pry-byebug (3.7.0)
+      byebug (~> 11.0)
       pry (~> 0.10)
     rack (2.0.7)
     rack-test (0.6.3)
@@ -165,9 +157,9 @@ GEM
       rspec-core (~> 3.8.0)
       rspec-expectations (~> 3.8.0)
       rspec-mocks (~> 3.8.0)
-    rspec-core (3.8.0)
+    rspec-core (3.8.1)
       rspec-support (~> 3.8.0)
-    rspec-expectations (3.8.3)
+    rspec-expectations (3.8.4)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.8.0)
     rspec-instafail (1.0.0)
@@ -175,7 +167,7 @@ GEM
     rspec-its (1.3.0)
       rspec-core (>= 3.0.0)
       rspec-expectations (>= 3.0.0)
-    rspec-mocks (3.8.0)
+    rspec-mocks (3.8.1)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.8.0)
     rspec-rails (3.8.2)
@@ -186,32 +178,25 @@ GEM
       rspec-expectations (~> 3.8.0)
       rspec-mocks (~> 3.8.0)
       rspec-support (~> 3.8.0)
-    rspec-support (3.8.0)
+    rspec-support (3.8.2)
     rspec-wait (0.0.9)
       rspec (>= 3, < 4)
     rspec_junit_formatter (0.2.3)
       builder (< 4)
       rspec-core (>= 2, < 4, != 2.12.0)
-    rubocop (0.69.0)
+    rubocop (0.71.0)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
       parser (>= 2.6)
       rainbow (>= 2.2.2, < 4.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 1.7)
-    ruby-progressbar (1.10.0)
+    ruby-progressbar (1.10.1)
     ruby_dep (1.5.0)
-    ruby_gntp (0.3.4)
     scorpion-ioc (1.0.4)
       rails (>= 4.0)
     shellany (0.0.1)
-    simplecov (0.16.1)
-      docile (~> 1.1)
-      json (>= 1.8, < 3)
-      simplecov-html (~> 0.10.0)
-    simplecov-html (0.10.2)
-    spring (2.0.2)
-      activesupport (>= 4.2)
+    spring (2.1.0)
     sprockets (3.7.2)
       concurrent-ruby (~> 1.0)
       rack (> 1, < 3)
@@ -227,7 +212,7 @@ GEM
     unicode-display_width (1.6.0)
     websocket-driver (0.6.5)
       websocket-extensions (>= 0.1.0)
-    websocket-extensions (0.1.3)
+    websocket-extensions (0.1.4)
     yard (0.9.19)
     yard-activesupport-concern (0.0.1)
       yard (>= 0.8)
@@ -240,30 +225,25 @@ DEPENDENCIES
   activerecord (~> 5.0)
   awesome_print
   bundler (~> 1.6)
-  byebug (~> 9.0)
-  codeclimate-test-reporter (~> 1.0)
-  combustion (~> 0.5)
-  guard (~> 2.12)
+  byebug
+  combustion
   guard-rspec
-  guard-rubocop
-  i18n (~> 0.7)
+  i18n
   kaminari (~> 0.16.3)
-  nokogiri (~> 1.8.0)
+  nokogiri
   pry-byebug
   rake
   responders (~> 2.1.2)
-  rspec (~> 3.00)
+  rspec
   rspec-instafail
   rspec-its
   rspec-rails
   rspec-wait
   rspec_junit_formatter (~> 0.2.2)
-  rubocop (~> 0.49)
-  ruby_gntp (~> 0.3.4)
+  rubocop
   shamu!
-  simplecov (~> 0.14)
   spring
-  sqlite3 (~> 1.3.11)
+  sqlite3 (~> 1.3.13)
   yard
   yard-activesupport-concern
 

@@ -31,7 +31,6 @@ jobs:
     - run: gem update --system
     - run: RAILS_ENV=test bundle exec rspec -r rspec_junit_formatter --format progress --format RspecJunitFormatter -o $CIRCLE_TEST_REPORTS/rspec/junit.xml
     - run: bundle exec rubocop
-    - run: bundle exec codeclimate-test-reporter
     - store_test_results:
         path: /tmp/circleci-test-results
     - store_artifacts:
