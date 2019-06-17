@@ -59,7 +59,7 @@ GEM
     codeclimate-test-reporter (1.0.7)
       simplecov
     coderay (1.1.2)
-    combustion (0.9.1)
+    combustion (1.1.0)
       activesupport (>= 3.0.0)
       railties (>= 3.0.0)
       thor (>= 0.14.6)
@@ -242,7 +242,7 @@ DEPENDENCIES
   bundler (~> 1.6)
   byebug (~> 9.0)
   codeclimate-test-reporter (~> 1.0)
-  combustion (~> 0.5)
+  combustion (~> 1.1)
   guard (~> 2.12)
   guard-rspec
   guard-rubocop
