@@ -18,7 +18,7 @@ describe Shamu::Rails::Controller, type: :controller do
     public :services, :secure_services, :permit?
 
     def show
-      render plain: ""
+      render json: "{}"
     end
   end
 
