@@ -66,10 +66,17 @@ module Shamu
         #     attribute :label, coerce: ->(value){ value.upcase.to_sym }
         #     attribute :tags, coerce: :to_s, array: true
         #   end
-        def attribute( name, *args, **options, &block )
-          super
-          define_attribute_assignment( name, **options )
-          define_attribute_writer( name, **options )
+        def attribute( name, *args, coerce: nil, **options, &block )
+          super(name, *args, **options)
+
+          if block_given?
+            coerce = block
+          else
+            coerce ||= :smart
+          end
+
+          define_attribute_assignment( name, coerce: coerce, **options )
+          define_attribute_writer( name, coerce: coerce, **options )
         end
 
         private

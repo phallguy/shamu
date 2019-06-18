@@ -126,6 +126,18 @@ describe Shamu::Attributes::Assignment do
       expect( instance.label ).to eq "coerced"
     end
 
+    it "coerces using given attribute block" do
+      klass = Class.new( base_klass ) do
+        attribute :label do |value|
+          "coerced"
+        end
+      end
+
+      instance = klass.new( label: "original" )
+      expect( instance.label ).to eq "coerced"
+    end
+
+
     it "coerces using a class" do
       coerce_class = Class.new do
         def initialize( v ); end
