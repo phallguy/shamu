@@ -38,7 +38,7 @@ module Shamu
         value
       end
 
-      # @return [Array<Result>] results from calling dependent assemblies that
+      # @return [Array<Result>] results from calling dependent services that
       # may have caused the request to fail.
       def nested_results
         @nested_results ||= []
