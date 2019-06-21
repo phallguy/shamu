@@ -13,7 +13,7 @@ module Shamu
       #
       # @return [self]
       def resource( resource, presenter = nil, &block )
-        output[:data] = build_resource( resource, presenter, &block )
+        output[:data] = resource ? build_resource( resource, presenter, &block ) : nil
         self
       end
 
