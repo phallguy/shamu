@@ -7,6 +7,9 @@ module JsonApiContextSpec
   class Resource
     include Shamu::Attributes
   end
+
+  class ResourcePresenter
+  end
 end
 
 describe Shamu::JsonApi::Context do
@@ -55,6 +58,12 @@ describe Shamu::JsonApi::Context do
       resource = double model_name: ActiveModel::Name.new( Class, nil, "JsonApiContextSpec::Symbol" )
       context = Shamu::JsonApi::Context.new namespaces: [ "JsonApiContextSpec" ]
       expect( context.find_presenter( resource ) ).to eq JsonApiContextSpec::SymbolPresenter
+    end
+
+    it "finds implicitly named presenter in natural namespaces" do
+      context = Shamu::JsonApi::Context.new namespaces: []
+
+      expect( context.find_presenter( JsonApiContextSpec::Resource.new ) ).to eq JsonApiContextSpec::ResourcePresenter
     end
 
     it "raises if no presenter can be found" do
