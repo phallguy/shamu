@@ -1,5 +1,3 @@
-require "listen"
-
 module Shamu
   module Features
 
@@ -85,10 +83,13 @@ module Shamu
         def toggles
           @toggles ||= begin
             if File.exist?( config_path )
-              listener = Listen.to File.dirname( config_path ), only: File.basename( config_path ) do
-                @toggles = Toggle.load( config_path )
+              if Rails.env.development?
+                require "listen"
+                listener = Listen.to File.dirname( config_path ), only: File.basename( config_path ) do
+                  @toggles = Toggle.load( config_path )
+                end
+                listener.start
               end
-              listener.start
 
               Toggle.load( config_path )
             else
