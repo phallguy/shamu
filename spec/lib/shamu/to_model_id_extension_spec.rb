@@ -6,12 +6,12 @@ describe Shamu::ToModelIdExtension do
   end
 
   describe Shamu::ToModelIdExtension::Strings do
-
     {
       "7432" => 7432,
       "   123" => 123,
       "one" => nil,
-      "99 bottles" => nil
+      "99 bottles" => nil,
+      "1bb12fb0-180e-40da-973c-fa80611ede18" => "1bb12fb0-180e-40da-973c-fa80611ede18"
     }.each do |candidate, expected|
       it "converts '#{ candidate }' to #{ expected }" do
         expect( candidate.to_model_id ).to eq expected
