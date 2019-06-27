@@ -62,7 +62,6 @@ describe Shamu::Attributes do
     end
   end
 
-
   describe "delegate" do
     it "delegates to another method" do
       contact = double
@@ -254,6 +253,35 @@ describe Shamu::Attributes do
       end
 
       expect( klass.new( query: "ABC" ).q ).to eq "ABC"
+    end
+
+    it "fails for unknown attributes" do
+      klass = Class.new do
+        include Shamu::Attributes
+
+        attribute :named
+      end
+
+      expect do
+        klass.new not_a_real_attribute: true
+      end.to raise_error Shamu::Attributes::UnknownAttributeError
+    end
+
+    it "ignores unknown attributes fro rails request params" do
+      klass = Class.new do
+        include Shamu::Attributes
+
+        attribute :named
+      end
+
+      expect do
+        params = {}
+        params[:not_a_real_attribute] = true
+        def params.permit
+        end
+
+        klass.new params
+      end.not_to raise_error
     end
   end
 

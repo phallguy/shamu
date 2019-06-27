@@ -30,6 +30,7 @@ module Shamu
     require "shamu/attributes/camel_case"
     require "shamu/attributes/html_sanitation"
     require "shamu/attributes/trim_strings"
+    require "shamu/attributes/unknown_attribute_error"
 
     def initialize( *attributes )
       assign_attributes( attributes.last )
@@ -138,14 +139,20 @@ module Shamu
       #
       # @return [self]
       def assign_attributes( attributes )
-        attributes = resolve_attributes( attributes )
+        resolved_attributes = resolve_attributes( attributes )
+
+        keys = resolved_attributes.keys
 
         self.class.attributes.each do |key, options|
           as = options[ :as ] # Alias support
-          next unless attributes.key?( key ) || ( as && attributes.key?( as ) )
 
-          value = attributes[ key ]
-          value ||= attributes[ as ] if as
+          keys.delete(key)
+          keys.delete(as) if as
+
+          next unless resolved_attributes.key?( key ) || ( as && resolved_attributes.key?( as ) )
+
+          value = resolved_attributes[ key ]
+          value ||= resolved_attributes[ as ] if as
 
           if build = options[:build]
             value = build_value( build, value )
@@ -153,6 +160,10 @@ module Shamu
 
           send :"assign_#{ key }", value
         end
+
+        handle_unknown_attribute(keys.first, attributes) if keys.present?
+
+        self
       end
 
       def build_value( build, value )
@@ -180,6 +191,16 @@ module Shamu
         else
           attributes
         end
+      end
+
+      def handle_unknown_attribute(key, attributes)
+        # For hashes coming from rails requests, allow unexpected attributes.
+        # They will be ignored but will not raise an error.
+        return if attributes.respond_to?(:permit)
+
+        # If we're given an attribute we don't know about then fail to avoid
+        # unexpected typos or errors when changing attribute names.
+        raise UnknownAttributeError.new( attribute: key, attribute_class: self.class.name)
       end
 
     class_methods do
@@ -236,17 +257,17 @@ module Shamu
         self
       end
 
-      # Define an {.attribute} that defines an association to another resource
-      # that also has it's own attributes.
+      # # Define an {.attribute} that defines an association to another resource
+      # # that also has it's own attributes.
+      # #
+      # # @param (see .attribute)
+      # # @yieldreturn (see .attribute)
+      # # @return [self]
+      # def association( name, *args, **options, &block )
+      #   options[:association] = true
       #
-      # @param (see .attribute)
-      # @yieldreturn (see .attribute)
-      # @return [self]
-      def association( name, *args, **options, &block )
-        options[:association] = true
-
-        attribute( name, *args, **options, &block )
-      end
+      #   attribute( name, *args, **options, &block )
+      # end
 
       private
 

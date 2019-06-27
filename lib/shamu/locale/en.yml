@@ -37,6 +37,10 @@ en:
         no_presenter: No presenter available for %{class} objects. Looked in %{namespaces}.
         no_json_body: "Missing `data` node for JSON API body. Override `json_request_payload` if no body is expected."
 
+    attributes:
+      errors:
+        unknown_attribute_named: "%{attribute_class} does not have an attribute named `%{attribute}`"
+
   activemodel:
     errors:
       models:

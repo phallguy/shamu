@@ -49,6 +49,11 @@ module Shamu
         params
       end
 
+      private
+
+      def handle_unknown_attribute(key, attributes)
+      end
+
       class << self
         # Coerces a hash or params object to a proper ListScope object.
         # @param [Object] params to be coerced.
