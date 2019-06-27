@@ -124,9 +124,9 @@ module Shamu
         #     the first time it's used instead of when the controller is
         #     initialized.
         # @return [name]
-        def service( name, contract, **options, &block )
+        def service( name, contract, lazy: true, **options, &block )
           services << name
-          attr_dependency name, contract, options.merge( private: true )
+          attr_dependency name, contract, options.merge( private: true, lazy: lazy )
           name
         end
       end
