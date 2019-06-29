@@ -18,6 +18,8 @@ module Shamu
           end
 
           rescue_from Exception, with: :render_unhandled_exception unless ::Rails.env.test?
+
+          helper_method :json_resource
         end
 
         private
@@ -311,7 +313,7 @@ module Shamu
           end
 
           def json_paginate_resources( response, resources, pagination )
-            pagination = resources.respond_to?( :current_page ) if pagination == :auto
+            pagination = resources.respond_to?( :paged? ) && resources.paged? if pagination == :auto
             return unless pagination
 
             json_paginate resources, response

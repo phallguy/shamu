@@ -549,6 +549,8 @@ describe Shamu::Services::ActiveRecordCrud do
     let!( :entity ) { service.create( name: "Example", label: "Books" ).entity }
     let( :entity_class ) do
       Class.new( Shamu::Entities::Entity ) do
+        model :record
+
         attribute :id
       end
     end

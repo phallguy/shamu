@@ -24,12 +24,6 @@ describe Shamu::JsonApi::RelationshipBuilder do
       expect( builder.compile ).to include attributes: { name: "Jim" }
     end
 
-    it "adds a single name, value pair" do
-      builder.attribute :name, "Jim"
-
-      expect( builder.compile ).to include attributes: { name: "Jim" }
-    end
-
     it "excludes filtered attributes" do
       allow( context ).to receive( :include_field? ).and_return false
 

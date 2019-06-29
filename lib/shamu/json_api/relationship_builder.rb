@@ -19,12 +19,19 @@ module Shamu
       # @param [String] type of the resource.
       # @param [Object] id of the resource.
       # @return [void]
-      def identifier( type, id = nil )
+      def identifier( type, id = :not_set )
         output[:data] ||= {}
-        output[:data][:type] = @type = type.to_s
-        output[:data][:id]   = id.to_s
+        add_identifier( output[:data], type, id )
+
         self
       end
+
+      private
+
+      def require_identifier!
+        # Identifiers are not required for relationships
+      end
+
     end
   end
 end
