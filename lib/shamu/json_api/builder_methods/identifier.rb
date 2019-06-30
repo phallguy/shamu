@@ -47,9 +47,12 @@ module Shamu
 
 
           def require_identifier!
-            fail IncompleteResourceError unless type
+            fail IncompleteResourceError unless @identifier_satisfied || type
           end
 
+          def identifier_satisfied!
+            @identifier_satisfied = true
+          end
       end
     end
   end
