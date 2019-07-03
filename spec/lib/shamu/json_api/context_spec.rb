@@ -29,15 +29,15 @@ describe Shamu::JsonApi::Context do
     let( :context ) { Shamu::JsonApi::Context.new( fields: { "user": "name,email" } ) }
 
     it "is true for unfiltered" do
-      expect( context.include_field?( :order, :number ) ).to be_truthy
+      expect( context.include_field?( "order", :number ) ).to be_truthy
     end
 
     it "is true for filtered with field" do
-      expect( context.include_field?( :user, :name ) ).to be_truthy
+      expect( context.include_field?( "user", :name ) ).to be_truthy
     end
 
     it "is false for filtered without field" do
-      expect( context.include_field?( :user, :birthdate ) ).not_to be_truthy
+      expect( context.include_field?( "user", :birthdate ) ).not_to be_truthy
     end
   end
 

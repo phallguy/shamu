@@ -154,6 +154,7 @@ describe JsonApiControllerSpec::ResourcesController, type: :controller do
   describe "#json_collection" do
     before( :each ) do
       allow( controller.resources ).to receive( :current_page ).and_return 1
+      allow( controller.resources ).to receive( :paged? ).and_return true
     end
 
     subject do

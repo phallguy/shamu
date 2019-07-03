@@ -68,7 +68,7 @@ module Shamu
       #     when no explicit fields have been selected.
       # @return [Boolean] true if the field should be included.
       def include_field?( type, name, default = true )
-        return default unless type_fields = fields[ type ]
+        return default unless type_fields = fields[ type.to_sym ]
 
         type_fields.include?( name )
       end

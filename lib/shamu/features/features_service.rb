@@ -83,7 +83,7 @@ module Shamu
         def toggles
           @toggles ||= begin
             if File.exist?( config_path )
-              if Rails.env.development?
+              if ::Rails.env.development?
                 require "listen"
                 listener = Listen.to File.dirname( config_path ), only: File.basename( config_path ) do
                   @toggles = Toggle.load( config_path )

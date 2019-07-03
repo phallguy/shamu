@@ -39,7 +39,7 @@ describe Shamu::JsonApi::BuilderMethods::Identifier do
     resource = double( id: 56, json_type: "double" )
 
     builder.identifier resource
-    expect( builder.output[ :id ] ).to eq 56
+    expect( builder.output[ :id ] ).to eq "56"
     expect( builder.output[ :type ] ).to eq "double"
   end
 end

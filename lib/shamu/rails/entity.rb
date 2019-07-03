@@ -30,6 +30,18 @@ module Shamu
 
         # @!visibility public
         #
+        # @
+        def filter_params
+        end
+
+        def sort_params
+        end
+
+        def paging_params
+        end
+
+        # @!visibility public
+        #
         # Get the raw request hash params for the given parameter key.
         # @param [Symbol] param_key key of the entity params to fetch.
         # @return [Hash] the params
