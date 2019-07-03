@@ -173,6 +173,54 @@ describe JsonApiControllerSpec::ResourcesController, type: :controller do
 
       expect( pagination.number ).to eq 3
     end
+
+    it "parses nested pagination parameters" do
+      controller.params[:users] = { page: { number: 5 } }
+      pagination = controller.send :json_pagination, :users
+
+      expect( pagination.number ).to eq 5
+    end
+  end
+
+  describe "#json_sort" do
+    {
+      "name" => { name: :asc },
+      "-name" => { name: :desc },
+      "name,email" => { name: :asc, email: :asc },
+      "name,-email" => { name: :asc, email: :desc },
+      "author.name,-email" => { "author.name": :asc, email: :desc },
+    }
+      .each do |raw, parsed|
+      it "parses #{ raw } to #{ parsed }" do
+        controller.params[:sort] = raw
+        sort = controller.send :json_sort
+
+        expect(sort).to eq(parsed)
+      end
+    end
+
+    it "handles nested sort params" do
+      controller.params[:users] = { sort: "name" }
+      sort = controller.send :json_sort, :users
+
+      expect(sort).to eq( name: :asc )
+    end
+  end
+
+  describe "#json_filter" do
+    it "symbolizes keys" do
+      controller.params[:filter] = { "name" => "bat" }
+      filter = controller.send :json_filter
+
+      expect(filter).to eq(name: "bat")
+    end
+
+    it "handles nested filter params" do
+      controller.params[:users] = { filter: { name: "bat" } }
+      filter = controller.send :json_filter, :users
+
+      expect(filter).to eq(name: "bat")
+    end
   end
 
   it "writes an error" do

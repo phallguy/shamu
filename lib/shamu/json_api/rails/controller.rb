@@ -135,7 +135,7 @@ module Shamu
           # @param [JsonApi::BaseBuilder] builder to add links to.
           # @param [String] param the name of the key page parameter to adjust
           # @return [void]
-          def json_paginate( resources, builder, param: :page )
+          def json_paginate( resources, builder, param: nil )
             page = resources.current_page
 
             if resources.respond_to?( :next_page ) ? resources.next_page : true
@@ -151,10 +151,12 @@ module Shamu
             params = self.params
             params = params.to_unsafe_hash if params.respond_to?( :to_unsafe_hash )
 
-            page_params = params.reverse_merge page_param_name => {}
-            page_params[page_param_name][param] = value
+            root = page_param_name ? params[page_param_name].try(:permit!) : params
 
-            page_params
+            page_params = root.reverse_merge :page => {}
+            page_params[:page][param] = value
+
+            page_param_name ? { page_param_name => page_params } : page_params
           end
 
           # @!visibility public
@@ -164,8 +166,15 @@ module Shamu
           # @param [Symbol] param the request parameter to read pagination
           #     options from.
           # @return [Pagination] the pagination state
-          def json_pagination( param: :page )
-            page_params = params[ param ] || {}
+          def json_pagination( param = nil )
+            root = param ? params[param].try(:permit!) : params
+
+            page_params =
+              if root && ( filter = root[:page] )
+                filter.permit!.to_hash.deep_symbolize_keys
+              else
+                {}
+              end
 
             Pagination.new( page_params.merge( param: param ) )
           end
@@ -234,6 +243,49 @@ module Shamu
               fields: fields == :not_set ? json_context_fields : fields,
               namespaces: namespaces == :not_set ? json_context_namespaces : namespaces,
               presenters: presenters == :not_set ? json_context_presenters : presenters
+          end
+
+          # @!visibility public
+          #
+          # Parameters to filter the specific JSON request by. Typically used
+          # to constrain the results of a to-many relationsip.
+          #
+          # @param [Symbol] param name to fetch filter parameters from. Default
+          # :filter.
+          #
+          # @return [Hash]
+          def json_filter(param = nil)
+            root = param ? params[param].try(:permit!) : params
+
+            if root && ( filter = root[:filter] )
+              filter.permit!.to_hash.deep_symbolize_keys
+            else
+              {}
+            end
+          end
+
+          # @!visibility public
+          #
+          # The `sort` param parsed into a hash of pairs indicating the fields
+          # to sort on and in which order.
+          #
+          # https://jsonapi.org/format/#fetching-sorting
+          #
+          # @return [Hash]
+          def json_sort(param = nil)
+            root = param ? params[param].try(:permit!) : params
+
+            if root && ( sort = root[:sort] )
+              sort.split(",").map(&:strip).each_with_object({}) do |attribute, parsed|
+                if attribute[0] == "-"
+                  parsed[attribute[1..-1].to_sym] = :desc
+                else
+                  parsed[attribute.to_sym] = :asc
+                end
+              end
+            else
+              {}
+            end
           end
 
           # See (Shamu::Rails::Entity#request_params)

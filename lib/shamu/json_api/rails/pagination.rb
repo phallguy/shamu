@@ -34,7 +34,7 @@ module Shamu
 
         # @!attribute
         # @return [String] opaque cursor value
-        attribute :cursor, coerce: :to_i
+        attribute :cursor, coerce: :to_s
 
         #
         # @!endgroup Attributes

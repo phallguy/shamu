@@ -41,11 +41,13 @@ module Shamu
     #
     # @param [Array, Regex] only include matching attributes
     # @param [Array, Regex] except matching attributes
+    # @param [Boolean] set only include attributes that have actually been set.
     # @return [Hash] of attributes
-    def to_attributes( only: nil, except: nil )
+    def to_attributes( only: nil, except: nil, set: false ) # rubocop:disable Metrics/PerceivedComplexity
       self.class.attributes.each_with_object({}) do |(name, options), attrs|
         next if ( only && !match_attribute?( only, name ) ) || ( except && match_attribute?( except, name ) )
         next unless serialize_attribute?( name, options )
+        next if set && !set?(name)
 
         attrs[name] = send( name )
       end
@@ -138,7 +140,7 @@ module Shamu
       # @param [Hash] attributes to assign.
       #
       # @return [self]
-      def assign_attributes( attributes )
+      def assign_attributes( attributes ) # rubocop:disable Metrics/PerceivedComplexity
         resolved_attributes = resolve_attributes( attributes )
 
         keys = resolved_attributes.keys

@@ -12,9 +12,6 @@ module LoadEntitySpec
     def list( params = nil )
       Shamu::Entities::List.new [ find( 1 ) ]
     end
-
-    def authorize!( * )
-    end
   end
 
   class ExampleEntity < Shamu::Entities::Entity
@@ -51,7 +48,6 @@ describe Shamu::Rails::Entity, type: :controller do
       example_request
       render plain: ""
     end
-
   end
 
   before( :each ) do
@@ -94,10 +90,10 @@ describe Shamu::Rails::Entity, type: :controller do
     get :index
   end
 
-  it "authorizes action for entity request" do
-    expect( example_service ).to receive( :authorize! )
+  it "passes list_params to list method for index types" do
+    expect(controller).to receive(:list_params).and_call_original
 
-    post :create
+    get :index
   end
 
   it "doesn't load entity on create actions" do

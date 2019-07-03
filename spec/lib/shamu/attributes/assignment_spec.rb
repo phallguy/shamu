@@ -128,7 +128,7 @@ describe Shamu::Attributes::Assignment do
 
     it "coerces using given attribute block" do
       klass = Class.new( base_klass ) do
-        attribute :label do |value|
+        attribute :label do |_value|
           "coerced"
         end
       end
@@ -139,12 +139,12 @@ describe Shamu::Attributes::Assignment do
 
     it "handles attribute block when not initialized" do
       klass = Class.new( base_klass ) do
-        attribute :label do |value|
+        attribute :label do |_value|
           "coerced"
         end
       end
 
-      instance = klass.new()
+      instance = klass.new
       expect( instance.label ).to eq nil
     end
 

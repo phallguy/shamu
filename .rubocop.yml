@@ -116,6 +116,9 @@ Style/Lambda:
 Style/MultilineBlockChain:
   Enabled: false
 
+Layout/MultilineMethodCallIndentation:
+  Enabled: false
+
 Style/NumericPredicate:
   Enabled: false
 
