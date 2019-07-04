@@ -5,8 +5,6 @@ module Sinatra
 end
 
 require "kaminari"
-Kaminari::Hooks.init
-
 
 ActiveRecord::Base.establish_connection(
   adapter: "sqlite3",
