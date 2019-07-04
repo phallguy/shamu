@@ -26,5 +26,5 @@ group :test do
 
   gem "nokogiri"
 
-  gem "rspec_junit_formatter", "~> 0.2.2", platforms: :mri
+  gem "rspec_junit_formatter", "~> 0.4.1", platforms: :mri
 end
