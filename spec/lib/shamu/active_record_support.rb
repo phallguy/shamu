@@ -12,7 +12,7 @@ module ActiveRecordSpec
     scope :by_label, ->( label ) { where( label: label ) }
   end
 
-  class FavoriteMigration < ::ActiveRecord::Migration
+  class FavoriteMigration < ::ActiveRecord::Migration[5.2]
     def self.up
       create_table :favorites do |t|
         t.string :name

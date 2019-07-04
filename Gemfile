@@ -4,8 +4,8 @@ source "https://rubygems.org"
 gemspec
 
 group :test do
-  gem "activerecord", "~> 5.0"
-  gem "actionpack", "~> 5.0"
+  gem "activerecord", "~> 5.2"
+  gem "actionpack", "~> 5.2"
   gem "responders", "~> 2.4.1"
   gem "kaminari", "~> 0.16.3", require: false
 
