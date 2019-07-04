@@ -68,7 +68,7 @@ module Shamu
       #     when no explicit fields have been selected.
       # @return [Boolean] true if the field should be included.
       def include_field?( type, name, default = true )
-        return default unless type_fields = fields[ type ]
+        return default unless type_fields = fields[ type.to_sym ]
 
         type_fields.include?( name )
       end
@@ -88,9 +88,7 @@ module Shamu
       # @raise [NoPresenter] if a presenter cannot be found.
       def find_presenter( resource )
         presenter   = presenters[ resource.class ]
-        presenter ||= presenters[ resource.class ] = find_namespace_presenter( resource )
-
-        fail NoPresenter.new( resource, namespaces ) unless presenter
+        presenter ||= presenters[ resource.class ] = find_namespace_presenter!( resource )
 
         presenter
       end
@@ -125,14 +123,25 @@ module Shamu
           end
         end
 
-        def find_namespace_presenter( resource )
-          presenter   = find_namespace_presenter_for( resource.class.name.demodulize )
-          presenter ||= find_namespace_presenter_for( resource.model_name.element.camelize )       if resource.respond_to?( :model_name )        # rubocop:disable Metrics/LineLength
-          presenter ||= find_namespace_presenter_for( resource.class.model_name.element.camelize ) if resource.class.respond_to?( :model_name )  # rubocop:disable Metrics/LineLength
+        def find_namespace_presenter!(resource)
+          natural_namespaces = resource.class.name.split("::")[0...-1]
+          candidate_namespaces = namespaces | natural_namespaces
+
+          if presenter = find_namespace_presenter(resource, candidate_namespaces)
+            return presenter
+          end
+
+          fail NoPresenter.new( resource, candidate_namespaces ) unless presenter
+        end
+
+        def find_namespace_presenter( resource, namespaces )
+          presenter   = find_namespace_presenter_for( resource.class.name.demodulize, namespaces )
+          presenter ||= find_namespace_presenter_for( resource.model_name.element.camelize, namespaces )       if resource.respond_to?( :model_name )        # rubocop:disable Metrics/LineLength
+          presenter ||= find_namespace_presenter_for( resource.class.model_name.element.camelize, namespaces ) if resource.class.respond_to?( :model_name )  # rubocop:disable Metrics/LineLength
           presenter
         end
 
-        def find_namespace_presenter_for( name )
+        def find_namespace_presenter_for( name, namespaces )
           name = "#{ name }Presenter".to_sym
 
           namespaces.each do |namespace|

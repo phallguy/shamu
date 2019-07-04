@@ -20,12 +20,12 @@ module Shamu
       def attribute( name_or_hash, value = nil )
         require_identifier!
 
-        if value
-          add_attribute name_or_hash, value
-        else
+        if name_or_hash.is_a?(Hash)
           name_or_hash.each do |n, v|
             add_attribute n, v
           end
+        else
+          add_attribute name_or_hash, value
         end
       end
       alias_method :attributes, :attribute

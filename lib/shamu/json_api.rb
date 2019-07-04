@@ -6,6 +6,7 @@ module Shamu
 
     require "shamu/json_api/context"
     require "shamu/json_api/builder_methods"
+    require "shamu/json_api/collection_builder"
     require "shamu/json_api/relationship_builder"
     require "shamu/json_api/resource_builder"
     require "shamu/json_api/response"

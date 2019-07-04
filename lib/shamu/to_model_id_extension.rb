@@ -28,9 +28,13 @@ module Shamu
     # Add `to_model_id` to String types.
     module Strings
       NUMERIC_PATTERN = /\A\s*[0-9]+\z/.freeze
+      UUID_PATTERN = /\A[0-9A-F]{8}-?([0-9A-F]{4}-?){3}[0-9A-F]{12}\z/i.freeze
 
       def to_model_id
-        self =~ NUMERIC_PATTERN ? to_i : nil
+        case self
+        when UUID_PATTERN then self
+        when NUMERIC_PATTERN then to_i
+        end
       end
     end
 

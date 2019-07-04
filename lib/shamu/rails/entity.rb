@@ -13,7 +13,7 @@ module Shamu
         end
 
         def fetch_entities( service, param )
-          service.list( param ? params[ param ] : params )
+          service.list( list_params(param) )
         end
 
         def fetch_entity_request( service, entity, param_key )
@@ -24,7 +24,6 @@ module Shamu
           param_key ||= entity.model_name.param_key if entity
           request.assign_attributes( request_params( param_key ) )
 
-          service.authorize!( action, entity, request ) if service.respond_to?( :authorize! )
           request
         end
 
@@ -40,6 +39,14 @@ module Shamu
           else
             params[ param_key ]
           end
+        end
+
+        # Filtering and sorting params to apply when {#fech_entities fetching
+        # the entities}.
+        #
+        # @param [Symbol] param_key to use when fetching nested parameters.
+        def list_params( param_key = nil )
+          {}
         end
 
         def load_entity( method:, list_method:, action: nil, only: nil, except: nil )

@@ -216,7 +216,7 @@ module Shamu
               anonymous_permissions
             end
           else
-            fail IncompleteSetupError, "Permissions have not been defined. Add a private `permissions` method to #{ self.class.name }" # rubocop:disable Metrics/LineLength
+            fail IncompleteSetupError, "Permissions have not been defined. Add a private `authenticated_permissions` and `anonymous_permissions` method to #{ self.class.name }" # rubocop:disable Metrics/LineLength
           end
         end
 

@@ -66,16 +66,36 @@ module Shamu
         #     attribute :label, coerce: ->(value){ value.upcase.to_sym }
         #     attribute :tags, coerce: :to_s, array: true
         #   end
-        def attribute( name, *args, **options, &block )
-          super
-          define_attribute_assignment( name, **options )
-          define_attribute_writer( name, **options )
+        def attribute( name, *args, coerce: nil, **options, &block )
+          super(name, *args, **options)
+
+          if block_given?
+            coerce = block
+          else
+            coerce ||= :smart
+          end
+
+          define_attribute_assignment( name, coerce: coerce, **options )
+          define_attribute_writer( name, coerce: coerce, **options )
+        end
+
+        # Explicitly allow instances to be initialized from hashes that have
+        # keys that do not correspond to explicitly defined attributes.
+        def allow_unknown_attributes!
+          define_method :handle_unknown_attribute do |*|
+          end
         end
 
         private
 
           def attribute_option_keys
             super + [ :coerce, :array ]
+          end
+
+          def define_virtual_fetcher( name, default, &block )
+            # Don't pass on the block because we use that for coercion on
+            # assignment.
+            super(name, default, &nil)
           end
 
           def define_attribute_assignment( name, coerce: :smart, array: false, ** )
