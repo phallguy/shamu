@@ -4,15 +4,15 @@ source "https://rubygems.org"
 gemspec
 
 group :test do
-  gem "activerecord", "~> 5.0"
-  gem "actionpack", "~> 5.0"
+  gem "activerecord", "~> 5.2"
+  gem "actionpack", "~> 5.2"
   gem "responders", "~> 2.4.1"
   gem "kaminari", "~> 0.16.3", require: false
 
   gem "byebug"
   gem "pry-byebug"
 
-  gem "sqlite3", "~> 1.3.13"
+  gem "sqlite3", "~> 1.4.1"
   gem "rubocop"
   gem "spring"
   gem "guard-rspec"
