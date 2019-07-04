@@ -7,7 +7,7 @@ group :test do
   gem "activerecord", "~> 5.0"
   gem "actionpack", "~> 5.0"
   gem "responders", "~> 2.4.1"
-  gem "kaminari", "~> 0.16.3", require: false
+  gem "kaminari", "~> 1.1.1", require: false
 
   gem "byebug"
   gem "pry-byebug"
