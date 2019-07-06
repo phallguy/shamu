@@ -48,24 +48,31 @@ module Shamu
       def relationship( name, &block )
         require_identifier!
 
-        return unless context.include_field?( type, name )
+        include_or_mark_partial name do
+          builder = RelationshipBuilder.new( context )
+          yield builder
 
-        builder = RelationshipBuilder.new( context )
-        yield builder
-
-        relationships = ( output[:relationships] ||= {} )
-        relationships[ name.to_sym ] = builder.compile
+          relationships = ( output[:relationships] ||= {} )
+          relationships[ name.to_sym ] = builder.compile
+        end
       end
 
       private
 
         def add_attribute( name, value )
-          return unless context.include_field?( type, name )
-
-          attributes = ( output[:attributes] ||= {} )
-          attributes[ name.to_sym ] = value
+          include_or_mark_partial name do
+            attributes = ( output[:attributes] ||= {} )
+            attributes[ name.to_sym ] = value
+          end
         end
 
+        def include_or_mark_partial(field)
+          if context.include_field?( type, field )
+            yield
+          else
+            meta :partial, true
+          end
+        end
     end
   end
 end
