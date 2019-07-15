@@ -373,7 +373,7 @@ module Shamu
 
           def json_http_status_code_from_error( error )
             case error
-            when ActiveRecord::RecordNotFound then :not_found
+            when ActiveRecord::RecordNotFound, ::Shamu::NotFoundError then :not_found
             when ActiveRecord::RecordInvalid  then :unprocessable_entity
             when /AccessDenied/               then :forbidden
             else
