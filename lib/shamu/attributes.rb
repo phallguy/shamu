@@ -245,10 +245,10 @@ module Shamu
         options = create_attribute( name, *args, **options )
 
         define_attribute_reader( name, **options )
-        define_attribute_assignment( name, **options )
+        define_attribute_assignment( name, **options, &block )
 
         if options.key?( :on )
-          define_delegate_fetcher( name, options[:on], options[:build] )
+          define_delegate_fetcher( name, options[:on], options[:build] || block )
         else
           define_virtual_fetcher( name, options[:default], &block )
         end
@@ -338,7 +338,7 @@ module Shamu
           end
         end
 
-        def define_attribute_assignment( name, ** )
+        def define_attribute_assignment( name, **, &block )
           mod = Module.new do
             module_eval <<-RUBY, __FILE__, __LINE__ + 1
               private def assign_#{ name }( value )                   # assign_attribute( value )
@@ -350,6 +350,8 @@ module Shamu
               end                                                     # end
             RUBY
           end
+
+          define_method "clean_#{ name }_attribute", &block if block
 
           include mod
         end

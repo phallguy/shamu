@@ -34,6 +34,18 @@ describe Shamu::Attributes do
     klass.new( address: {} )
   end
 
+  it "uses block as builder if present" do
+    expect do |b|
+      klass = Class.new do
+        include Shamu::Attributes
+
+        attribute :address, &b
+      end
+
+      klass.new( address: {} ).address
+    end.to yield_control
+  end
+
   it "creates alias accessor" do
     klass = Class.new do
       include Shamu::Attributes

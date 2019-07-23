@@ -375,7 +375,7 @@ module Shamu
             case error
             when ActiveRecord::RecordNotFound, ::Shamu::NotFoundError then :not_found
             when ActiveRecord::RecordInvalid  then :unprocessable_entity
-            when /AccessDenied/               then :forbidden
+            when /AccessDenied/, Security::AccessDeniedError then :unauthorized
             else
               if error.is_a?( Exception )
                 ActionDispatch::ExceptionWrapper.status_code_for_exception( error )
