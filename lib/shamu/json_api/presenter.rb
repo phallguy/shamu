@@ -23,6 +23,7 @@ module Shamu
     # end
     # ```
     class Presenter
+      include Scorpion::Object
 
       # @param [Object] resource to presenter.
       # @param [ResourceBuilder] builder used to build the JSON API response.

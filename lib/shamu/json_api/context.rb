@@ -1,6 +1,7 @@
 module Shamu
   module JsonApi
     class Context
+      include Scorpion::Object
 
       # @param [Hash<Symbol,Array>] fields explicitly declare the attributes and
       #     resources that should be included in the response. The hash consists

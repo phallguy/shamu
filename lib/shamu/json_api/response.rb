@@ -121,7 +121,7 @@ module Shamu
           builder   = ResourceBuilder.new( context )
 
           if presenter
-            instance = presenter.new( resource, builder )
+            instance = context.scorpion.fetch( presenter, resource, builder )
             instance.present
           else
             yield builder

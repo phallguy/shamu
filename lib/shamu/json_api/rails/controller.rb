@@ -239,10 +239,12 @@ module Shamu
           # @return [JsonApi::Context] the builder context honoring any filter
           #     parameters sent by the client.
           def json_context( fields: :not_set, namespaces: :not_set, presenters: :not_set )
-            Shamu::JsonApi::Context.new \
+            scorpion.fetch(
+              Shamu::JsonApi::Context,
               fields: fields == :not_set ? json_context_fields : fields,
               namespaces: namespaces == :not_set ? json_context_namespaces : namespaces,
               presenters: presenters == :not_set ? json_context_presenters : presenters
+            )
           end
 
           # @!visibility public
