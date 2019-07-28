@@ -63,7 +63,7 @@ module Shamu
       end
 
       def link(name, *args)
-        identifier_satisfied! if name == :self
+        identifier_satisfied! if name == :self || name == :related
         super
       end
 
