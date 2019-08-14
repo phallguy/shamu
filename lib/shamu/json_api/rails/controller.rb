@@ -138,12 +138,16 @@ module Shamu
           def json_paginate( resources, builder, param: nil )
             page = resources.current_page
 
-            if resources.respond_to?( :next_page ) ? resources.next_page : true
+            if resources.respond_to?( :next? ) ? resources.next? : true
               builder.link :next, url_for( json_page_parameter( param, :number, page + 1 ) )
+            else
+              builder.link :next, nil
             end
 
-            if resources.respond_to?( :prev_page ) ? resources.prev_page : page > 1
+            if resources.respond_to?( :prev? ) ? resources.prev? : page > 1
               builder.link :prev, url_for( json_page_parameter( param, :number, page - 1 ) )
+            else
+              builder.link :prev, nil
             end
           end
 
@@ -154,7 +158,11 @@ module Shamu
             root = page_param_name ? params[page_param_name].try(:permit!) : params
 
             page_params = root.reverse_merge :page => {}
-            page_params[:page][param] = value
+            if value > 1
+              page_params[:page][param] = value
+            else
+              page_params[:page].delete param
+            end
 
             page_param_name ? { page_param_name => page_params } : page_params
           end

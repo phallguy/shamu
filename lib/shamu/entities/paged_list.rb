@@ -93,6 +93,8 @@ module Shamu
         if @has_next == :not_set
           if raw_entities.respond_to?( :has_next? )
             raw_entities.has_next?
+          elsif raw_entities.respond_to?( :next_page )
+            !!raw_entities.next_page
           elsif raw_entities.respond_to?( :last_page? )
             !raw_entities.last_page?
           end
@@ -115,6 +117,8 @@ module Shamu
         if @has_previous == :not_set
           if raw_entities.respond_to?( :has_previous? )
             raw_entities.has_previous?
+          elsif raw_entities.respond_to?( :prev_page )
+            !!raw_entities.prev_page
           elsif raw_entities.respond_to?( :first_page? )
             !raw_entities.first_page?
           end
