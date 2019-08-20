@@ -78,7 +78,7 @@ describe Shamu::JsonApi::Context do
     it "finds implicitly named presenter in natural namespaces" do
       context = Shamu::JsonApi::Context.new namespaces: []
 
-      expect( context.find_presenter( JsonApiContextSpec::Nested::NestedResource.new ) ).to eq JsonApiContextSpec::Nested::NestedResourcePresenter
+      expect( context.find_presenter( JsonApiContextSpec::Nested::NestedResource.new ) ).to eq JsonApiContextSpec::Nested::NestedResourcePresenter # rubocop:disable Metrics/LineLength
     end
 
     it "raises if no presenter can be found" do

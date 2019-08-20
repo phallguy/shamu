@@ -27,7 +27,7 @@ describe Shamu::Security::Roles do
         role :admin, inherits: :manager
         role :manager, inherits: :user
         role :user
-     end
+      end
     end
 
     let( :klass ) do

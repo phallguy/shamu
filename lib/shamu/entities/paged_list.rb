@@ -89,7 +89,7 @@ module Shamu
       end
 
       # @return [Boolean] true if there is another page of data available.
-      def next?
+      def next? # rubocop:disable Metrics/PerceivedComplexity
         if @has_next == :not_set
           if raw_entities.respond_to?( :has_next? )
             raw_entities.has_next?
@@ -113,7 +113,7 @@ module Shamu
       end
 
       # @return [Boolean] true if there is another page of data available.
-      def previous?
+      def previous? # rubocop:disable Metrics/PerceivedComplexity
         if @has_previous == :not_set
           if raw_entities.respond_to?( :has_previous? )
             raw_entities.has_previous?

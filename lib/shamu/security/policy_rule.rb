@@ -37,7 +37,7 @@ module Shamu
         return false unless actions.include? action
         return false unless resource_match?( resource )
 
-        if block && !resource.is_a?( Module )
+        if block
           block.call( resource, additional_context )
         else
           true
