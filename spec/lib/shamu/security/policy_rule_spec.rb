@@ -49,12 +49,6 @@ describe Shamu::Security::PolicyRule do
           Shamu::Security::PolicyRule.new( [ :read, :write ], klass, :yes, b.to_proc ).match?( :read, instance, nil )
         end.to yield_control
       end
-
-      it "does not invoke block if resource is a Module" do
-        expect do |b|
-          Shamu::Security::PolicyRule.new( [ :read, :write ], klass, :yes, b.to_proc ).match?( :read, klass, nil )
-        end.not_to yield_control
-      end
     end
   end
 end

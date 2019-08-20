@@ -4,13 +4,25 @@ module Shamu
     # Mixin for {Policy} and {Support} classes to define security roles
     # including inheritance.
     module Roles
-      extend ActiveSupport::Concern
 
-      class_methods do
+      def self.included(into)
+        into.extend ClassMethods
+      end
+
+      module ClassMethods
 
         # @return [Hash] the named roles defined on the class.
         def roles
           @roles ||= {}
+        end
+
+        def included(into)
+          into.extend ClassMethods
+
+          roles = self.roles
+          into.define_singleton_method :roles do
+            roles
+          end
         end
 
         # Define a named role.
@@ -21,7 +33,7 @@ module Shamu
         # @param [Array<Symbol>] scopes that the role may be granted in.
         # @return [void]
         def role( name, inherits: nil, scopes: nil )
-          roles[ name.to_sym ] = { inherits: Array( inherits ), scopes: Array( scopes ) }
+          roles[ name.to_sym ] = { name: name, inherits: Array( inherits ), scopes: Array( scopes ) }
         end
 
         # Expand the given roles to include the roles that they have inherited.

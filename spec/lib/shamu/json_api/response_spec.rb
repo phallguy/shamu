@@ -2,11 +2,13 @@ require "spec_helper"
 require "active_model"
 
 describe Shamu::JsonApi::Response do
-  let( :context )  { Shamu::JsonApi::Context.new }
+  let( :context )  { scorpion.fetch( Shamu::JsonApi::Context ) }
   let( :response ) { Shamu::JsonApi::Response.new context }
 
   it "uses presenter if given" do
-    presenter = double
+    presenter = Class.new do
+    end
+
     expect( presenter ).to receive( :new ) do |resource, builder|
       instance = Shamu::JsonApi::Presenter.new resource, builder
 

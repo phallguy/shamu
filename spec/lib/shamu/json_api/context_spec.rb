@@ -10,6 +10,15 @@ module JsonApiContextSpec
 
   class ResourcePresenter
   end
+
+  module Nested
+    class NestedResource
+      include Shamu::Attributes
+    end
+
+    class NestedResourcePresenter
+    end
+  end
 end
 
 describe Shamu::JsonApi::Context do
@@ -64,6 +73,12 @@ describe Shamu::JsonApi::Context do
       context = Shamu::JsonApi::Context.new namespaces: []
 
       expect( context.find_presenter( JsonApiContextSpec::Resource.new ) ).to eq JsonApiContextSpec::ResourcePresenter
+    end
+
+    it "finds implicitly named presenter in natural namespaces" do
+      context = Shamu::JsonApi::Context.new namespaces: []
+
+      expect( context.find_presenter( JsonApiContextSpec::Nested::NestedResource.new ) ).to eq JsonApiContextSpec::Nested::NestedResourcePresenter # rubocop:disable Metrics/LineLength
     end
 
     it "raises if no presenter can be found" do

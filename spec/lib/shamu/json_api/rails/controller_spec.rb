@@ -241,6 +241,10 @@ describe JsonApiControllerSpec::ResourcesController, type: :controller do
         "JsonApiControllerSpec"
       ]
     end
+
+    it "shares the controller scorpion" do
+      expect( controller.send( :json_context ).scorpion ).to eq controller.scorpion
+    end
   end
 
   describe "#request_params" do

@@ -1,6 +1,7 @@
 module Shamu
   module JsonApi
     class Context
+      include Scorpion::Object
 
       # @param [Hash<Symbol,Array>] fields explicitly declare the attributes and
       #     resources that should be included in the response. The hash consists
@@ -124,7 +125,7 @@ module Shamu
         end
 
         def find_namespace_presenter!(resource)
-          natural_namespaces = resource.class.name.split("::")[0...-1]
+          natural_namespaces = natural_namespaces_for(resource)
           candidate_namespaces = namespaces | natural_namespaces
 
           if presenter = find_namespace_presenter(resource, candidate_namespaces)
@@ -152,6 +153,19 @@ module Shamu
           end
 
           nil
+        end
+
+        def natural_namespaces_for(resource)
+          parts = resource.class.name.split("::")
+          parts.pop
+
+          parts.each_with_object([]) do |part, ns|
+            if ns.present?
+              ns.push(ns.last + "::" + part)
+            else
+              ns.push(part)
+            end
+          end
         end
 
     end

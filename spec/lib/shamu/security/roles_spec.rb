@@ -1,13 +1,17 @@
 require "spec_helper"
 
 describe Shamu::Security::Roles do
+  module AdminRoles
+    include Shamu::Security::Roles
+
+    role :admin
+  end
+
 
   describe "#role" do
     it "adds a role" do
       klass = Class.new do
-        include Shamu::Security::Roles
-
-        role :admin
+        include AdminRoles
       end
 
       expect( klass.roles ).to have_key :admin
@@ -16,13 +20,19 @@ describe Shamu::Security::Roles do
   end
 
   describe "#expand_roles" do
-    let( :klass ) do
-      Class.new do
+    let( :roles ) do
+      Module.new do
         include Shamu::Security::Roles
 
         role :admin, inherits: :manager
         role :manager, inherits: :user
         role :user
+      end
+    end
+
+    let( :klass ) do
+      Class.new.tap do |klass|
+        klass.include roles
       end
     end
 
