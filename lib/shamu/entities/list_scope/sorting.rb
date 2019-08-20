@@ -79,8 +79,8 @@ module Shamu
           def parse_sort_by( arguments )
             Array( arguments ).each_with_object( {} ) do |arg, sorted|
               case arg
-              when Array          then sorted.merge!( parse_sort_by( arg ) )
-              when Hash           then
+              when Array then sorted.merge!( parse_sort_by( arg ) )
+              when Hash
                 arg.each do |attr, direction|
                   case direction
                   when :asc, :desc, "asc", "desc" then sorted[attr] = direction.to_sym

@@ -60,9 +60,9 @@ module Shamu
         # @return [Object]
         def attribute_value( value )
           case value
-          when Date, DateTime then
+          when Date, DateTime
             value.to_date.iso8601
-          when Time, ActiveSupport::TimeWithZone then
+          when Time, ActiveSupport::TimeWithZone
             value.iso8601
           else value
           end
