@@ -29,6 +29,7 @@ module Shamu
       def collection( collection, presenter = nil, &block )
         output[:data] =
           collection.map do |resource|
+            context.dont_include_resource( resource )
             build_resource resource, presenter, &block
           end
         self

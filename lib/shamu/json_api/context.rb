@@ -46,6 +46,12 @@ module Shamu
         end
       end
 
+      # Signals that the given resource was presented in the primary payload
+      # and should not be included in the additional `included` resource.
+      def dont_include_resource(resource)
+        included_resources.delete(resource)
+      end
+
       # Collects all the currently included resources and resets the queue.
       #
       # @return [Array<Object,Hash>] returns the the resource and presentation
