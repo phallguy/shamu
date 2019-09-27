@@ -9,6 +9,8 @@ module Shamu
         # @param [Hash] meta optional additional meta information.
         # @return [self]
         def link( name, url, meta: nil )
+          return if context.linkage_only?
+
           links = ( output[:links] ||= {} )
 
           if meta # rubocop:disable Style/ConditionalAssignment

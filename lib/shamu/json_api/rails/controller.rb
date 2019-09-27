@@ -224,7 +224,7 @@ module Shamu
           end
 
 
-          JSON_CONTEXT_KEYWORDS = [ :fields, :namespaces, :presenters ].freeze
+          JSON_CONTEXT_KEYWORDS = [ :fields, :namespaces, :presenters, :linkage_only ].freeze
 
           # @!visibility public
           #
@@ -244,14 +244,19 @@ module Shamu
           # @param [Hash<Class,Class>] presenters a hash that maps resource classes
           #     to the presenter class to use when building responses. See
           #     {JsonApi::Context#find_presenter}.
+          #
+          # @param [Boolean] linkage_only true to include only resource
+          # identifier objects.
+          #
           # @return [JsonApi::Context] the builder context honoring any filter
           #     parameters sent by the client.
-          def json_context( fields: :not_set, namespaces: :not_set, presenters: :not_set )
+          def json_context( fields: :not_set, namespaces: :not_set, presenters: :not_set, linkage_only: false )
             scorpion.fetch(
               Shamu::JsonApi::Context,
               fields: fields == :not_set ? json_context_fields : fields,
               namespaces: namespaces == :not_set ? json_context_namespaces : namespaces,
-              presenters: presenters == :not_set ? json_context_presenters : presenters
+              presenters: presenters == :not_set ? json_context_presenters : presenters,
+              linkage_only: linkage_only
             )
           end
 
@@ -346,11 +351,9 @@ module Shamu
                 body = request.body.read || "{}"
                 json = JSON.parse( body, symbolize_names: true )
 
-                unless json.blank?
-                  fail NoJsonBodyError unless json[ :data ]
-                end
+                fail NoJsonBodyError unless json.present? && json.key?( :data )
 
-                json ? json[ :data ] : {}
+                json[ :data ]
               end
           end
 
