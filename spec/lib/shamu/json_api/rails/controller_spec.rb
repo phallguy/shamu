@@ -286,6 +286,12 @@ describe JsonApiControllerSpec::ResourcesController, type: :controller do
       expect( controller.send( :request_params, :example ) ).to include stores: [ { id: "56", title: "First Street" } ]
     end
 
+    it "maps nil relationship data to root attributes" do
+      body[ :data ][ :relationships ][ :book ][ :data ] = nil
+
+      expect( controller.send( :request_params, :example ) ).to include book: nil
+    end
+
     it "maps data id if available" do
       body[ :data ][ :id ] = "73"
 

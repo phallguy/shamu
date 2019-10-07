@@ -332,8 +332,8 @@ module Shamu
                   payload[ attr_key.to_sym ] = value[ :data ].map { |d| d[ :id ] }
                   payload[ key ] = value[ :data ].map { |d| map_json_resource_payload( d ) }
                 else
-                  payload[ attr_key.to_sym ] = value[ :data ][ :id ]
-                  payload[ key ] = map_json_resource_payload( value[ :data ] )
+                  payload[ attr_key.to_sym ] = value.dig( :data, :id )
+                  payload[ key ] = value[ :data ].nil? ? nil : map_json_resource_payload( value[ :data ] )
                 end
               end
             end
