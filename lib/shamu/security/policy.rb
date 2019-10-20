@@ -319,11 +319,38 @@ module Shamu
           aliases[to] |= actions
         end
 
+        # @!visibility public
+        #
+        # Define the `resource` to {#permit} or {#deny} access to. Inside the
+        # block you can omit the `resource` param on DSL methods that expect
+        # it.
+        #
+        # @example
+        #   resource UserEntity do
+        #     permit :read
+        #     permit :update do |user|
+        #       user.id == principal.user_id
+        #     end
+        #
+        #     permit :chop, OtherKindOfEntity
+        #   end
+        def resource( resource )
+          last_resource = @dsl_resource
+          @dsl_resource = resource
+          yield
+        ensure
+          @dsl_resource = last_resource
+        end
+
         #
         # @!endgroup DSL
 
+        def dsl_resource
+          @dsl_resource || fail( "Provide a `resource` argument or use a #resource block to declare the protected resource." ) # rubocop:disable Metrics/LineLength
+        end
+
         def extract_resource( actions )
-          resource = actions.pop
+          resource = actions.last.is_a?( Symbol ) ? dsl_resource : actions.pop
           [ resource, actions ]
         end
 

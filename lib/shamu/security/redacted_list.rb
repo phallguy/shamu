@@ -30,6 +30,14 @@ module Shamu
                :paged?, :next?, :last?, :first?, :previous?,
                to: :list
 
+      def to_a
+        entities.to_a
+      end
+
+      def to_ary
+        entities.to_a
+      end
+
       private
 
         attr_reader :list
