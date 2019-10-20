@@ -305,17 +305,23 @@ module Shamu
 
           # See (Shamu::Rails::Entity#request_params)
           def request_params( param_key )
-            if relationships = json_request_payload[ :relationships ]
-              return map_json_resource_payload( relationships[ param_key ][ :data ] ) if relationships.key?( param_key )
+            return {} unless json_request_payload.present?
+
+            if json_request_payload.is_a?( Array )
+              json_request_payload.map { |r| map_json_resource_payload( r ) }
+            else
+              if  relationships = json_request_payload[ :relationships ]
+                return map_json_resource_payload( relationships[ param_key ][ :data ] ) if relationships.key?( param_key )
+              end
+
+              payload = map_json_resource_payload( json_request_payload )
+
+              request.params.each do |key, value|
+                payload[ key.to_sym ] ||= value if ID_PATTERN =~ key
+              end
+
+              payload
             end
-
-            payload = map_json_resource_payload( json_request_payload )
-
-            request.params.each do |key, value|
-              payload[ key.to_sym ] ||= value if ID_PATTERN =~ key
-            end
-
-            payload
           end
 
           def map_json_resource_payload( resource ) # rubocop:disable Metrics/AbcSize
@@ -344,7 +350,7 @@ module Shamu
           # @!visibility public
           #
           # Map a JSON body to a hash.
-          # @return [Hash] the parsed JSON payload.
+          # @return [Hash, Array] the parsed JSON payload.
           def json_request_payload
             @json_request_payload ||=
               begin

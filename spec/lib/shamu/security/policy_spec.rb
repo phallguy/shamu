@@ -11,7 +11,7 @@ describe Shamu::Security::Policy do
       role :authenticated
 
       public :in_role?, :add_rule, :rules, :permit, :deny, :when_elevated,
-             :alias_action, :expand_aliases, :resource
+             :alias_action, :expand_aliases
     end
   end
 
@@ -115,28 +115,6 @@ describe Shamu::Security::Policy do
       end
 
       expect( policy.rules.first.result ).to eq :maybe
-    end
-  end
-
-  describe "#resource" do
-    it "fails if no resource block and resource omitted to permit" do
-      expect do
-        policy.permit :read
-      end.to raise_exception( /resource/ )
-    end
-
-    it "uses the dsl resource when omitted" do
-      expect( policy ).to receive( :add_rule ).with( [ :read ], Object, :yes )
-      policy.resource Object do
-        policy.permit :read
-      end
-    end
-
-    it "uses an explicit resource when provided" do
-      expect( policy ).to receive( :add_rule ).with( [ :read ], Symbol, :yes )
-      policy.resource Object do
-        policy.permit :read, Symbol
-      end
     end
   end
 
