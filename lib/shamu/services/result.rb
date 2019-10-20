@@ -54,7 +54,7 @@ module Shamu
       #   the first {Request} object found in the `values`.
       # @param [Entities::Entity] entity submitted to the service. If :not_set,
       #   uses the first {Entity} object found in the `values`.
-      def initialize( *values, request: :not_set, entity: :not_set ) # rubocop:disable Metrics/LineLength, Metrics/PerceivedComplexity
+      def initialize( *values, request: :not_set, entity: :not_set ) # rubocop:disable Metrics/PerceivedComplexity
         @values = values
         @value  = values.first
 

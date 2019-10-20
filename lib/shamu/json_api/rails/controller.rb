@@ -13,7 +13,9 @@ module Shamu
 
         included do
           before_action do
-            render json: json_error( "The 'include' parameter is not supported" ), status: :bad_request if params[:include] # rubocop:disable Metrics/LineLength
+            if params[:include]
+              render json: json_error( "The 'include' parameter is not supported" ), status: :bad_request
+            end
             request.formats = [ :json_api, :json ]
           end
 
@@ -310,8 +312,10 @@ module Shamu
             if json_request_payload.is_a?( Array )
               json_request_payload.map { |r| map_json_resource_payload( r ) }
             else
-              if  relationships = json_request_payload[ :relationships ]
-                return map_json_resource_payload( relationships[ param_key ][ :data ] ) if relationships.key?( param_key )
+              if relationships = json_request_payload[ :relationships ]
+                if relationships.key?( param_key )
+                  return map_json_resource_payload( relationships[ param_key ][ :data ] )
+                end
               end
 
               payload = map_json_resource_payload( json_request_payload )
@@ -324,7 +328,7 @@ module Shamu
             end
           end
 
-          def map_json_resource_payload( resource ) # rubocop:disable Metrics/AbcSize
+          def map_json_resource_payload( resource ) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
             payload = resource[ :attributes ] ? resource[ :attributes ].dup : {}
             payload[ :id ] = resource[ :id ] if resource.key?( :id )
 

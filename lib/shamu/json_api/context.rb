@@ -155,9 +155,13 @@ module Shamu
         end
 
         def find_namespace_presenter( resource, namespaces )
-          presenter   = find_namespace_presenter_for( resource.class.name.demodulize, namespaces )
-          presenter ||= find_namespace_presenter_for( resource.model_name.element.camelize, namespaces )       if resource.respond_to?( :model_name )        # rubocop:disable Metrics/LineLength
-          presenter ||= find_namespace_presenter_for( resource.class.model_name.element.camelize, namespaces ) if resource.class.respond_to?( :model_name )  # rubocop:disable Metrics/LineLength
+          presenter = find_namespace_presenter_for( resource.class.name.demodulize, namespaces )
+          if resource.respond_to?( :model_name )
+            presenter ||= find_namespace_presenter_for( resource.model_name.element.camelize, namespaces )
+          end
+          if resource.class.respond_to?( :model_name )
+            presenter ||= find_namespace_presenter_for( resource.class.model_name.element.camelize, namespaces )
+          end
           presenter
         end
 
@@ -165,10 +169,8 @@ module Shamu
           name = "#{ name }Presenter".to_sym
 
           namespaces.each do |namespace|
-            begin
-              return "#{ namespace }::#{ name }".constantize
-            rescue NameError # rubocop:disable Lint/HandleExceptions
-            end
+            return "#{ namespace }::#{ name }".constantize
+          rescue NameError # rubocop:disable Lint/HandleExceptions
           end
 
           nil

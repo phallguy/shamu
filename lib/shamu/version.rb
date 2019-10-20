@@ -2,7 +2,7 @@
 
 module Shamu
   # The primary version number
-  VERSION_NUMBER  = "0.0.26"
+  VERSION_NUMBER  = "0.0.27"
 
   # Version suffix such as 'beta' or 'alpha'
   VERSION_SUFFIX  = ""

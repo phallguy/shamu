@@ -87,7 +87,9 @@ module Shamu
           end
 
           def ensure_includes_sorting!
-            raise "Must include Shamu::Entities::ListScope::Sorting to use last/before" unless respond_to?( :reverse_sort!, true ) # rubocop:disable Metrics/LineLength
+            unless respond_to?( :reverse_sort!, true )
+              raise "Must include Shamu::Entities::ListScope::Sorting to use last/before"
+            end
           end
 
       end

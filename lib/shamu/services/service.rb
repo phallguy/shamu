@@ -121,7 +121,9 @@ module Shamu
           return Entities::List.new [] unless records
 
           unless transformer
-            fail "Either provide a block or add a private method `def build_entities( records )` to #{ self.class.name }." unless respond_to?( :build_entities, true ) # rubocop:disable Metrics/LineLength
+            unless respond_to?( :build_entities, true )
+              fail "Either provide a block or add a private method `def build_entities( records )` to #{ self.class.name }." # rubocop:disable Metrics/LineLength
+            end
 
             transformer ||= method( :build_entities )
           end

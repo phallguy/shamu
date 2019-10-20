@@ -77,8 +77,12 @@ module Shamu
       end
 
       def initialize( attributes )
-        fail ArgumentError, "Must provide a retire_at attribute for '#{ attributes[ 'name' ] }' toggle." unless attributes["retire_at"] # rubocop:disable Metrics/LineLength
-        fail ArgumentError, "Type must be one of #{ TYPES } for '#{ attributes[ 'name' ] }' toggle." unless TYPES.include?( attributes["type"] ) # rubocop:disable Metrics/LineLength
+        unless attributes["retire_at"]
+          fail ArgumentError, "Must provide a retire_at attribute for '#{ attributes[ 'name' ] }' toggle."
+        end
+        unless TYPES.include?( attributes["type"] )
+          fail ArgumentError, "Type must be one of #{ TYPES } for '#{ attributes[ 'name' ] }' toggle."
+        end
 
         super
       end
