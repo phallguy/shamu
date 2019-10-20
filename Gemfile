@@ -6,7 +6,7 @@ gemspec
 group :test do
   gem "activerecord", "~> 5.2"
   gem "actionpack", "~> 5.2"
-  gem "responders", "~> 2.4.1"
+  gem "responders", "~> 3.0.0"
   gem "kaminari", "~> 1.1.1", require: false
 
   gem "byebug"
