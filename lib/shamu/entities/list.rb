@@ -64,6 +64,14 @@ module Shamu
         end
       end
 
+      def to_a
+        entities.to_a
+      end
+
+      def to_ary
+        entities.to_a
+      end
+
       private
 
         attr_reader :raw_entities

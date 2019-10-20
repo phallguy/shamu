@@ -17,12 +17,17 @@ module Shamu
       # @param [Hash<Class,Class>] presenters a hash that maps resource classes
       #     to the presenter class to use when building responses. See
       #     {#find_presenter}.
-      def initialize( fields: nil, namespaces: [], presenters: {} )
+      #
+      # @param [Boolean] linkage_only true to include only resource
+      # identifier objects.
+      #
+      def initialize( fields: nil, namespaces: [], presenters: {}, linkage_only: false )
         @included_resources = {}
         @all_resources = Set.new
         @fields = parse_fields( fields )
         @namespaces = Array( namespaces )
         @presenters = presenters || {}
+        @linkage_only = linkage_only
       end
 
       # Add an included resource for a compound response.
@@ -44,6 +49,12 @@ module Shamu
           presenter ||= find_presenter( resource ) unless block
           { presenter: presenter, block: block }
         end
+      end
+
+      # Signals that the given resource was presented in the primary payload
+      # and should not be included in the additional `included` resource.
+      def dont_include_resource(resource)
+        included_resources.delete(resource)
       end
 
       # Collects all the currently included resources and resets the queue.
@@ -69,6 +80,7 @@ module Shamu
       #     when no explicit fields have been selected.
       # @return [Boolean] true if the field should be included.
       def include_field?( type, name, default = true )
+        return false if linkage_only?
         return default unless type_fields = fields[ type.to_sym ]
 
         type_fields.include?( name )
@@ -101,6 +113,12 @@ module Shamu
         { fields: fields }
       end
 
+      # @return [Boolean] only output resource linkage. Skip attributes, links,
+      # and meta.
+      def linkage_only?
+        linkage_only
+      end
+
       private
 
         attr_reader :all_resources
@@ -108,6 +126,7 @@ module Shamu
         attr_reader :fields
         attr_reader :namespaces
         attr_reader :presenters
+        attr_reader :linkage_only
 
         def parse_fields( raw )
           return {} unless raw
@@ -136,9 +155,13 @@ module Shamu
         end
 
         def find_namespace_presenter( resource, namespaces )
-          presenter   = find_namespace_presenter_for( resource.class.name.demodulize, namespaces )
-          presenter ||= find_namespace_presenter_for( resource.model_name.element.camelize, namespaces )       if resource.respond_to?( :model_name )        # rubocop:disable Metrics/LineLength
-          presenter ||= find_namespace_presenter_for( resource.class.model_name.element.camelize, namespaces ) if resource.class.respond_to?( :model_name )  # rubocop:disable Metrics/LineLength
+          presenter = find_namespace_presenter_for( resource.class.name.demodulize, namespaces )
+          if resource.respond_to?( :model_name )
+            presenter ||= find_namespace_presenter_for( resource.model_name.element.camelize, namespaces )
+          end
+          if resource.class.respond_to?( :model_name )
+            presenter ||= find_namespace_presenter_for( resource.class.model_name.element.camelize, namespaces )
+          end
           presenter
         end
 
@@ -146,10 +169,8 @@ module Shamu
           name = "#{ name }Presenter".to_sym
 
           namespaces.each do |namespace|
-            begin
-              return "#{ namespace }::#{ name }".constantize
-            rescue NameError # rubocop:disable Lint/HandleExceptions
-            end
+            return "#{ namespace }::#{ name }".constantize
+          rescue NameError # rubocop:disable Lint/HandleExceptions
           end
 
           nil

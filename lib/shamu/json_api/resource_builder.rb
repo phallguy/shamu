@@ -47,6 +47,7 @@ module Shamu
       #     of the relationship.
       def relationship( name, &block )
         require_identifier!
+        return if context.linkage_only?
 
         include_or_mark_partial name do
           builder = RelationshipBuilder.new( context )
@@ -70,7 +71,7 @@ module Shamu
           if context.include_field?( type, field )
             yield
           else
-            meta :partial, true
+            meta :partial, true unless context.linkage_only?
           end
         end
     end

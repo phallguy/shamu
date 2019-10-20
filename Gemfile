@@ -20,11 +20,9 @@ group :test do
   gem "rspec-wait"
   gem "rspec-rails", require: false
   gem "rspec-instafail"
-  gem "yard"
-  gem "yard-activesupport-concern"
   gem "awesome_print"
 
   gem "nokogiri"
 
-  gem "rspec_junit_formatter", "~> 0.4.1", platforms: :mri
+  gem "rspec_junit_formatter", platforms: :mri
 end

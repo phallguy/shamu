@@ -13,7 +13,9 @@ module Shamu
 
         included do
           before_action do
-            render json: json_error( "The 'include' parameter is not supported" ), status: :bad_request if params[:include] # rubocop:disable Metrics/LineLength
+            if params[:include]
+              render json: json_error( "The 'include' parameter is not supported" ), status: :bad_request
+            end
             request.formats = [ :json_api, :json ]
           end
 
@@ -224,7 +226,7 @@ module Shamu
           end
 
 
-          JSON_CONTEXT_KEYWORDS = [ :fields, :namespaces, :presenters ].freeze
+          JSON_CONTEXT_KEYWORDS = [ :fields, :namespaces, :presenters, :linkage_only ].freeze
 
           # @!visibility public
           #
@@ -244,14 +246,19 @@ module Shamu
           # @param [Hash<Class,Class>] presenters a hash that maps resource classes
           #     to the presenter class to use when building responses. See
           #     {JsonApi::Context#find_presenter}.
+          #
+          # @param [Boolean] linkage_only true to include only resource
+          # identifier objects.
+          #
           # @return [JsonApi::Context] the builder context honoring any filter
           #     parameters sent by the client.
-          def json_context( fields: :not_set, namespaces: :not_set, presenters: :not_set )
+          def json_context( fields: :not_set, namespaces: :not_set, presenters: :not_set, linkage_only: false )
             scorpion.fetch(
               Shamu::JsonApi::Context,
               fields: fields == :not_set ? json_context_fields : fields,
               namespaces: namespaces == :not_set ? json_context_namespaces : namespaces,
-              presenters: presenters == :not_set ? json_context_presenters : presenters
+              presenters: presenters == :not_set ? json_context_presenters : presenters,
+              linkage_only: linkage_only
             )
           end
 
@@ -300,20 +307,28 @@ module Shamu
 
           # See (Shamu::Rails::Entity#request_params)
           def request_params( param_key )
-            if relationships = json_request_payload[ :relationships ]
-              return map_json_resource_payload( relationships[ param_key ][ :data ] ) if relationships.key?( param_key )
+            return {} unless json_request_payload.present?
+
+            if json_request_payload.is_a?( Array )
+              json_request_payload.map { |r| map_json_resource_payload( r ) }
+            else
+              if relationships = json_request_payload[ :relationships ]
+                if relationships.key?( param_key )
+                  return map_json_resource_payload( relationships[ param_key ][ :data ] )
+                end
+              end
+
+              payload = map_json_resource_payload( json_request_payload )
+
+              request.params.each do |key, value|
+                payload[ key.to_sym ] ||= value if ID_PATTERN =~ key
+              end
+
+              payload
             end
-
-            payload = map_json_resource_payload( json_request_payload )
-
-            request.params.each do |key, value|
-              payload[ key.to_sym ] ||= value if ID_PATTERN =~ key
-            end
-
-            payload
           end
 
-          def map_json_resource_payload( resource ) # rubocop:disable Metrics/AbcSize
+          def map_json_resource_payload( resource ) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
             payload = resource[ :attributes ] ? resource[ :attributes ].dup : {}
             payload[ :id ] = resource[ :id ] if resource.key?( :id )
 
@@ -327,8 +342,8 @@ module Shamu
                   payload[ attr_key.to_sym ] = value[ :data ].map { |d| d[ :id ] }
                   payload[ key ] = value[ :data ].map { |d| map_json_resource_payload( d ) }
                 else
-                  payload[ attr_key.to_sym ] = value[ :data ][ :id ]
-                  payload[ key ] = map_json_resource_payload( value[ :data ] )
+                  payload[ attr_key.to_sym ] = value.dig( :data, :id )
+                  payload[ key ] = value[ :data ].nil? ? nil : map_json_resource_payload( value[ :data ] )
                 end
               end
             end
@@ -339,18 +354,16 @@ module Shamu
           # @!visibility public
           #
           # Map a JSON body to a hash.
-          # @return [Hash] the parsed JSON payload.
+          # @return [Hash, Array] the parsed JSON payload.
           def json_request_payload
             @json_request_payload ||=
               begin
                 body = request.body.read || "{}"
                 json = JSON.parse( body, symbolize_names: true )
 
-                unless json.blank?
-                  fail NoJsonBodyError unless json[ :data ]
-                end
+                fail NoJsonBodyError unless json.present? && json.key?( :data )
 
-                json ? json[ :data ] : {}
+                json[ :data ]
               end
           end
 

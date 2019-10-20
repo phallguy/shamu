@@ -104,7 +104,7 @@ module Shamu
             string = env[ "HTTP_COOKIE" ]
 
             # Cribbed from Rack::Request#cookies
-            parsed = ::Rack::Utils.parse_query( string, ";," ) { |s| ::Rack::Utils.unescape( s ) rescue s } # rubocop:disable Style/RescueModifier, Metrics/LineLength
+            parsed = ::Rack::Utils.parse_query( string, ";," ) { |s| ::Rack::Utils.unescape( s ) rescue s } # rubocop:disable Style/RescueModifier
             parsed.each do |k, v|
               @env_cookies[ k ] = Array === v ? v.first : v
             end

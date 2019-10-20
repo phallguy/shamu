@@ -49,7 +49,9 @@ module Shamu
             next if attribute_option_keys.include?( key )
 
             validator = "#{ key.to_s.camelize }Validator"
-            key = "shamu/attributes/validators/#{ key }" if Shamu::Attributes::Validators.const_defined?( validator.to_sym ) # rubocop:disable Metrics/LineLength
+            if Shamu::Attributes::Validators.const_defined?( validator.to_sym )
+              key = "shamu/attributes/validators/#{ key }"
+            end
             opts[ key ] = value
           end
           validates name, validation_options if validation_options.any?
