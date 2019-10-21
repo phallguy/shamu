@@ -10,6 +10,7 @@ module Shamu
     require "shamu/security/redacted_list"
     require "shamu/security/support"
     require "shamu/security/roles"
+    require "shamu/security/role_entity"
     require "shamu/security/roles_service"
     require "shamu/security/hashed_value"
 
