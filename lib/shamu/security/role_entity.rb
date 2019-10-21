@@ -35,6 +35,10 @@ module Shamu
         defined_role[:implicit]
       end
 
+      def implicit?
+        !!implicit
+      end
+
       # @!attribute
       # @return [Array<Symbol>]
       attribute :inherited_ids do
