@@ -3,6 +3,7 @@ module Shamu
   module Security
     require "shamu/security/error"
     require "shamu/security/principal"
+    require "shamu/security/context"
     require "shamu/security/delegate_principal"
     require "shamu/security/policy"
     require "shamu/security/policy_rule"
