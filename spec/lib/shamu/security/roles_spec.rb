@@ -5,6 +5,8 @@ describe Shamu::Security::Roles do
     include Shamu::Security::Roles
 
     role :admin
+    role :member
+    role :reviewer, bit: 5
   end
 
 
@@ -16,6 +18,9 @@ describe Shamu::Security::Roles do
 
       expect( klass.roles ).to have_key :admin
       expect( klass.roles[:admin] ).to be_a Hash
+      expect( klass.roles[:admin][:bit] ).to eq 0
+      expect( klass.roles[:member][:bit] ).to eq 1
+      expect( klass.roles[:reviewer][:bit] ).to eq 5
     end
   end
 

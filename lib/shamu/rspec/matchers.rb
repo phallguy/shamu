@@ -26,7 +26,7 @@ RSpec::Matchers.define :be_permitted_to do |*args|
     true
   end
 
-  failure_message do |actual|
+  failure_message do
     "be permitted to #{ expected.first } #{ expected.second.inspect }"
   end
 
@@ -45,7 +45,7 @@ RSpec::Matchers.define :maybe_be_permitted_to do |*args|
     true
   end
 
-  failure_message do |actual|
+  failure_message do
     "maybe be permitted to #{ expected.first } #{ expected.second.inspect }"
   end
 
@@ -64,7 +64,7 @@ RSpec::Matchers.define :absolutely_be_permitted_to do |*args|
     true
   end
 
-  failure_message do |actual|
+  failure_message do
     "absolutely be permitted to #{ expected.first } #{ expected.second.inspect }"
   end
 
