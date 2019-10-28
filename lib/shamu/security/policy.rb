@@ -45,6 +45,11 @@ module Shamu
       attr_reader :principal
 
       # @!attribute
+      # @return [Context] context holding additional data about the current
+      # request.
+      attr_reader :context
+
+      # @!attribute
       # @return [Array<Roles>] roles that have been granted to the {#principal}.
       attr_reader :roles
 
@@ -56,8 +61,9 @@ module Shamu
       #
       # @!endgroup Dependencies
 
-      def initialize( principal: nil, roles: nil, related_user_ids: nil )
+      def initialize( principal: nil, context: nil, roles: nil, related_user_ids: nil )
         @principal        = principal || Principal.new
+        @context          = context || Context.new
         @roles            = roles || []
         @related_user_ids = Array.wrap( related_user_ids )
       end

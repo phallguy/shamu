@@ -35,6 +35,7 @@ module Shamu
       def policy
         @policy ||= _policy_class.new(
           principal: security_principal,
+          context: security_context,
           roles: roles_service.roles_for( security_principal, security_context )
         )
       end
@@ -91,6 +92,8 @@ module Shamu
         # @return [Enumerable<Entities::Entity>] the redacted entities
         def redact_list( list )
           list.map do |entity|
+            next entity if permit?(:read_private, entity)
+
             policy.redact( entity )
           end
         end
