@@ -14,13 +14,21 @@ module Shamu
 
       # Enumerate through each of the entities in the list.
       def each( &block )
-        entities.each( &block )
+        if eager?
+          entities.to_a.each( &block )
+        else
+          entities.each( &block )
+        end
       end
 
-      delegate :first, :last, :count, :[], :empty?, to: :raw_entities
+      delegate :first, :last, :[], :empty?, to: :raw_entities
 
       alias_method :size, :count
       alias_method :length, :count
+
+      def count
+        eager? ? to_a.count : raw_entities.count
+      end
 
       # @return [Boolean] true if the list represents a slice of a larger set.
       # See {PagedList} for paged implementation.
@@ -72,6 +80,15 @@ module Shamu
         entities.to_a
       end
 
+      # Eagerly load the list into memory before attempting to count the
+      # entities or enumerate over them.
+      #
+      # @return [Self]
+      def eager!
+        @eager = true
+        self
+      end
+
       private
 
         attr_reader :raw_entities
@@ -84,6 +101,10 @@ module Shamu
 
         def key_attribute
           :id
+        end
+
+        def eager?
+          @eager
         end
     end
   end

@@ -31,14 +31,19 @@ module Shamu
         # @param [Array<Symbol>] inherits additional roles that are
         #     automatically inherited when the named role is granted.
         # @param [Array<Symbol>] scopes that the role may be granted in.
+        # @param [Integer] bit to associate with the role if stored as a
+        # bitmask
         # @return [void]
-        def role( name, title: name.to_s.titleize, inherits: nil, scopes: nil, implicit: false )
+        def role( name, title: name.to_s.titleize, inherits: nil, scopes: nil, implicit: false, bit: :not_set )
+          bit = implicit ? nil : roles.length if bit == :not_set
+
           roles[ name.to_sym ] = {
             name: name,
             title: title,
             inherits: Array( inherits ),
             scopes: Array( scopes ),
-            implicit: implicit
+            implicit: implicit,
+            bit: bit
           }
         end
 

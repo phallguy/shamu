@@ -15,6 +15,9 @@ en:
         incomplete_setup: The service has not been setup. See included modules documentation for details.
         service_request_failed: 'The service call failed with: %{errors}.'
 
+    entities:
+      errors:
+        list_scope_invalid: The list scope is invalid.
 
     security:
       errors:

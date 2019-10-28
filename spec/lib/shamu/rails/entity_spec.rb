@@ -37,6 +37,7 @@ describe Shamu::Rails::Entity, type: :controller do
     end
 
     def index
+      examples
       render plain: ""
     end
 
@@ -80,17 +81,8 @@ describe Shamu::Rails::Entity, type: :controller do
     controller.send :example_request
   end
 
-  it "loads the entity before the request" do
-    expect( controller ).to receive( :example ).and_call_original
-    get :show, params: { id: 1 }
-  end
-
-  it "invokes list for index types" do
-    expect( controller ).to receive( :examples ).and_call_original
-    get :index
-  end
-
   it "passes list_params to list method for index types" do
+    expect(controller).to receive(:examples_list_params).and_call_original
     expect(controller).to receive(:list_params).and_call_original
 
     get :index
@@ -101,64 +93,4 @@ describe Shamu::Rails::Entity, type: :controller do
 
     post :create
   end
-
-  context "only some actions" do
-    controller ActionController::Base do
-      service :example_service, LoadEntitySpec::Service
-      entity LoadEntitySpec::ExampleEntity, only: :show
-
-      def show
-        render plain: ""
-      end
-
-      def new
-        render plain: ""
-      end
-
-      def create
-        render plain: ""
-      end
-    end
-
-    it "loads on show" do
-      expect( controller ).to receive( :example )
-      get :show, params: { id: 1 }
-    end
-
-    it "doesn't load on new" do
-      expect( controller ).not_to receive( :example )
-      post :create
-      get :new
-    end
-  end
-
-  context "except some actions" do
-    controller ActionController::Base do
-      service :example_service, LoadEntitySpec::Service
-      entity LoadEntitySpec::ExampleEntity, except: :show
-
-      def show
-        render plain: ""
-      end
-
-      def new
-        render plain: ""
-      end
-
-      def create
-        render plain: ""
-      end
-    end
-
-    it "loads on show" do
-      expect( controller ).not_to receive( :example )
-      get :show, params: { id: 1 }
-    end
-
-    it "doesn't load on new" do
-      expect( controller ).not_to receive( :example )
-      get :new
-    end
-  end
-
 end

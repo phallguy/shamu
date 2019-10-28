@@ -56,5 +56,11 @@ describe Shamu::Entities::List do
         list.send( method )
       end
     end
+
+    it "does not short-circuit with eager loading" do
+      expect(source).not_to receive(:count)
+      list.eager!
+      list.count
+    end
   end
 end

@@ -49,20 +49,6 @@ module Shamu
           {}
         end
 
-        def load_entity( method:, list_method:, action: nil, only: nil, except: nil )
-          action ||= params[ :action ].to_sym
-          return unless matching_entity_action?( action, only: only, except: except )
-
-          send list_action?( action ) ? list_method : method
-        end
-
-        def matching_entity_action?( action, only:, except: )
-          return if only.present? && !only.include?( action )
-          return if except.present? && except.include?( action )
-
-          !create_action?( action )
-        end
-
         def list_action?( action = params[ :action ] )
           action.to_sym == :index
         end
@@ -127,14 +113,6 @@ module Shamu
           define_entity_method( as, through, param )
           define_entities_method( list, through, list_param )
           define_entity_request_method( as, through, param_key )
-
-          before_action do
-            load_entity( method: as,
-                         list_method: list,
-                         action: action,
-                         only: only && Array( only ),
-                         except: except && Array( except ) )
-          end
         end
 
         private
@@ -160,9 +138,13 @@ module Shamu
             class_eval <<-RUBY, __FILE__, __LINE__ + 1
               private
 
+              def #{ as }_list_params                                                         # def entities_list_params
+                list_params( #{ param ? ":#{ param }" : 'nil' } )                                                     #   list_params( nil )
+              end                                                                             # end
+
               def #{ as }                                                                     # def entities
                 return @#{ as } if defined? @#{ as }                                          #   return @entities if defined? @entities
-                @#{ as } = fetch_entities( #{ through }, #{ param ? ":#{ param }" : 'nil' } ) #   @entities = fetch_entities( entity_service, nil )
+                @#{ as } = #{ through }.list( #{ as }_list_params  )                          #   @entities = entity_service.list( entity_list_params )
               end                                                                             # end
 
               helper_method :#{ as } if respond_to?( :helper_method )

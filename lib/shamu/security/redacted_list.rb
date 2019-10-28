@@ -26,7 +26,7 @@ module Shamu
       end
 
       # Make sure redacted lists can delegate to paged lists.
-      delegate :empty?, :total_count, :limit, :offset, :current_page, :to_a, :to_ary,
+      delegate :empty?, :total_count, :limit, :offset, :current_page, :to_a, :to_ary, :eager!,
                :paged?, :next?, :last?, :first?, :previous?,
                to: :list
 

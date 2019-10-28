@@ -150,6 +150,17 @@ module Shamu
         self.class.new( to_attributes.merge( hash ) )
       end
 
+      def ==(other)
+        return true if super
+
+        # Match model instances
+        self.class.attributes.find do |key, attr|
+          next unless attr[:model]
+
+          self[key] == other
+        end
+      end
+
       private
 
         def pretty_print_custom( pp )

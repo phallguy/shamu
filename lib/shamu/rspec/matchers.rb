@@ -26,9 +26,14 @@ RSpec::Matchers.define :be_permitted_to do |*args|
     true
   end
 
-  failure_message do |actual|
-    "expected that #{ actual.class.name } would be permitted to #{ expected.first } #{ expected.second }"
+  failure_message do
+    "be permitted to #{ expected.first } #{ expected.second.inspect }"
   end
+
+  description do
+    "be permitted to #{ expected.first } #{ expected.second.inspect }"
+  end
+
   match do |policy|
     policy.permit?( *args )
   end
@@ -40,8 +45,12 @@ RSpec::Matchers.define :maybe_be_permitted_to do |*args|
     true
   end
 
-  failure_message do |actual|
-    "expected that #{ actual.class.name } might be permitted to #{ expected.first } #{ expected.second }"
+  failure_message do
+    "maybe be permitted to #{ expected.first } #{ expected.second.inspect }"
+  end
+
+  description do
+    "maybe be permitted to #{ expected.first } #{ expected.second.inspect }"
   end
 
   match do |policy|
@@ -55,8 +64,12 @@ RSpec::Matchers.define :absolutely_be_permitted_to do |*args|
     true
   end
 
-  failure_message do |actual|
-    "expected that #{ actual.class.name } would absolutely be permitted to #{ expected.first } #{ expected.second }"
+  failure_message do
+    "absolutely be permitted to #{ expected.first } #{ expected.second.inspect }"
+  end
+
+  description do
+    "absolutely be permitted to #{ expected.first } #{ expected.second.inspect }"
   end
 
   match do |policy|

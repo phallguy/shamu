@@ -11,10 +11,11 @@ module Shamu
       end
 
       # @param [Principal] principal of the currently logged in user.
+      # @param [Context] context of the request that may limit resolved roles.
       # @param [Boolean] reload to reload the roles from storage and bypass any
       # caching.
       # @return [Array<Symbol>] the roles granted to the principal.
-      def roles_for( principal, reload: false )
+      def roles_for( principal, context, reload: false )
         []
       end
 
@@ -23,7 +24,7 @@ module Shamu
         include RolesService
 
         # (see RolesService#roles_for)
-        def roles_for( principal )
+        def roles_for( principal, context, reload: false )
           []
         end
       end

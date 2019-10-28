@@ -117,7 +117,7 @@ module Shamu
           Features::Context.new self,
                                 scorpion: scorpion,
                                 user_id: security_principal.user_id,
-                                roles: roles_service.roles_for( security_principal.user_id )
+                                roles: roles_service.roles_for( security_principal.user_id, security_context )
         end
 
         def resolve_toggle( toggle, context )

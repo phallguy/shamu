@@ -1,6 +1,7 @@
 module Shamu
   # {include:file:lib/shamu/entities/README.md}
   module Entities
+    require "shamu/entities/error"
     require "shamu/entities/entity"
     require "shamu/entities/null_entity"
     require "shamu/entities/list"

@@ -26,6 +26,8 @@ module Shamu
       # @param [ListScope] scope to apply
       # @return [ActiveRecord::Relation]
       def by_list_scope( scope )
+        raise ::Shamu::Entities::ListScopeInvalidError unless scope.valid?
+
         criteria = all
         criteria = apply_paging_scope( criteria, scope )        if scope.respond_to?( :paged? )
         criteria = apply_scoped_paging_scope( criteria, scope ) if scope.respond_to?( :scoped_page? )

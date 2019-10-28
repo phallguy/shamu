@@ -110,6 +110,14 @@ module Shamu
           redact_entities([ entity ]).first
         end
 
+        # Hook to post-process entity list before returning it to the caller.
+        # @param [Enumerable<Shamu::Entities::Entity>] entities to return
+        # @return [Enumerable<Shamu::Entities::Entity>] the processed
+        # entities.
+        def return_entities( entities )
+          redact_entities( entities )
+        end
+
       class_methods do
 
         # Declare the entity and resource classes used by the service.

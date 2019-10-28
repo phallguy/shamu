@@ -43,7 +43,7 @@ module Shamu
 
           # @!attribute
           # @return [Integer] the page number.
-          attribute :number, coerce: :to_i
+          attribute :number, coerce: :to_i, default: -> { size.present? ? 1 : nil }
 
           # @!attribute
           # @return [Integer] the size of each page.
@@ -51,7 +51,7 @@ module Shamu
 
           # @!attribute
           # @return [Integer] the default page size if not specified.
-          attribute :default_size, coerce: :to_i, default: 15, serialize: false
+          attribute :default_size, coerce: :to_i, serialize: false
 
           # @return [Hash] the scope as a params hash.
           def params

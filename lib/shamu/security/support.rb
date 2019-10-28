@@ -18,11 +18,16 @@ module Shamu
       # @return [Security::RolesService] a roles service to retrieve the roles
       #     granted to the {#security_principal}.
 
+      # @!attribute roles_service
+      # @return [Security::Context] additional per-application context
+      #     to help when resolving the {#security_principal}'s roles.
+
       #
       # @!endgroup Dependencies
 
       included do
         attr_dependency :security_principal, Security::Principal unless method_defined? :security_principal
+        attr_dependency :security_context, Security::Context unless method_defined? :security_context
         attr_dependency :roles_service, Security::RolesService
       end
 
@@ -30,7 +35,7 @@ module Shamu
       def policy
         @policy ||= _policy_class.new(
           principal: security_principal,
-          roles: roles_service.roles_for( security_principal )
+          roles: roles_service.roles_for( security_principal, security_context )
         )
       end
 
