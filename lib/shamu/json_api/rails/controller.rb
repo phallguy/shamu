@@ -16,7 +16,6 @@ module Shamu
             if params[:include]
               render json: json_error( "The 'include' parameter is not supported" ), status: :bad_request
             end
-            request.formats = [ :json_api, :json ]
           end
 
           rescue_from Exception, with: :render_unhandled_exception unless ::Rails.env.test?
