@@ -245,7 +245,7 @@ module Shamu
         options = create_attribute( name, *args, **options )
 
         define_attribute_reader( name, **options )
-        define_attribute_assignment( name, **options, &block )
+        define_attribute_assignment( name, **options )
 
         if options.key?( :on )
           define_delegate_fetcher( name, options[:on], options[:build] || block )
