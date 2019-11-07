@@ -93,10 +93,6 @@ module Shamu
         #     through.
         # @param [Symbol] list the name of the method to expose the list of
         #     entities for index actions.
-        # @param [Array<Symbol>] only load the entity only for the given
-        #     actions.
-        # @param [Array<Symbol>] except load the entity except for the given
-        #     actions.
         # @param [Symbol] param the request param that holds the id of the
         #     entity.
         # @param [Symbol] list_param request param that hols list scope params.
@@ -105,7 +101,7 @@ module Shamu
         # @param [Symbol] action override the default action detection. For
         #     example always use :show for a secondary or root entity that is
         #     not being modified in an :update request.
-        def entity( entity_class, through: nil, as: nil, list: nil, only: nil, except: nil, param: :id, list_param: nil, action: nil, param_key: nil ) # rubocop:disable Metrics/LineLength
+        def entity( entity_class, through: nil, as: nil, list: nil, param: :id, list_param: nil, action: nil, param_key: nil ) # rubocop:disable Metrics/LineLength
           as      ||= entity_as_name( entity_class )
           through ||= :"#{ as.to_s.pluralize }_service"
           list    ||= as.to_s.pluralize.to_sym
