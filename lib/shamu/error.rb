@@ -24,6 +24,8 @@ module Shamu
       @id = id
       @resource = resource
 
+      resource = resource.model_name.element if resource.respond_to?( :model_name )
+
       if message == :not_found
         message =
           if id != :not_set
