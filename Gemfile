@@ -11,7 +11,7 @@ group :test do
   gem "byebug"
   gem "pry-byebug"
 
-  gem "sqlite3", "~> 1.4.1"
+  gem "sqlite3", "~> 1.4.2"
   gem "rubocop"
   gem "spring"
   gem "guard-rspec"
