@@ -58,7 +58,7 @@ GEM
     ast (2.4.0)
     awesome_print (1.8.0)
     builder (3.2.3)
-    byebug (11.0.1)
+    byebug (11.1.0)
     coderay (1.1.2)
     combustion (1.1.2)
       activesupport (>= 3.0.0)
