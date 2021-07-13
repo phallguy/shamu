@@ -28,8 +28,9 @@ Gem::Specification.new do |spec|
   spec.add_dependency "multi_json", "~> 1.11"
   spec.add_dependency "rack", ">= 1"
   spec.add_dependency "scorpion-ioc", "~> 1.0"
+  spec.add_dependency "thwait", "~> 0"
 
-  spec.add_development_dependency "bundler", "~> 1.6"
+  spec.add_development_dependency "bundler", "~> 2"
   spec.add_development_dependency "combustion"
   spec.add_development_dependency "i18n"
   spec.add_development_dependency "rake"
