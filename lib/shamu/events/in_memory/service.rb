@@ -1,5 +1,3 @@
-require "thwait"
-
 module Shamu
   module Events
     module InMemory

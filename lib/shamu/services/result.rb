@@ -173,8 +173,8 @@ module Shamu
         def append_error_source( source )
           return unless source.respond_to?( :errors )
 
-          source.errors.each do |attr, message|
-            errors.add attr, message unless errors[attr].include? message
+          source.errors.each do |err|
+            errors.add err.attribute, err.message unless errors[err.attribute].include? err.message
           end
         end
 

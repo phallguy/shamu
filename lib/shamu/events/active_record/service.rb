@@ -140,7 +140,7 @@ module Shamu
             return unless last_message
 
             runner = create_runner( runner_id )
-            runner.update_attributes last_processed_id: last_message.id, last_processed_at: Time.now.utc
+            runner.update! last_processed_id: last_message.id, last_processed_at: Time.now.utc
           end
 
           def pending_messages( state, runner_id, limit )

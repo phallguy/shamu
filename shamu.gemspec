@@ -20,15 +20,14 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = ">= 2.6.0"
 
-  spec.add_dependency "activemodel", ">= 5.0"
-  spec.add_dependency "activesupport", ">= 5.0"
+  spec.add_dependency "activemodel", ">= 6.0"
+  spec.add_dependency "activesupport", ">= 6.0"
   spec.add_dependency "crc32", "~> 1"
   # spec.add_dependency "listen", "~> 3"
   spec.add_dependency "loofah", "~> 2"
   spec.add_dependency "multi_json", "~> 1.11"
   spec.add_dependency "rack", ">= 1"
   spec.add_dependency "scorpion-ioc", "~> 1.0"
-  spec.add_dependency "thwait", "~> 0"
 
   spec.add_development_dependency "bundler", "~> 2"
   spec.add_development_dependency "combustion"

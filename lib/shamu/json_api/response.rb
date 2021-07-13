@@ -68,13 +68,13 @@ module Shamu
       # @yieldparam [String] message the error message.
       # @return [self]
       def validation_errors( errors, &block )
-        errors.each do |attr, message|
-          error message do |builder|
+        errors.each do |err|
+          error err.message do |builder|
             path = "/data"
-            path << "/attributes/#{ attr }" unless attr == :base
+            path << "/attributes/#{ err.attribute }" unless err.attribute == :base
             builder.pointer path
 
-            yield builder, attr, message if block_given?
+            yield builder, err.attribute, err.message if block_given?
           end
         end
       end

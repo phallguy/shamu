@@ -4,8 +4,8 @@ source "https://rubygems.org"
 gemspec
 
 group :test do
-  gem "activerecord", "~> 5.2"
-  gem "actionpack", "~> 5.2"
+  gem "activerecord", "~> 6"
+  gem "actionpack", "~> 6"
   gem "kaminari", "~> 1.2.0", require: false
 
   gem "byebug"
