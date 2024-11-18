@@ -2,7 +2,6 @@ require "shamu/services"
 
 module Shamu
   module Entities
-
     # Implements an {EntityLookupService} that works with {OpaqueId} encoded
     # values to obfuscate the contents and type of record identified by the id.
     # Useful for implementing guidelines for globally unique IDs in a GraphQL
@@ -16,7 +15,6 @@ module Shamu
     # end
     # ```
     class OpaqueEntityLookupService < EntityLookupService
-
       # ============================================================================
       # @!group Dependencies
       #
@@ -24,36 +22,34 @@ module Shamu
       # @!attribute
       # @return [EntityLookupService] the underlying lookup service to use.
       attr_dependency :lookup_service, EntityLookupService do |scorpion|
-        scorpion.new( EntityLookupService, { entity_map: entity_map }, {} )
+        scorpion.new(EntityLookupService, { entity_map: entity_map }, {})
       end
-
 
       #
       # @!endgroup Dependencies
 
       # (see {EntityLookupService#ids)
-      def ids( entities )
+      def ids(entities)
         super.map do |id|
-          OpaqueId.opaque_id( id )
+          OpaqueId.opaque_id(id)
         end
       end
 
       # (see {EntityLookupService#record_ids)
-      def record_ids( ids )
-        super( ids_to_entity_paths( ids ) )
+      def record_ids(ids)
+        super(ids_to_entity_paths(ids))
       end
 
       # (see {EntityLookupService#lookup)
-      def lookup( *ids )
-        super( *ids_to_entity_paths( ids ) )
+      def lookup(*ids)
+        super(*ids_to_entity_paths(ids))
       end
 
       private
 
-        def ids_to_entity_paths( ids )
-          Array.wrap( ids ).map { |id| OpaqueId.to_entity_path( id ) }
+        def ids_to_entity_paths(ids)
+          Array.wrap(ids).map { |id| OpaqueId.to_entity_path(id) }
         end
-
     end
   end
 end

@@ -1,7 +1,6 @@
 module Shamu
   # {include:file:lib/shamu/json_api/README.md}
   module JsonApi
-
     MIME_TYPE = "application/vnd.api+json".freeze
 
     require "shamu/json_api/context"

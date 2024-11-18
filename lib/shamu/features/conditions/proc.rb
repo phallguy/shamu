@@ -1,7 +1,6 @@
 module Shamu
   module Features
     module Conditions
-
       # Match against a custom method. Due to their dynamic nature, proc
       # conditions are much slower and should be reserved for only a few
       # features.
@@ -25,14 +24,14 @@ module Shamu
         include Scorpion::Object
 
         # (see Condition#match?)
-        def match?( context )
-          instance( context ).send( proc_method, context, toggle )
+        def match?(context)
+          instance(context).send(proc_method, context, toggle)
         end
 
         private
 
-          def instance( context )
-            context.scorpion.fetch( proc_class )
+          def instance(context)
+            context.scorpion.fetch(proc_class)
           end
 
           def proc_class
@@ -44,11 +43,9 @@ module Shamu
           end
 
           def proc_config
-            @proc_config ||= config.split( "#" )
+            @proc_config ||= config.split("#")
           end
-
       end
-
     end
   end
 end

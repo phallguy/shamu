@@ -1,7 +1,6 @@
 require "scorpion/rack/middleware"
 
 module Shamu
-
   # {include:file:lib/shamu/rack/README.md}
   module Rack
     require "shamu/rack/cookies"

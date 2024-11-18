@@ -1,6 +1,5 @@
 module Shamu
   module Events
-
     # See {ActiveRecord::Service}
     module ActiveRecord
       require "shamu/events/active_record/service"

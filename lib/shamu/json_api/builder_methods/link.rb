@@ -8,15 +8,15 @@ module Shamu
         # @param [String] url
         # @param [Hash] meta optional additional meta information.
         # @return [self]
-        def link( name, url, meta: nil )
+        def link(name, url, meta: nil)
           return if context.linkage_only?
 
-          links = ( output[:links] ||= {} )
+          links = (output[:links] ||= {})
 
-          if meta # rubocop:disable Style/ConditionalAssignment
-            links[ name.to_sym ] = { href: url, meta: meta }
+          if meta
+            links[name.to_sym] = { href: url, meta: meta }
           else
-            links[ name.to_sym ] = url
+            links[name.to_sym] = url
           end
 
           self

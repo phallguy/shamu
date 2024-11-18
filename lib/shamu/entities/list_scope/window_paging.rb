@@ -1,7 +1,6 @@
 module Shamu
   module Entities
     class ListScope
-
       # Limit/offset style paging using first/after naming conventions typical
       # in GraphQL implementations.
       #
@@ -15,7 +14,6 @@ module Shamu
       # scope.after    # => 75
       # ```
       module WindowPaging
-
         # ============================================================================
         # @!group Attributes
         #
@@ -35,36 +33,36 @@ module Shamu
         #
         # @!endgroup Attributes
 
-        def self.included( base )
+        def self.included(base)
           super
 
-          base.attribute :first, coerce: :to_i, default: -> { default_first }
-          base.attribute :default_first, coerce: :to_i, serialize: false
+          base.attribute(:first, coerce: :to_i, default: -> { default_first })
+          base.attribute(:default_first, coerce: :to_i, serialize: false)
 
-          base.attribute :after, coerce: :to_i
+          base.attribute(:after, coerce: :to_i)
 
-          base.attribute :last, default: -> { default_last }, coerce: ->( value ) do
+          base.attribute(:last, default: -> { default_last }, coerce: lambda { |value|
             ensure_includes_sorting!
             reverse_sort!
 
             value.to_i if value
-          end
+          })
 
-          base.attribute :default_last, serialize: false, coerce: ->( value ) do
+          base.attribute(:default_last, serialize: false, coerce: lambda { |value|
             ensure_includes_sorting!
             reverse_sort!
 
             value.to_i if value
-          end
+          })
 
-          base.attribute :before, coerce: ->( value ) do
+          base.attribute(:before, coerce: lambda { |value|
             ensure_includes_sorting!
             reverse_sort!
 
             value.to_i if value
-          end
+          })
 
-          base.validate :only_first_or_last
+          base.validate(:only_first_or_last)
         end
 
         # @return [Boolean] true if the scope is paged.
@@ -83,15 +81,14 @@ module Shamu
           end
 
           def only_first_or_last
-            errors.add :base, :only_first_or_last if first? && last?
+            errors.add(:base, :only_first_or_last) if first? && last?
           end
 
           def ensure_includes_sorting!
-            unless respond_to?( :reverse_sort!, true )
+            unless respond_to?(:reverse_sort!, true)
               raise "Must include Shamu::Entities::ListScope::Sorting to use last/before"
             end
           end
-
       end
     end
   end

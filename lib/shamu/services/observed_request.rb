@@ -1,6 +1,5 @@
 module Shamu
   module Services
-
     # Describes request that will be/has been performed by a service and the
     # associated data properties.
     class ObservedRequest
@@ -26,7 +25,7 @@ module Shamu
       #
       # @return [Result] a nested result that should be reported for why the
       # request was canceled.
-      def request_cancel( result = Result.new )
+      def request_cancel(result = Result.new)
         @cancel_reason = result
       end
 
@@ -39,7 +38,7 @@ module Shamu
       # Execute block if the action was canceled by another observer.
       # @yield(result)
       # @yieldresult [Result]
-      def on_canceled( &block )
+      def on_canceled(&block)
         @on_cancel_blocks ||= []
         @on_cancel_blocks << block
       end
@@ -52,25 +51,24 @@ module Shamu
       # processed.
       #
       # @return [Result] the result of all the observed callbacks.
-      def complete( result, canceled )
-        invoke_callbacks( result, @on_cancel_blocks ) if canceled
+      def complete(result, canceled)
+        invoke_callbacks(result, @on_cancel_blocks) if canceled
 
         result
       end
 
       private
 
-        def invoke_callbacks( result, callbacks )
+        def invoke_callbacks(result, callbacks)
           return unless callbacks.present?
 
           callbacks.each do |callback|
-            nested = callback.call( result )
-            result.join( nested ) if nested
+            nested = callback.call(result)
+            result.join(nested) if nested
           end
 
           result
         end
-
     end
   end
 end

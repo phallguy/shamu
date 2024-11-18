@@ -1,6 +1,5 @@
 module Shamu
   module Events
-
     # See {Service}.
     module InMemory
       require "shamu/events/in_memory/service"

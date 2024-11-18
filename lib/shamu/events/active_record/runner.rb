@@ -1,11 +1,9 @@
 module Shamu
   module Events
     module ActiveRecord
-
       # Keep track of the last time message processed by a channel dispatch
       # runner.
       class Runner < ::ActiveRecord::Base
-
         self.table_name = "shamu_event_runners"
         self.primary_key = "id"
 
@@ -21,7 +19,6 @@ module Shamu
 
         #
         # @!endgroup Attributes
-
       end
     end
   end

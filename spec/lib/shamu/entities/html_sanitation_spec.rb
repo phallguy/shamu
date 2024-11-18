@@ -9,9 +9,9 @@ module HtmlSanitationSpec
 end
 
 describe Shamu::Attributes::HtmlSanitation do
-  let( :entity ) { HtmlSanitationSpec::Entity.new( name: "<b>Bold</b> <p>Name</p>" ) }
+  let(:entity) { HtmlSanitationSpec::Entity.new(name: "<b>Bold</b> <p>Name</p>") }
 
   it "removes all HTML by default" do
-    expect( entity.name ).to eq "Bold Name"
+    expect(entity.name).to(eq("Bold Name"))
   end
 end

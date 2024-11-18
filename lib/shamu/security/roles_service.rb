@@ -1,13 +1,11 @@
 module Shamu
   module Security
-
     # Used to determine the roles that the current {Principal} should be given
     # on a {Services::Service}.
     module RolesService
-
       # @!visibility private
-      def self.create( scorpion, * )
-        scorpion.new EmptyRolesService
+      def self.create(scorpion, *)
+        scorpion.new(EmptyRolesService)
       end
 
       # @param [Principal] principal of the currently logged in user.
@@ -15,7 +13,7 @@ module Shamu
       # @param [Boolean] reload to reload the roles from storage and bypass any
       # caching.
       # @return [Array<Symbol>] the roles granted to the principal.
-      def roles_for( principal, context, reload: false )
+      def roles_for(_principal, _context, reload: false)
         []
       end
 
@@ -24,7 +22,7 @@ module Shamu
         include RolesService
 
         # (see RolesService#roles_for)
-        def roles_for( principal, context, reload: false )
+        def roles_for(_principal, _context, reload: false)
           []
         end
       end

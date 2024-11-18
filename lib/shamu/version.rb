@@ -8,5 +8,5 @@ module Shamu
   VERSION_SUFFIX  = ""
 
   # Published version number
-  VERSION         = "#{ VERSION_NUMBER }#{ VERSION_SUFFIX }"
+  VERSION         = "#{VERSION_NUMBER}#{VERSION_SUFFIX}"
 end

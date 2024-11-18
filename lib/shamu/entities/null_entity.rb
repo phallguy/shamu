@@ -1,6 +1,5 @@
 module Shamu
   module Entities
-
     # Null entities look at feel just like their natural counterparts but are
     # not backed by any real data. Rather than returning null from a service
     # lookup function, services will return a null entity so that clients do not
@@ -30,14 +29,12 @@ module Shamu
     # user.id    # => nil
     # ```
     module NullEntity
-
       # Attributes to automatically format as "Unknown {Entity Class Name}"
-      AUTO_FORMATTED_ATTRIBUTES = %i( name title label ).freeze
+      AUTO_FORMATTED_ATTRIBUTES = %i[name title label].freeze
 
       # @return [nil]
       # Prevent rails url helpers from generating URLs for the entity.
-      def to_param
-      end
+      def to_param; end
 
       # @return [true]
       #
@@ -46,19 +43,19 @@ module Shamu
         true
       end
 
-      def self.included( base )
+      def self.included(base)
         AUTO_FORMATTED_ATTRIBUTES.each do |attr|
-          next unless base.attributes.key?( attr )
+          next unless base.attributes.key?(attr)
 
           base_name ||=
             begin
               name = base.superclass.name || "Resource"
-              name.split( "::" )
+              name.split("::")
                   .last
-                  .sub( /Entity/, "" )
-                  .gsub( /(.)([[:upper:]])/, '\1 \2' )
+                  .sub("Entity", "")
+                  .gsub(/(.)([[:upper:]])/, '\1 \2')
             end
-          base.attribute attr, default: "Unknown #{ base_name }"
+          base.attribute(attr, default: "Unknown #{base_name}")
         end
 
         # Make sure the null version has the model name.
@@ -70,25 +67,24 @@ module Shamu
       # Dynamically generate a new null entity class.
       # @param [Class] entity_class {Entity} class
       # @return [Class] a null entity class derived from `entity_class`.
-      def self.for( entity_class )
-        if null_klass = ( entity_class.const_defined?( :NullEntity, false ) &&
-                          entity_class.const_get( :NullEntity, false ) )
+      def self.for(entity_class)
+        if null_klass = (entity_class.const_defined?(:NullEntity, false) &&
+                          entity_class.const_get(:NullEntity, false))
           # If the base class is reloaded a-la rails dev, then regenerate the
           # null class as well.
           null_klass = nil if null_klass.superclass != entity_class
         end
 
         unless null_klass
-          null_klass = Class.new( entity_class )
-          entity_class.const_set :NullEntity, null_klass
+          null_klass = Class.new(entity_class)
+          entity_class.const_set(:NullEntity, null_klass)
 
           # After const_set so we have name and inheritance
-          null_klass.include ::Shamu::Entities::NullEntity
+          null_klass.include(::Shamu::Entities::NullEntity)
         end
 
         null_klass
       end
-
     end
   end
 end

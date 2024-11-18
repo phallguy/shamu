@@ -21,36 +21,35 @@ describe Shamu::Events::Support do
       "Users::ProfileService" => "users/profile",
       "Users::Profiles::ProfilesService" => "users/profiles",
       "Service" => "",
-      "Users::Service" => "users"
+      "Users::Service" => "users",
     }.each do |name, channel|
-
-      it "is #{ channel } for #{ name }" do
-        klass = Class.new( Shamu::Services::Service ) do
+      it "is #{channel} for #{name}" do
+        klass = Class.new(Shamu::Services::Service) do
           include Shamu::Events::Support
 
           public :event_channel
         end
 
-        allow( klass ).to receive( :name ).and_return name
+        allow(klass).to(receive(:name).and_return(name))
 
-        expect( klass.new.event_channel ).to eq channel
+        expect(klass.new.event_channel).to(eq(channel))
       end
     end
   end
 
   describe "event!" do
-    hunt( :events_service, Shamu::Events::EventsService )
+    hunt(:events_service, Shamu::Events::EventsService)
 
-    let( :service ) { scorpion.new EventsSupportSpec::Service }
+    let(:service) { scorpion.new(EventsSupportSpec::Service) }
 
     it "publishes message to events_service" do
-      expect( events_service ).to receive( :publish )
-      service.event! Shamu::Events::Message.new
+      expect(events_service).to(receive(:publish))
+      service.event!(Shamu::Events::Message.new)
     end
 
     it "creates message from attributes" do
-      expect( events_service ).to receive( :publish )
-      service.event! :boom, name: "Me"
+      expect(events_service).to(receive(:publish))
+      service.event!(:boom, name: "Me")
     end
   end
 end

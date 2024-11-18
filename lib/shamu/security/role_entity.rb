@@ -54,7 +54,7 @@ module Shamu
       # @!attribute
       # @return [Hash] the role hash defined by the {Roles.role)
       def defined_role
-        fail Shamu::NotImplementedError
+        raise(Shamu::NotImplementedError)
       end
     end
   end

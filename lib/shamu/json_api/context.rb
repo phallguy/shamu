@@ -21,11 +21,11 @@ module Shamu
       # @param [Boolean] linkage_only true to include only resource
       # identifier objects.
       #
-      def initialize( fields: nil, namespaces: [], presenters: {}, linkage_only: false )
+      def initialize(fields: nil, namespaces: [], presenters: {}, linkage_only: false)
         @included_resources = {}
         @all_resources = Set.new
-        @fields = parse_fields( fields )
-        @namespaces = Array( namespaces )
+        @fields = parse_fields(fields)
+        @namespaces = Array(namespaces)
         @presenters = presenters || {}
         @linkage_only = linkage_only
       end
@@ -41,12 +41,12 @@ module Shamu
       #     be chosen.
       # @yield (builder)
       # @yieldparam [ResourceBuilder] builder to write embedded resource to.
-      def include_resource( resource, presenter = nil, &block )
-        return if all_resources.include?( resource )
+      def include_resource(resource, presenter = nil, &block)
+        return if all_resources.include?(resource)
 
         all_resources << resource
         included_resources[resource] ||= begin
-          presenter ||= find_presenter( resource ) unless block
+          presenter ||= find_presenter(resource) unless block
           { presenter: presenter, block: block }
         end
       end
@@ -79,11 +79,11 @@ module Shamu
       # @param [Boolean] default true if the field should be included by default
       #     when no explicit fields have been selected.
       # @return [Boolean] true if the field should be included.
-      def include_field?( type, name, default = true )
+      def include_field?(type, name, default = true)
         return false if linkage_only?
-        return default unless type_fields = fields[ type.to_sym ]
+        return default unless type_fields = fields[type.to_sym]
 
-        type_fields.include?( name )
+        type_fields.include?(name)
       end
 
       # Find a {Presenter} that can write the resource to a {ResourceBuilder}.
@@ -99,9 +99,9 @@ module Shamu
       # @param [Object] resource to present.
       # @return [Class] the {Presenter} class to use.
       # @raise [NoPresenter] if a presenter cannot be found.
-      def find_presenter( resource )
-        presenter   = presenters[ resource.class ]
-        presenter ||= presenters[ resource.class ] = find_namespace_presenter!( resource )
+      def find_presenter(resource)
+        presenter   = presenters[resource.class]
+        presenter ||= presenters[resource.class] = find_namespace_presenter!(resource)
 
         presenter
       end
@@ -128,16 +128,16 @@ module Shamu
         attr_reader :presenters
         attr_reader :linkage_only
 
-        def parse_fields( raw )
+        def parse_fields(raw)
           return {} unless raw
 
-          raw = raw.to_unsafe_hash if raw.respond_to?( :to_unsafe_hash )
+          raw = raw.to_unsafe_hash if raw.respond_to?(:to_unsafe_hash)
 
-          raw.each_with_object( {} ) do |(type, fields), parsed|
-            fields = fields.split( "," ) if fields.is_a?( String )
+          raw.each_with_object({}) do |(type, fields), parsed|
+            fields = fields.split(",") if fields.is_a?(String)
 
             parsed[ type.to_sym ] = fields.map do |field|
-              field = field.strip if field.is_a? String
+              field = field.strip if field.is_a?(String)
               field.to_sym
             end
           end
@@ -151,26 +151,26 @@ module Shamu
             return presenter
           end
 
-          fail NoPresenter.new( resource, candidate_namespaces ) unless presenter
+          raise(NoPresenter.new(resource, candidate_namespaces)) unless presenter
         end
 
-        def find_namespace_presenter( resource, namespaces )
-          presenter = find_namespace_presenter_for( resource.class.name.demodulize, namespaces )
-          if resource.respond_to?( :model_name )
-            presenter ||= find_namespace_presenter_for( resource.model_name.element.camelize, namespaces )
+        def find_namespace_presenter(resource, namespaces)
+          presenter = find_namespace_presenter_for(resource.class.name.demodulize, namespaces)
+          if resource.respond_to?(:model_name)
+            presenter ||= find_namespace_presenter_for(resource.model_name.element.camelize, namespaces)
           end
-          if resource.class.respond_to?( :model_name )
-            presenter ||= find_namespace_presenter_for( resource.class.model_name.element.camelize, namespaces )
+          if resource.class.respond_to?(:model_name)
+            presenter ||= find_namespace_presenter_for(resource.class.model_name.element.camelize, namespaces)
           end
           presenter
         end
 
-        def find_namespace_presenter_for( name, namespaces )
-          name = "#{ name }Presenter".to_sym
+        def find_namespace_presenter_for(name, namespaces)
+          name = :"#{name}Presenter"
 
           namespaces.each do |namespace|
-            return "#{ namespace }::#{ name }".constantize
-          rescue NameError # rubocop:disable Lint/HandleExceptions
+            return "#{namespace}::#{name}".constantize
+          rescue NameError
           end
 
           nil
@@ -188,7 +188,6 @@ module Shamu
             end
           end
         end
-
     end
   end
 end

@@ -1,11 +1,9 @@
 module Shamu
   module JsonApi
-
     # Used by a {Serilaizer} to write fields and relationships
     class BaseBuilder
-
       # @param [Context] context the current serialization context.
-      def initialize( context )
+      def initialize(context)
         @context = context
         @output = {}
       end
@@ -22,11 +20,11 @@ module Shamu
 
         # @!attribute
         # @return [Hash] output hash.
-          attr_reader :output
+        attr_reader :output
 
         # @!attribute
         # @return [Context] the JSON serialization context.
-          attr_reader :context
+        attr_reader :context
     end
   end
 end

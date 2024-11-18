@@ -2,7 +2,6 @@ require "shamu/rack/cookies"
 
 module Shamu
   module Sessions
-
     # Track persistent values in a cookie stored on the user's machine. Values
     # kept in the CookieStore are not encrypted but they are protected by HMAC
     # hashing to ensure that they have not been modified.
@@ -35,7 +34,7 @@ module Shamu
       include Shamu::Security::HashedValue
 
       # How long cookies should be kept.
-      TTL = ( 30 * 24 * 60 * 60 )
+      TTL = (30 * 24 * 60 * 60)
 
       # ============================================================================
       # @!group Dependencies
@@ -51,31 +50,30 @@ module Shamu
 
       # @param [String] private_key the private key used to verify cookie
       #     values.
-      def initialize( private_key = Shamu::Security.private_key )
+      def initialize(private_key = Shamu::Security.private_key)
         @private_key = private_key
 
         super()
       end
 
       # (see SessionStore#fetch)
-      def fetch( key, &block )
-        if cookies.key?( key )
-          verify_hash( cookies.get( key ) )
+      def fetch(key)
+        if cookies.key?(key)
+          verify_hash(cookies.get(key))
         elsif block_given?
           yield
         end
       end
 
       # (see SessionStore#set)
-      def set( key, value )
-        cookies.set( key, value: hash_value( value ), secure: true, max_age: TTL )
+      def set(key, value)
+        cookies.set(key, value: hash_value(value), secure: true, max_age: TTL)
       end
 
       # (see SessionStore#delete)
-      def delete( key )
-        cookies.delete( key )
+      def delete(key)
+        cookies.delete(key)
       end
-
     end
   end
 end

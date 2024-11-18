@@ -1,6 +1,5 @@
 module Shamu
   module Security
-
     # Adds support for authorizing and querying security {Policy} to a
     # {Services::Service}.
     module Support
@@ -26,8 +25,8 @@ module Shamu
       # @!endgroup Dependencies
 
       included do
-        attr_dependency :security_principal, Security::Principal unless method_defined? :security_principal
-        attr_dependency :security_context, Security::Context unless method_defined? :security_context
+        attr_dependency :security_principal, Security::Principal unless method_defined?(:security_principal)
+        attr_dependency :security_context, Security::Context unless method_defined?(:security_context)
         attr_dependency :roles_service, Security::RolesService
       end
 
@@ -36,7 +35,7 @@ module Shamu
         @policy ||= _policy_class.new(
           principal: security_principal,
           context: security_context,
-          roles: roles_service.roles_for( security_principal, security_context )
+          roles: roles_service.roles_for(security_principal, security_context)
         )
       end
 
@@ -66,7 +65,7 @@ module Shamu
         #
         # @return [Class] a {Policy} class used to authorize actions.
         def policy_class
-          fail Security::IncompleteSetupError, "No policy class defined. Override #policy_class in #{ self.class.name } to declare policy." # rubocop:disable Metrics/LineLength
+          raise(Security::IncompleteSetupError, "No policy class defined. Override #policy_class in #{self.class.name} to declare policy.")
         end
 
         # @!visibility public
@@ -90,37 +89,35 @@ module Shamu
         #
         # @param [Entities::List] list to be redacted
         # @return [Enumerable<Entities::Entity>] the redacted entities
-        def redact_list( list )
+        def redact_list(list)
           list.map do |entity|
             next entity if permit?(:read_private, entity)
 
-            policy.redact( entity )
+            policy.redact(entity)
           end
         end
 
-        def redact_entities( entities )
-          Shamu::Security::RedactedList.new( entities ) do |list|
-            redact_list( list )
+        def redact_entities(entities)
+          Shamu::Security::RedactedList.new(entities) do |list|
+            redact_list(list)
           end
         end
 
-        def authorize_relation( *args )
-          policy.refine_relation( *args )
+        def authorize_relation(*args)
+          policy.refine_relation(*args)
         end
 
-      class_methods do
+        class_methods do
+          # Define the {Policy} class to use when enforcing policy on the service
+          # methods.
+          def policy_class(klass)
+            define_method(:policy_class) do
+              klass
+            end
 
-        # Define the {Policy} class to use when enforcing policy on the service
-        # methods.
-        def policy_class( klass )
-          define_method :policy_class do
-            klass
+            private(:policy_class)
           end
-
-          private :policy_class
         end
-      end
-
     end
   end
 end

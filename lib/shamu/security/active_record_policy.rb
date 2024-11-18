@@ -1,6 +1,5 @@
 module Shamu
   module Security
-
     # Extends the standard {Policy} class to add {ActiveRecord::Relation}
     # refinements based on granted policies.
     #
@@ -36,7 +35,6 @@ module Shamu
     #       end
     #   end
     class ActiveRecordPolicy < Policy
-
       # Refine an {ActiveRecord::Relation} to select only those records
       # permitted for the given `action`.
       #
@@ -46,18 +44,18 @@ module Shamu
       # @param [Object] additional_context that the {#refine} block may consider
       #     when applying the refinement.
       # @return [ActiveRecord::Relation] the refined relation.
-      def refine_relation( action, relation, additional_context = nil )
+      def refine_relation(action, relation, additional_context = nil)
         resolve_permissions
         refined = false
 
         if refinements.blank?
-          fail IncompleteSetupError, "Refinements have not been defined. Add refinements in the permission definitions of #{ self.class.name }" # rubocop:disable Metrics/LineLength
+          raise(IncompleteSetupError, "Refinements have not been defined. Add refinements in the permission definitions of #{self.class.name}")
         end
 
         refinements.each do |refinement|
-          if refinement.match?( action, relation, additional_context )
+          if refinement.match?(action, relation, additional_context)
             refined  = true
-            relation = refinement.apply( relation, additional_context ) || relation
+            relation = refinement.apply(relation, additional_context) || relation
           end
         end
 
@@ -95,10 +93,10 @@ module Shamu
         # @yieldreturn [ActiveRecord::Relation,nil] the refined relation, or nil
         #     if no refinement should be applied.
         # @return [void]
-        def refine( *actions, model_class, &block )
-          fail "No actions defined" if actions.blank?
+        def refine(*actions, model_class, &block)
+          raise("No actions defined") if actions.blank?
 
-          refinements << PolicyRefinement.new( expand_aliases( actions ), model_class, block )
+          refinements << PolicyRefinement.new(expand_aliases(actions), model_class, block)
         end
 
         #
@@ -107,7 +105,6 @@ module Shamu
         def refinements
           @refinements ||= []
         end
-
     end
   end
 end

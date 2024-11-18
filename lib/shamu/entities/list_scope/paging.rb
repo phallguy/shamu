@@ -1,7 +1,6 @@
 module Shamu
   module Entities
     class ListScope
-
       # Include paging parsing and attributes. Adds the following attributes
       # to the list scope:
       #
@@ -15,7 +14,6 @@ module Shamu
       # scope.per_page # => 25
       # ```
       module Paging
-
         # ============================================================================
         # @!group Attributes
         #
@@ -32,19 +30,18 @@ module Shamu
         #
         # @!endgroup Attributes
 
-        def self.included( base )
+        def self.included(base)
           super
 
-          base.attribute :page, coerce: :to_i
-          base.attribute :per_page, coerce: :to_i, default: -> { default_per_page }
-          base.attribute :default_per_page, coerce: :to_i, serialize: false
+          base.attribute(:page, coerce: :to_i)
+          base.attribute(:per_page, coerce: :to_i, default: -> { default_per_page })
+          base.attribute(:default_per_page, coerce: :to_i, serialize: false)
         end
 
         # @return [Boolean] true if the scope is paged.
         def paged?
           !!page || !!per_page
         end
-
       end
     end
   end

@@ -3,18 +3,17 @@ require "rack"
 module Shamu
   module JsonApi
     module Rails
-
       # Add support for writing resources as well-formed JSON API.
       module Controller
         extend ActiveSupport::Concern
 
         # Pattern to identify request params that hold 'ids'
-        ID_PATTERN = /\A(id|.+_id)\z/.freeze
+        ID_PATTERN = /\A(id|.+_id)\z/
 
         included do
           before_action do
             if params[:include]
-              render json: json_error( "The 'include' parameter is not supported" ), status: :bad_request
+              render json: json_error("The 'include' parameter is not supported"), status: :bad_request
             end
           end
 
@@ -38,9 +37,9 @@ module Shamu
           #     information.
           # @yieldparam [JsonApi::Response] response
           # @return [JsonApi::Response] the presented JSON response.
-          def json_resource( resource, presenter = nil, **context, &block )
-            response = build_json_response( context )
-            response.resource resource, presenter
+          def json_resource(resource, presenter = nil, **context)
+            response = build_json_response(context)
+            response.resource(resource, presenter)
             yield response if block_given?
             response.as_json
           end
@@ -52,13 +51,13 @@ module Shamu
           #
           # @param [Symbol,Number] status the HTTP status code.
           # @param (see #json_resource)
-          def render_resource( resource, presenter: nil, status: nil, location: nil, **context, &block )
-            json = json_resource( resource, presenter, **context, &block )
+          def render_resource(resource, presenter: nil, status: nil, location: nil, **context, &block)
+            json = json_resource(resource, presenter, **context, &block)
 
             # Include canonical url to resource if present
-            if data = json[ "data" ]
-              if links = data[ "links" ]
-                location ||= links[ "self" ] if links[ "self" ]
+            if data = json["data"]
+              if links = data["links"]
+                location ||= links["self"] if links["self"]
               end
             end
 
@@ -72,7 +71,7 @@ module Shamu
           #
           # @param [Shamu::Services::Result] result of a service call
           # @param (see #json_resource)
-          def render_result( result, presenter: nil, status: nil, **context, &block )
+          def render_result(result, presenter: nil, status: nil, **context, &block)
             if result.valid?
               if result.entity
                 status ||= case request.method
@@ -81,12 +80,12 @@ module Shamu
                            else               :ok
                            end
 
-                render_resource result.entity, presenter: presenter, status: status, **context, &block
+                render_resource(result.entity, presenter: presenter, status: status, **context, &block)
               else
                 head status || :no_content
               end
             else
-              render json: json_validation_errors( result.errors, **context ), status: :unprocessable_entity
+              render json: json_validation_errors(result.errors, **context), status: :unprocessable_entity
             end
           end
 
@@ -101,18 +100,18 @@ module Shamu
           #     information.
           # @yieldparam [JsonApi::Response] response
           # @return [JsonApi::Response] the presented JSON response.
-          def json_collection( resources, presenter = nil, pagination: :auto, **context, &block )
-            response = build_json_response( context )
-            response.collection resources, presenter
-            json_paginate_resources response, resources, pagination
+          def json_collection(resources, presenter = nil, pagination: :auto, **context)
+            response = build_json_response(context)
+            response.collection(resources, presenter)
+            json_paginate_resources(response, resources, pagination)
             yield response if block_given?
             response.as_json
           end
 
           # Present the resources as json and render it adding appropriate HTTP
           # response codes and headers.
-          def render_collection( resources, presenter: nil, pagination: :auto, **context, &block )
-            render json: json_collection( resources, presenter, pagination: pagination, **context, &block )
+          def render_collection(resources, presenter: nil, pagination: :auto, **context, &block)
+            render json: json_collection(resources, presenter, pagination: pagination, **context, &block)
           end
 
           # Write all the validation errors from a record to the response.
@@ -121,9 +120,9 @@ module Shamu
           # @yield (builder, attr, message)
           # @yieldparam (see Shamu::JsonApi::Response#validation_errors)
           # @return [JsonApi::Response] the presented JSON response.
-          def json_validation_errors( errors, **context, &block )
-            response = build_json_response( context )
-            response.validation_errors errors, &block
+          def json_validation_errors(errors, **context, &block)
+            response = build_json_response(context)
+            response.validation_errors(errors, &block)
 
             response.as_json
           end
@@ -136,33 +135,33 @@ module Shamu
           # @param [JsonApi::BaseBuilder] builder to add links to.
           # @param [String] param the name of the key page parameter to adjust
           # @return [void]
-          def json_paginate( resources, builder, param: nil )
+          def json_paginate(resources, builder, param: nil)
             page = resources.current_page
 
-            if resources.respond_to?( :next? ) ? resources.next? : true
-              builder.link :next, url_for( json_page_parameter( param, :number, page + 1 ) )
+            if resources.respond_to?(:next?) ? resources.next? : true
+              builder.link(:next, url_for(json_page_parameter(param, :number, page + 1)))
             else
-              builder.link :next, nil
+              builder.link(:next, nil)
             end
 
-            if resources.respond_to?( :prev? ) ? resources.prev? : page > 1
-              builder.link :prev, url_for( json_page_parameter( param, :number, page - 1 ) )
+            if resources.respond_to?(:prev?) ? resources.prev? : page > 1
+              builder.link(:prev, url_for(json_page_parameter(param, :number, page - 1)))
             else
-              builder.link :prev, nil
+              builder.link(:prev, nil)
             end
           end
 
-          def json_page_parameter( page_param_name, param, value )
+          def json_page_parameter(page_param_name, param, value)
             params = self.params
-            params = params.to_unsafe_hash if params.respond_to?( :to_unsafe_hash )
+            params = params.to_unsafe_hash if params.respond_to?(:to_unsafe_hash)
 
             root = page_param_name ? params[page_param_name].try(:permit!) : params
 
-            page_params = root.reverse_merge :page => {}
+            page_params = root.reverse_merge(:page => {})
             if value > 1
               page_params[:page][param] = value
             else
-              page_params[:page].delete param
+              page_params[:page].delete(param)
             end
 
             page_param_name ? { page_param_name => page_params } : page_params
@@ -175,17 +174,17 @@ module Shamu
           # @param [Symbol] param the request parameter to read pagination
           #     options from.
           # @return [Pagination] the pagination state
-          def json_pagination( param = nil )
+          def json_pagination(param = nil)
             root = param ? params[param].try(:permit!) : params
 
             page_params =
-              if root && ( filter = root[:page] )
+              if root && (filter = root[:page])
                 filter.permit!.to_hash.deep_symbolize_keys
               else
                 {}
               end
 
-            Pagination.new( page_params.merge( param: param ) )
+            Pagination.new(page_params.merge(param: param))
           end
 
           # @!visibility public
@@ -197,35 +196,34 @@ module Shamu
           # @yieldparam [Shamu::JsonApi::ErrorBuilder] builder to customize the
           #     error response.
           # @return [JsonApi::Response] the presented JSON response.
-          def json_error( error = nil, **context, &block )
-            response = build_json_response( context )
+          def json_error(error = nil, **context)
+            response = build_json_response(context)
 
-            response.error error do |builder|
-              builder.http_status json_http_status_code_from_error( error )
-              annotate_json_error( error, builder )
+            response.error(error) do |builder|
+              builder.http_status(json_http_status_code_from_error(error))
+              annotate_json_error(error, builder)
               yield builder if block_given?
             end
 
             response.to_json
           end
 
-          def render_unhandled_exception( exception )
-            render json: json_error( exception ), status: :internal_server_error
+          def render_unhandled_exception(exception)
+            render json: json_error(exception), status: :internal_server_error
           end
 
           # @!visibility public
           #
           # Annotate an exception that is being rendered to the browser - for
           # example to add current user or security information if available.
-          def annotate_json_error( error, builder )
+          def annotate_json_error(error, builder)
             if ::Rails.env.development?
-              builder.meta :type, error.class.to_s
-              builder.meta :backtrace, error.backtrace
+              builder.meta(:type, error.class.to_s)
+              builder.meta(:backtrace, error.backtrace)
             end
           end
 
-
-          JSON_CONTEXT_KEYWORDS = [ :fields, :namespaces, :presenters, :linkage_only ].freeze
+          JSON_CONTEXT_KEYWORDS = %i[fields namespaces presenters linkage_only].freeze
 
           # @!visibility public
           #
@@ -251,7 +249,7 @@ module Shamu
           #
           # @return [JsonApi::Context] the builder context honoring any filter
           #     parameters sent by the client.
-          def json_context( fields: :not_set, namespaces: :not_set, presenters: :not_set, linkage_only: false )
+          def json_context(fields: :not_set, namespaces: :not_set, presenters: :not_set, linkage_only: false)
             scorpion.fetch(
               Shamu::JsonApi::Context,
               fields: fields == :not_set ? json_context_fields : fields,
@@ -273,7 +271,7 @@ module Shamu
           def json_filter(param = nil)
             root = param ? params[param].try(:permit!) : params
 
-            if root && ( filter = root[:filter] )
+            if root && (filter = root[:filter])
               filter.permit!.to_hash.deep_symbolize_keys
             else
               {}
@@ -291,7 +289,7 @@ module Shamu
           def json_sort(param = nil)
             root = param ? params[param].try(:permit!) : params
 
-            if root && ( sort = root[:sort] )
+            if root && (sort = root[:sort])
               sort.split(",").map(&:strip).each_with_object({}) do |attribute, parsed|
                 if attribute[0] == "-"
                   parsed[attribute[1..-1].to_sym] = :desc
@@ -305,44 +303,44 @@ module Shamu
           end
 
           # See (Shamu::Rails::Entity#request_params)
-          def request_params( param_key )
+          def request_params(param_key)
             return {} unless json_request_payload.present?
 
-            if json_request_payload.is_a?( Array )
-              json_request_payload.map { |r| map_json_resource_payload( r ) }
+            if json_request_payload.is_a?(Array)
+              json_request_payload.map { |r| map_json_resource_payload(r) }
             else
-              if relationships = json_request_payload[ :relationships ]
-                if relationships.key?( param_key )
-                  return map_json_resource_payload( relationships[ param_key ][ :data ] )
+              if relationships = json_request_payload[:relationships]
+                if relationships.key?(param_key)
+                  return map_json_resource_payload(relationships[param_key][:data])
                 end
               end
 
-              payload = map_json_resource_payload( json_request_payload )
+              payload = map_json_resource_payload(json_request_payload)
 
               request.params.each do |key, value|
-                payload[ key.to_sym ] ||= value if ID_PATTERN =~ key
+                payload[key.to_sym] ||= value if ID_PATTERN =~ key
               end
 
               payload
             end
           end
 
-          def map_json_resource_payload( resource ) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
-            payload = resource[ :attributes ] ? resource[ :attributes ].dup : {}
-            payload[ :id ] = resource[ :id ] if resource.key?( :id )
+          def map_json_resource_payload(resource)
+            payload = resource[:attributes] ? resource[:attributes].dup : {}
+            payload[:id] = resource[:id] if resource.key?(:id)
 
-            if relationships = resource[ :relationships ]
+            if relationships = resource[:relationships]
               relationships.each do |key, value|
-                attr_key = "#{ key.to_s.singularize }_id"
+                attr_key = "#{key.to_s.singularize}_id"
 
-                if value[ :data ].is_a?( Array )
-                  attr_key += "s" if value[ :data ].is_a?( Array )
+                if value[:data].is_a?(Array)
+                  attr_key += "s" if value[:data].is_a?(Array)
 
-                  payload[ attr_key.to_sym ] = value[ :data ].map { |d| d[ :id ] }
-                  payload[ key ] = value[ :data ].map { |d| map_json_resource_payload( d ) }
+                  payload[attr_key.to_sym] = value[:data].map { |d| d[:id] }
+                  payload[key] = value[:data].map { |d| map_json_resource_payload(d) }
                 else
-                  payload[ attr_key.to_sym ] = value.dig( :data, :id )
-                  payload[ key ] = value[ :data ].nil? ? nil : map_json_resource_payload( value[ :data ] )
+                  payload[attr_key.to_sym] = value.dig(:data, :id)
+                  payload[key] = value[:data].nil? ? nil : map_json_resource_payload(value[:data])
                 end
               end
             end
@@ -358,11 +356,11 @@ module Shamu
             @json_request_payload ||=
               begin
                 body = request.body.read || "{}"
-                json = JSON.parse( body, symbolize_names: true )
+                json = JSON.parse(body, symbolize_names: true)
 
-                fail NoJsonBodyError unless json.present? && json.key?( :data )
+                raise(NoJsonBodyError) unless json.present? && json.key?(:data)
 
-                json[ :data ]
+                json[:data]
               end
           end
 
@@ -371,8 +369,8 @@ module Shamu
           end
 
           def json_context_namespaces
-            name = self.class.name.sub( /Controller$/, "" )
-            namespaces = [ name.pluralize ]
+            name = self.class.name.sub(/Controller$/, "")
+            namespaces = [name.pluralize]
             loop do
               name = name.deconstantize
               break if name.blank?
@@ -383,24 +381,23 @@ module Shamu
             namespaces
           end
 
-          def json_context_presenters
-          end
+          def json_context_presenters; end
 
-          def json_paginate_resources( response, resources, pagination )
-            pagination = resources.respond_to?( :paged? ) && resources.paged? if pagination == :auto
+          def json_paginate_resources(response, resources, pagination)
+            pagination = resources.respond_to?(:paged?) && resources.paged? if pagination == :auto
             return unless pagination
 
-            json_paginate resources, response
+            json_paginate(resources, response)
           end
 
-          def json_http_status_code_from_error( error )
+          def json_http_status_code_from_error(error)
             case error
             when ActiveRecord::RecordNotFound, ::Shamu::NotFoundError then :not_found
             when ActiveRecord::RecordInvalid then :unprocessable_entity
             when /AccessDenied/, Security::AccessDeniedError then :unauthorized
             else
-              if error.is_a?( Exception )
-                ActionDispatch::ExceptionWrapper.status_code_for_exception( error )
+              if error.is_a?(Exception)
+                ActionDispatch::ExceptionWrapper.status_code_for_exception(error)
               else
                 :bad_request
               end
@@ -415,8 +412,8 @@ module Shamu
             end
           end
 
-          def build_json_response( context )
-            Shamu::JsonApi::Response.new( json_context( **context.slice( *JSON_CONTEXT_KEYWORDS ) ) )
+          def build_json_response(context)
+            Shamu::JsonApi::Response.new(json_context(**context.slice(*JSON_CONTEXT_KEYWORDS)))
           end
       end
     end

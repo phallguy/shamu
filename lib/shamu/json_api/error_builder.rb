@@ -2,10 +2,8 @@ require "rack"
 
 module Shamu
   module JsonApi
-
     # Build an error response object.
     class ErrorBuilder
-
       def initialize
         @output = {}
       end
@@ -15,7 +13,7 @@ module Shamu
 
       # @param [String] id unique id for this occurrence of the error.
       # @return [self]
-      def id( id )
+      def id(id)
         output[:id] = id
         self
       end
@@ -23,11 +21,11 @@ module Shamu
       # Summarize an exception as an error.
       # @param [Exception] exception
       # @return [self]
-      def exception( exception )
-        name = exception.class.name.demodulize.gsub( /Error$/, "" )
-        code name.underscore
-        title name.titleize
-        detail exception.message
+      def exception(exception)
+        name = exception.class.name.demodulize.gsub(/Error$/, "")
+        code(name.underscore)
+        title(name.titleize)
+        detail(exception.message)
 
         self
       end
@@ -35,29 +33,29 @@ module Shamu
       # Set an HTTP status code related to the error.
       # @param [Symbol,Integer] status code.
       # @return [self]
-      def http_status( status )
-        status = ::Rack::Utils.status_code( status ) if status.is_a? Symbol
+      def http_status(status)
+        status = ::Rack::Utils.status_code(status) if status.is_a?(Symbol)
         output[:status] = status.to_s
         self
       end
 
       # Set an application specific error code.
       # @return [self]
-      def code( code )
+      def code(code)
         output[:code] = code.to_s
         self
       end
 
       # Set a short human readable title of the error.
       # @return [self]
-      def title( title )
+      def title(title)
         output[:title] = title.to_s
         self
       end
 
       # @return [String] message details about the error.
       # @return [self]
-      def detail( message )
+      def detail(message)
         output[:detail] = message
         self
       end
@@ -65,7 +63,7 @@ module Shamu
       # JSON pointer to the associated document in the request that was the
       # source of the pointer.
       # @return [self]
-      def pointer( pointer )
+      def pointer(pointer)
         output[:source] ||= {}
         output[:source][:pointer] = pointer
         self
@@ -73,7 +71,7 @@ module Shamu
 
       # The name of the parameter that caused the error.
       # @return [self]
-      def parameter( name )
+      def parameter(name)
         output[:source] ||= {}
         output[:source][:parameter] = name
         self
@@ -87,7 +85,6 @@ module Shamu
       private
 
         attr_reader :output
-
     end
   end
 end

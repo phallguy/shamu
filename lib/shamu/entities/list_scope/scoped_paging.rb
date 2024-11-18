@@ -1,7 +1,6 @@
 module Shamu
   module Entities
     class ListScope
-
       # Include paging parsing and attributes exposed as a nested page object.
       # Adds the following attributes to the list scope:
       #
@@ -15,7 +14,6 @@ module Shamu
       # scope.page.size   # => 50
       # ```
       module ScopedPaging
-
         # ============================================================================
         # @!group Attributes
         #
@@ -26,10 +24,10 @@ module Shamu
         #
         # @!endgroup Attributes
 
-        def self.included( base )
+        def self.included(base)
           super
 
-          base.attribute :page, build: PageScope, default: PageScope.new
+          base.attribute(:page, build: PageScope, default: PageScope.new)
         end
 
         # @return [Boolean] true if the scope is paged.
@@ -58,7 +56,6 @@ module Shamu
             to_attributes
           end
         end
-
       end
     end
   end

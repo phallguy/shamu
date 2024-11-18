@@ -1,6 +1,5 @@
 module Shamu
   module JsonApi
-
     # Presenters are responsible for projecting an {Entities::Entity} or PORO
     # to a well-formatted JSON API {ResourceBuilder builder} response.
     #
@@ -27,7 +26,7 @@ module Shamu
 
       # @param [Object] resource to presenter.
       # @param [ResourceBuilder] builder used to build the JSON API response.
-      def initialize( resource, builder )
+      def initialize(resource, builder)
         @resource = resource
         @builder  = builder
       end
@@ -36,7 +35,7 @@ module Shamu
       #
       # @return [void]
       def present
-        fail NotImplementedError
+        raise(NotImplementedError)
       end
 
       private
@@ -46,19 +45,18 @@ module Shamu
         attr_reader :resource
         attr_reader :builder
 
-
         # Present all the named attributes of the {#resource}.
         # @param [Array<Symbol>] names of the resource to present.
-        def resource_attributes( *names )
+        def resource_attributes(*names)
           names.map do |name|
-            attribute name, attribute_value( resource.send( name ) )
+            attribute(name, attribute_value(resource.send(name)))
           end
         end
 
         # Get a JSON API safe version of the value.
         # @param [Object] value the value to be coerced.
         # @return [Object]
-        def attribute_value( value )
+        def attribute_value(value)
           case value
           when Date, DateTime
             value.to_date.iso8601
@@ -67,7 +65,6 @@ module Shamu
           else value
           end
         end
-
     end
   end
 end

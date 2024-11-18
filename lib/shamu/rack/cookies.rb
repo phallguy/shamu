@@ -1,16 +1,14 @@
 module Shamu
   module Rack
-
     # Expose the request cookies as a hash.
     class Cookies
-
       # @return [Cookies]
-      def self.create( * )
-        fail "Add Shamu::Rack::CookiesMiddleware to use Shamu::Rack::Cookies"
+      def self.create(*)
+        raise("Add Shamu::Rack::CookiesMiddleware to use Shamu::Rack::Cookies")
       end
 
       # @param [Hash] env the Rack environment
-      def initialize( env )
+      def initialize(env)
         @env = env
         @cookies = {}
         @deleted_cookies = []
@@ -23,13 +21,13 @@ module Shamu
       #
       # @param [Hash] headers from rack response
       # @return [Hash] the modified headers with cookie values.
-      def apply!( headers )
+      def apply!(headers)
         cookies.each do |key, value|
-          ::Rack::Utils.set_cookie_header! headers, key, value
+          ::Rack::Utils.set_cookie_header!(headers, key, value)
         end
 
         deleted_cookies.each do |key|
-          ::Rack::Utils.delete_cookie_header! headers, key
+          ::Rack::Utils.delete_cookie_header!(headers, key)
         end
 
         headers
@@ -38,21 +36,21 @@ module Shamu
       # Get a cookie value from the browser.
       # @param [String] key or name of the cookie
       # @return [String] cookie value
-      def get( key )
+      def get(key)
         key = key.to_s
 
-        if cookie = cookies[ key ]
+        if cookie = cookies[key]
           cookie[:value]
         else
-          env_cookies[ key ]
+          env_cookies[key]
         end
       end
-      alias_method :[], :get
+      alias [] get
 
       # @param [String] name
       # @return [Boolean] true if the cookie has been set.
-      def key?( name )
-        cookies.key?( name ) || env_cookies.key?( name )
+      def key?(name)
+        cookies.key?(name) || env_cookies.key?(name)
       end
 
       # Set or update a cookie in the headers.
@@ -72,23 +70,23 @@ module Shamu
       #   @option hash [Boolean] :http_only
       #
       # @return [self]
-      def set( key, value )
+      def set(key, value)
         key = key.to_s
-        deleted_cookies.delete( key )
+        deleted_cookies.delete(key)
 
-        value = { value: value } unless value.is_a? Hash
+        value = { value: value } unless value.is_a?(Hash)
         cookies[key] = value
 
         self
       end
-      alias_method :[]=, :set
+      alias []= set
 
       # Delete a cookie from the browser.
       # @param [String] key or name of the cookie.
       # @return [self]
-      def delete( key )
-        cookies.delete( key )
-        @deleted_cookies << key if env_cookies.key?( key )
+      def delete(key)
+        cookies.delete(key)
+        @deleted_cookies << key if env_cookies.key?(key)
         self
       end
 
@@ -101,12 +99,12 @@ module Shamu
         def env_cookies
           @env_cookies ||= begin
             @env_cookies = {}
-            string = env[ "HTTP_COOKIE" ]
+            string = env["HTTP_COOKIE"]
 
             # Cribbed from Rack::Request#cookies
-            parsed = ::Rack::Utils.parse_query( string, ";," ) { |s| ::Rack::Utils.unescape( s ) rescue s } # rubocop:disable Style/RescueModifier
+            parsed = ::Rack::Utils.parse_query(string, ";,") { |s| ::Rack::Utils.unescape(s) rescue s } # rubocop:disable Style/RescueModifier
             parsed.each do |k, v|
-              @env_cookies[ k ] = Array === v ? v.first : v
+              @env_cookies[k] = v.is_a?(Array) ? v.first : v
             end
           end
         end

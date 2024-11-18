@@ -1,6 +1,5 @@
 module Shamu
   module Features
-
     # Conditions that must match for a {Selector} to enable a {Toggle}.
     module Conditions
       require "shamu/features/conditions/condition"

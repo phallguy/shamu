@@ -1,9 +1,7 @@
 module Shamu
   module Security
-
     # ...
     class Principal
-
       # ============================================================================
       # @!group Attributes
       #
@@ -27,7 +25,7 @@ module Shamu
       #     providing their credentials.
       attr_reader :elevated
 
-        alias_method :elevated?, :elevated
+      alias elevated? elevated
 
       # @!attribute
       # @return [Array<Symbol>] security scopes the principal may be used to
@@ -41,7 +39,7 @@ module Shamu
       #
       # @!endgroup Attributes
 
-      def initialize( user_id: nil, super_principal: nil, remote_ip: nil, elevated: false, scopes: nil )
+      def initialize(user_id: nil, super_principal: nil, remote_ip: nil, elevated: false, scopes: nil)
         @user_id         = user_id
         @super_principal = super_principal
         @remote_ip       = remote_ip
@@ -69,21 +67,20 @@ module Shamu
       #
       # @param [Object] user_id of the user to impersonate.
       # @return [Principal] the new principal.
-      def impersonate( user_id )
-        self.class.new( user_id: user_id, super_principal: self, remote_ip: remote_ip, elevated: elevated )
+      def impersonate(user_id)
+        self.class.new(user_id: user_id, super_principal: self, remote_ip: remote_ip, elevated: elevated)
       end
 
       # @return [Boolean] true if the principal was offered by one service to
       #     another and requesting that the downstream service delegate security
       #     checks to the calling service.
-      def service_delegate?
-      end
+      def service_delegate?; end
 
       # @param [Symbol] scope
       # @return [Boolean] true if the principal is scoped to authenticate the
       # user for the given scope.
-      def scoped?( scope )
-        scopes.nil? || scopes.include?( scope )
+      def scoped?(scope)
+        scopes.nil? || scopes.include?(scope)
       end
 
       # @!attribute
@@ -94,37 +91,36 @@ module Shamu
       end
 
       def inspect
-        result = "<#{ self.class.name }:0x#{ object_id.to_s( 16 ) }"
-        [ :user_id, :scopes, :elevated, :remote_ip, :super_principal ].map do |name|
-          value = send( name )
-          result << " #{ name }=#{ send( name ).inspect }" if value
+        result = "<#{self.class.name}:0x#{object_id.to_s(16)}"
+        %i[user_id scopes elevated remote_ip super_principal].map do |name|
+          value = send(name)
+          result << " #{name}=#{send(name).inspect}" if value
         end
         result << ">"
         result
       end
 
-      def pretty_print( pp )
-        attributes = [ :user_id, :scopes, :elevated, :remote_ip, :super_principal ]
+      def pretty_print(pp)
+        attributes = %i[user_id scopes elevated remote_ip super_principal]
         attributes = attributes.reject! { |a| send(a).nil? }
 
-        pp.object_address_group( self ) do
-          pretty_print_custom( pp )
-          pp.seplist( attributes, -> { pp.text "," } ) do |name|
-            value = send( name )
+        pp.object_address_group(self) do
+          pretty_print_custom(pp)
+          pp.seplist(attributes, -> { pp.text(",") }) do |name|
+            value = send(name)
 
-            pp.breakable " "
-            pp.group( 1 ) do
-              pp.text name.to_s
-              pp.text ":"
-              pp.breakable " "
-              pp.pp value
+            pp.breakable(" ")
+            pp.group(1) do
+              pp.text(name.to_s)
+              pp.text(":")
+              pp.breakable(" ")
+              pp.pp(value)
             end
           end
         end
       end
 
-      def pretty_print_custom( pp )
-      end
+      def pretty_print_custom(pp); end
     end
   end
 end

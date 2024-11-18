@@ -1,6 +1,5 @@
 module Shamu
   module Services
-
     # Include into services that support mutating resources to add basic
     # {#with_request} and {Request} conventions.
     module RequestSupport
@@ -14,8 +13,8 @@ module Shamu
       #
       # @param [Symbol] method on the service that will be called.
       # @return [Class] a class that inherits from Request.
-      def request_class( method )
-        self.class.request_class( method )
+      def request_class(method)
+        self.class.request_class(method)
       end
 
       # Build a {Request} object, prepopulated with the current state of the
@@ -24,9 +23,9 @@ module Shamu
       # @param [Symbol] method that will be called with the generated request.
       # @param [Entities::Entity] entity optional entity that will modified.
       # @return [Request]
-      def request_for( method, entity = nil )
-        request    = request_class( method ).new( entity )
-        request.id = entity.id if entity && request.attribute?( :id )
+      def request_for(method, entity = nil)
+        request    = request_class(method).new(entity)
+        request.id = entity.id if entity && request.attribute?(:id)
 
         request
       end
@@ -35,7 +34,7 @@ module Shamu
 
         # @!visibility public
         #
-        # Respond to a {Request} returning a {Result} touple of the subject
+        # Respond to a {Request} returning a {Result} tuple of the subject
         # {Entities::Entity} and {Request}.
         #
         # Before processing the `params` will be coerced and validated. If the
@@ -54,7 +53,7 @@ module Shamu
         # @return [Result]
         # @example
         #   def process_order( params )
-        #     with_request params, ProcesOrderRequest do |request|
+        #     with_request params, ProcessOrderRequest do |request|
         #       order = Models::Order.find( request.id )
         #
         #       # Custom validation
@@ -69,8 +68,8 @@ module Shamu
         #       scorpion.fetch OrderEntity, { order: order }
         #     end
         #   end
-        def with_request( params, request_class, &block )
-          with_partial_request params, request_class do |request, *args|
+        def with_request(params, request_class)
+          with_partial_request(params, request_class) do |request, *args|
             next unless request.valid?
 
             yield request, *args
@@ -86,13 +85,13 @@ module Shamu
         # @param (see #with_request)
         # @return (see #with_request)
         # @see #with_request
-        def with_partial_request( params, request_class, &block )
-          request = request_class.coerce( params )
-          sources = yield( request )
+        def with_partial_request(params, request_class)
+          request = request_class.coerce(params)
+          sources = yield(request)
 
-          result = Result.coerce( sources, request: request )
-          request.complete( result.valid? )
-          recache_entity( result.entity ) if result.valid? && result.entity
+          result = Result.coerce(sources, request: request)
+          request.complete(result.valid?)
+          recache_entity(result.entity) if result.valid? && result.entity
 
           result
         end
@@ -105,63 +104,62 @@ module Shamu
         #   users.update user, name: "Changed"  # Backend service
         #   users.update id: 1, name: "Changed" # HTTP request params
         #
-        def extract_params( id, params )
-          params, id = id, id[ :id ] || id[ "id" ] if !params && !id.respond_to?( :to_model_id )
+        def extract_params(id, params)
+          params, id = id, id[:id] || id["id"] if !params && !id.respond_to?(:to_model_id)
 
           if params
-            params = params.symbolize_keys if params.respond_to?( :symbolize_keys )
-            params[ :id ] ||= id
+            params = params.symbolize_keys if params.respond_to?(:symbolize_keys)
+            params[:id] ||= id
           end
 
-          [ id, params ]
+          [id, params]
         end
 
-      # Static methods added to {RequestSupport}
-      class_methods do
+        # Static methods added to {RequestSupport}
+        class_methods do
+          # (see #request_class)
+          def request_class(method)
+            result = request_class_by_name(method) \
+                     || request_class_by_alias(method) \
+                     || request_class_default
 
-        # (see #request_class)
-        def request_class( method )
-          result = request_class_by_name( method ) \
-                   || request_class_by_alias( method ) \
-                   || request_class_default
+            result ||= superclass.request_class(method) if superclass.respond_to?(:request_class)
 
-          result ||= superclass.request_class( method ) if superclass.respond_to?( :request_class )
-
-          result || fail( IncompleteSetupError, "No Shamu::Services::Request classes defined for '#{ name }'." )
-        end
-
-        private
-
-          def request_class_namespace
-            @request_class_namespace ||= ( name || "" ).sub( /(Service)?$/, "" )
-                                                       .singularize
-                                                       .concat( "Request" )
-                                                       .constantize
-          rescue NameError
-            self
+            result || raise(IncompleteSetupError, "No Shamu::Services::Request classes defined for '#{name}'.")
           end
 
-          def request_class_by_name( method )
-            camelized = method.to_s.camelize
-            request_class_namespace.const_get( camelized ) if request_class_namespace.const_defined?( camelized )
-          end
+          private
 
-          def request_class_by_alias( method )
-            candidate =
-              case method
-              when :new  then "Create"
-              when :edit then "Update"
-              end
-
-            if candidate && request_class_namespace.const_defined?( candidate )
-              request_class_namespace.const_get( candidate )
+            def request_class_namespace
+              @request_class_namespace ||= (name || "").sub(/(Service)?$/, "")
+                                                         .singularize
+                                                         .concat("Request")
+                                                         .constantize
+            rescue NameError
+              self
             end
-          end
 
-          def request_class_default
-            request_class_namespace.const_get( "Change" ) if request_class_namespace.const_defined?( "Change" )
-          end
-      end
+            def request_class_by_name(method)
+              camelized = method.to_s.camelize
+              request_class_namespace.const_get(camelized) if request_class_namespace.const_defined?(camelized)
+            end
+
+            def request_class_by_alias(method)
+              candidate =
+                case method
+                when :new  then "Create"
+                when :edit then "Update"
+                end
+
+              if candidate && request_class_namespace.const_defined?(candidate)
+                request_class_namespace.const_get(candidate)
+              end
+            end
+
+            def request_class_default
+              request_class_namespace.const_get("Change") if request_class_namespace.const_defined?("Change")
+            end
+        end
     end
   end
 end

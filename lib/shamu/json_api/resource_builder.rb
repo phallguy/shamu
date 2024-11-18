@@ -2,10 +2,8 @@ require "shamu/json_api/base_builder"
 
 module Shamu
   module JsonApi
-
     # Used by a {Serilaizer} to write fields and relationships
     class ResourceBuilder < BaseBuilder
-
       include BuilderMethods::Identifier
 
       # @overload attribute( attributes )
@@ -17,18 +15,18 @@ module Shamu
       # Write one or more attributes to the output.
       #
       # @return [void]
-      def attribute( name_or_hash, value = nil )
+      def attribute(name_or_hash, value = nil)
         require_identifier!
 
         if name_or_hash.is_a?(Hash)
           name_or_hash.each do |n, v|
-            add_attribute n, v
+            add_attribute(n, v)
           end
         else
-          add_attribute name_or_hash, value
+          add_attribute(name_or_hash, value)
         end
       end
-      alias_method :attributes, :attribute
+      alias attributes attribute
 
       # Build a relationship reference.
       #
@@ -45,33 +43,33 @@ module Shamu
       # @yield (builder)
       # @yieldparam [RelationshipBuilder] builder used to define the properties
       #     of the relationship.
-      def relationship( name, &block )
+      def relationship(name)
         require_identifier!
         return if context.linkage_only?
 
-        include_or_mark_partial name do
-          builder = RelationshipBuilder.new( context )
+        include_or_mark_partial(name) do
+          builder = RelationshipBuilder.new(context)
           yield builder
 
-          relationships = ( output[:relationships] ||= {} )
-          relationships[ name.to_sym ] = builder.compile
+          relationships = (output[:relationships] ||= {})
+          relationships[name.to_sym] = builder.compile
         end
       end
 
       private
 
-        def add_attribute( name, value )
-          include_or_mark_partial name do
-            attributes = ( output[:attributes] ||= {} )
-            attributes[ name.to_sym ] = value
+        def add_attribute(name, value)
+          include_or_mark_partial(name) do
+            attributes = (output[:attributes] ||= {})
+            attributes[name.to_sym] = value
           end
         end
 
         def include_or_mark_partial(field)
-          if context.include_field?( type, field )
+          if context.include_field?(type, field)
             yield
           else
-            meta :partial, true unless context.linkage_only?
+            meta(:partial, true) unless context.linkage_only?
           end
         end
     end

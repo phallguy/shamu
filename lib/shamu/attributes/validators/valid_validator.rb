@@ -5,8 +5,8 @@ module Shamu
       #
       # validates :nested_request, valid: true
       class ValidValidator < ActiveModel::EachValidator
-        def validate_each( record, attribute, value )
-          record.errors.add attribute, :invalid if value && !value.valid?
+        def validate_each(record, attribute, value)
+          record.errors.add(attribute, :invalid) if value && !value.valid?
         end
       end
     end

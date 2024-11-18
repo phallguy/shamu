@@ -20,5 +20,5 @@ end
 desc "Run linters on the codebase"
 task :lint => "lint:run"
 
-task :default => [ :lint, :specs ]
-task :release => [ :default ]
+task :default => %i[lint specs]
+task :release => [:default]

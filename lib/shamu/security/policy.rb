@@ -2,7 +2,6 @@ require "shamu/security/roles"
 
 module Shamu
   module Security
-
     # ...
     #
     # @example
@@ -61,11 +60,11 @@ module Shamu
       #
       # @!endgroup Dependencies
 
-      def initialize( principal: nil, context: nil, roles: nil, related_user_ids: nil )
+      def initialize(principal: nil, context: nil, roles: nil, related_user_ids: nil)
         @principal        = principal || Principal.new
         @context          = context || Context.new
         @roles            = roles || []
-        @related_user_ids = Array.wrap( related_user_ids )
+        @related_user_ids = Array.wrap(related_user_ids)
       end
 
       # Authorize the given `action` on the given resource. If it is not
@@ -74,14 +73,14 @@ module Shamu
       # @param (see #permit?)
       # @return [resource]
       # @raise [AccessDeniedError] if not permitted.
-      def authorize!( action, resource, additional_context = nil )
-        return resource if permit?( action, resource, additional_context ) == :yes
+      def authorize!(action, resource, additional_context = nil)
+        return resource if permit?(action, resource, additional_context) == :yes
 
-        fail Security::AccessDeniedError,
-             action: action,
-             resource: resource,
-             additional_context: additional_context,
-             principal: principal
+        raise(Security::AccessDeniedError,
+              action: action,
+              resource: resource,
+              additional_context: additional_context,
+              principal: principal)
       end
 
       # Determines if the given `action` may be performed on the given
@@ -96,11 +95,11 @@ module Shamu
       #     A value of `:maybe` indicates the action is permitted but the user
       #     may need to present additional credentials such as logging on this
       #     session or entering a TFA code.
-      def permit?( action, resource, additional_context = nil )
-        fail_on_active_record_check( resource )
+      def permit?(action, resource, additional_context = nil)
+        fail_on_active_record_check(resource)
 
         rules.each do |rule|
-          next unless rule.match?( action, resource, additional_context )
+          next unless rule.match?(action, resource, additional_context)
 
           return rule.result
         end
@@ -113,7 +112,7 @@ module Shamu
       #
       # @param [Entities::Entity] entity to redact.
       # @return [Entities::Entity] the redacted entity.
-      def redact( entity )
+      def redact(entity)
         entity
       end
 
@@ -135,8 +134,8 @@ module Shamu
 
         def default_aliases
           {
-            view: [ :read, :list ],
-            change: [ :create, :update, :destroy ]
+            view: %i[read list],
+            change: %i[create update destroy],
           }
         end
 
@@ -145,16 +144,16 @@ module Shamu
         # @param [Array<Symbol>] roles to check.
         # @return [Boolean] true if the {#principal} has been granted one of the
         #     given roles.
-        def in_role?( *roles )
-          ( principal_roles & roles ).any?
+        def in_role?(*roles)
+          (principal_roles & roles).any?
         end
 
         def principal_roles
           @principal_roles ||= begin
-            expanded = self.class.expand_roles( *roles )
-            expanded << :authenticated if principal.user_id && self.class.role_defined?( :authenticated )
+            expanded = self.class.expand_roles(*roles)
+            expanded << :authenticated if principal.user_id && self.class.role_defined?(:authenticated)
             expanded.select do |role|
-              principal.scoped?( role )
+              principal.scoped?(role)
             end
           end
         end
@@ -164,8 +163,8 @@ module Shamu
         # @param [Integer] id of the candidate user.
         # @return [Boolean] true if the given id is one of the authorized user
         # ids on the principal.
-        def is_principal?( id ) # rubocop:disable Naming/PredicateName
-          principal.try( :user_id ) == id || related_user_ids.include?( id )
+        def is_principal?(id)
+          principal.try(:user_id) == id || related_user_ids.include?(id)
         end
 
         # @!visibility public
@@ -174,19 +173,18 @@ module Shamu
         # {#related_user_ids} that the policy can use to refine access to
         # entities.
         def principal_user_ids
-          @principal_user_ids ||= [ principal.try( :user_id ), related_user_ids ].flatten.compact
+          @principal_user_ids ||= [principal.try(:user_id), related_user_ids].flatten.compact
         end
 
         # @return [Boolean] true if {#principal} has authenticated.
         def authenticated?
-          principal.try( :user_id )
+          principal.try(:user_id)
         end
 
         # @return [Boolean] true if the {#principal} has not authenticated.
         def anonymous?
           !authenticated?
         end
-
 
         # ============================================================================
         # @!group DSL
@@ -215,24 +213,24 @@ module Shamu
         #
         # @return [void]
         def permissions
-          if respond_to?( :anonymous_permissions, true ) && respond_to?( :authenticated_permissions, true )
-            if in_role?( :authenticated )
+          if respond_to?(:anonymous_permissions, true) && respond_to?(:authenticated_permissions, true)
+            if in_role?(:authenticated)
               authenticated_permissions
             else
               anonymous_permissions
             end
           else
-            fail IncompleteSetupError, "Permissions have not been defined. Add a private `authenticated_permissions` and `anonymous_permissions` method to #{ self.class.name }" # rubocop:disable Metrics/LineLength
+            raise(IncompleteSetupError, "Permissions have not been defined. Add a private `authenticated_permissions` and `anonymous_permissions` method to #{self.class.name}")
           end
         end
 
-          # Makes sure the {#permissions} method is invoked only once.
-          def resolve_permissions
-            return if @permissions_resolved
+        # Makes sure the {#permissions} method is invoked only once.
+        def resolve_permissions
+          return if @permissions_resolved
 
-            @permissions_resolved = true
-            permissions
-          end
+          @permissions_resolved = true
+          permissions
+        end
 
         # @!visibility public
         #
@@ -261,11 +259,11 @@ module Shamu
         # @yieldparam [Object] additional_context offered to {#permit?}.
         # @yieldreturn [:yes, :maybe, false] see {#permit?}.
         # @return [void]
-        def permit( *actions, &block )
+        def permit(*actions, &block)
           result = @when_elevated ? :maybe : :yes
-          resource, actions = extract_resource( actions )
+          resource, actions = extract_resource(actions)
 
-          add_rule( actions, resource, result, &block )
+          add_rule(actions, resource, result, &block)
         end
 
         # @!visibility public
@@ -277,9 +275,9 @@ module Shamu
         # @yield (see #permit)
         # @yieldparam (see #permit)
         # @yieldreturn [Boolean] true to deny the action.
-        def deny( *actions, &block )
-          resource, actions = extract_resource( actions )
-          add_rule( actions, resource, false, &block )
+        def deny(*actions, &block)
+          resource, actions = extract_resource(actions)
+          add_rule(actions, resource, false, &block)
         end
 
         # @!visibility public
@@ -296,7 +294,7 @@ module Shamu
         # offered their credentials.
         #
         # @return [void]
-        def when_elevated( &block )
+        def when_elevated
           current = @when_elevated
           @when_elevated = true
           yield
@@ -320,7 +318,7 @@ module Shamu
         # @param [Array<Symbol>] actions to alias.
         # @param [Symbol] to the action that should permit all the listed aliases.
         # @return [void]
-        def alias_action( *actions, to: fail )
+        def alias_action(*actions, to: raise)
           aliases[to] ||= []
           aliases[to] |= actions
         end
@@ -340,7 +338,7 @@ module Shamu
         #
         #     permit :chop, OtherKindOfEntity
         #   end
-        def resource( resource )
+        def resource(resource)
           last_resource = @dsl_resource
           @dsl_resource = resource
           yield
@@ -352,47 +350,46 @@ module Shamu
         # @!endgroup DSL
 
         def dsl_resource
-          @dsl_resource || fail( "Provide a `resource` argument or use a #resource block to declare the protected resource." ) # rubocop:disable Metrics/LineLength
+          @dsl_resource || raise("Provide a `resource` argument or use a #resource block to declare the protected resource.")
         end
 
-        def extract_resource( actions )
-          resource = actions.last.is_a?( Symbol ) ? dsl_resource : actions.pop
-          [ resource, actions ]
+        def extract_resource(actions)
+          resource = actions.last.is_a?(Symbol) ? dsl_resource : actions.pop
+          [resource, actions]
         end
 
-        def add_rule( actions, resource, result, &block )
-          rules.unshift PolicyRule.new( expand_aliases( actions ), resource, result, block )
+        def add_rule(actions, resource, result, &block)
+          rules.unshift(PolicyRule.new(expand_aliases(actions), resource, result, block))
         end
 
-        def expand_aliases( actions )
+        def expand_aliases(actions)
           expanded = actions.dup
           actions.each do |action|
-            expand_alias_into( action, expanded )
+            expand_alias_into(action, expanded)
           end
 
           expanded
         end
 
-        def expand_alias_into( candidate, expanded )
+        def expand_alias_into(candidate, expanded)
           return unless mapped = aliases[candidate]
 
           mapped.each do |action|
-            next if expanded.include? action
+            next if expanded.include?(action)
 
             expanded << action
-            expand_alias_into( action, expanded )
+            expand_alias_into(action, expanded)
           end
         end
 
-        def fail_on_active_record_check( resource )
+        def fail_on_active_record_check(resource)
           return unless resource
           return unless defined? ActiveRecord
 
-          if resource.is_a?( ActiveRecord::Base ) || ( resource.is_a?( Class ) && resource < ActiveRecord::Base )
-            fail NoActiveRecordPolicyChecksError
+          if resource.is_a?(ActiveRecord::Base) || (resource.is_a?(Class) && resource < ActiveRecord::Base)
+            raise(NoActiveRecordPolicyChecksError)
           end
         end
-
     end
   end
 end

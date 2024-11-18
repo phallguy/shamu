@@ -1,9 +1,7 @@
 module Shamu
   module JsonApi
-
     # Build a JSON API response from one or more resources.
     class Response < BaseBuilder
-
       # Output a single resource as the response data.
       # @param [Object] resource to write.
       # @param [Presenter] presenter used to write the resource state.
@@ -12,8 +10,8 @@ module Shamu
       #     and meta.
       #
       # @return [self]
-      def resource( resource, presenter = nil, &block )
-        output[:data] = resource ? build_resource( resource, presenter, &block ) : nil
+      def resource(resource, presenter = nil, &block)
+        output[:data] = resource ? build_resource(resource, presenter, &block) : nil
         self
       end
 
@@ -26,11 +24,11 @@ module Shamu
       #     and meta.
       # @yieldparam [Object] resource being written.
       # @return [self]
-      def collection( collection, presenter = nil, &block )
+      def collection(collection, presenter = nil, &block)
         output[:data] =
           collection.map do |resource|
-            context.dont_include_resource( resource )
-            build_resource resource, presenter, &block
+            context.dont_include_resource(resource)
+            build_resource(resource, presenter, &block)
           end
         self
       end
@@ -42,18 +40,18 @@ module Shamu
       #   @yieldparam [ErrorBuilder] builder used to describe the error.
       #
       # @return [self]
-      def error( error = nil, &block )
+      def error(error = nil)
         builder = ErrorBuilder.new
 
-        if error.is_a?( Exception )
-          builder.exception( error )
+        if error.is_a?(Exception)
+          builder.exception(error)
         elsif error
-          builder.title error
+          builder.title(error)
         end
 
         yield builder if block_given?
 
-        errors = ( output[:errors] ||= [] )
+        errors = (output[:errors] ||= [])
         errors << builder.compile
 
         self
@@ -67,12 +65,12 @@ module Shamu
       # @yieldparam [String] attr the attribute with a validation error.
       # @yieldparam [String] message the error message.
       # @return [self]
-      def validation_errors( errors, &block )
+      def validation_errors(errors)
         errors.each do |err|
-          error err.message do |builder|
+          error(err.message) do |builder|
             path = "/data"
-            path << "/attributes/#{ err.attribute }" unless err.attribute == :base
-            builder.pointer path
+            path << "/attributes/#{err.attribute}" unless err.attribute == :base
+            builder.pointer(path)
 
             yield builder, err.attribute, err.message if block_given?
           end
@@ -86,13 +84,13 @@ module Shamu
           compiled[:jsonapi] = { version: "1.0" }
           if params_meta = context.params_meta
             compiled[:meta] ||= {}
-            compiled[:meta].reverse_merge!( params_meta )
+            compiled[:meta].reverse_merge!(params_meta)
           end
 
           while context.included_resources?
-            included = ( compiled[ :included ] ||= [] )
+            included = (compiled[:included] ||= [])
             context.collect_included_resources.each do |resource, options|
-              included << build_resource( resource, options[:presenter], &options[:block] )
+              included << build_resource(resource, options[:presenter], &options[:block])
             end
           end
 
@@ -101,12 +99,12 @@ module Shamu
       end
 
       # @return [Hash] the compiled resources.
-      def as_json( * )
+      def as_json(*)
         compile.as_json
       end
 
       # @return [String]
-      def to_json( * )
+      def to_json(*)
         compile.to_json
       end
 
@@ -117,12 +115,12 @@ module Shamu
 
       private
 
-        def build_resource( resource, presenter, &block )
-          presenter = context.find_presenter( resource ) if !presenter && !block_given?
-          builder   = ResourceBuilder.new( context )
+        def build_resource(resource, presenter)
+          presenter = context.find_presenter(resource) if !presenter && !block_given?
+          builder   = ResourceBuilder.new(context)
 
           if presenter
-            instance = context.scorpion.fetch( presenter, resource, builder )
+            instance = context.scorpion.fetch(presenter, resource, builder)
             instance.present
           else
             yield builder
@@ -130,7 +128,6 @@ module Shamu
 
           builder.compile
         end
-
     end
   end
 end

@@ -1,7 +1,6 @@
 module Shamu
   module JsonApi
     module Rails
-
       # Pagination information gathered from the request.
       class Pagination
         include Attributes
@@ -44,10 +43,9 @@ module Shamu
         private
 
           def only_one_kind_of_paging
-            kinds = [ number, offset, cursor ].compact
-            errors.add :base, :only_one_kind_of_paging if kinds.count > 2 || ( size && limit )
+            kinds = [number, offset, cursor].compact
+            errors.add(:base, :only_one_kind_of_paging) if kinds.count > 2 || (size && limit)
           end
-
       end
     end
   end

@@ -1,13 +1,11 @@
 module Shamu
   module Events
     module InMemory
-
       # An asynchronous version of {Service}. Event subscribers should be able
       # to handle events coming in on a separate thread.
       class AsyncService < InMemory::Service
-
         def initialize
-          ObjectSpace.define_finalizer self do
+          ObjectSpace.define_finalizer(self) do
             threads = mutex.synchronize do
               channels.map do |_, state|
                 state[:queue].close
@@ -15,7 +13,7 @@ module Shamu
               end
             end
 
-            ThreadsWait.all_waits( *threads )
+            ::ThreadsWait.all_waits(*threads)
           end
 
           super
@@ -28,19 +26,18 @@ module Shamu
 
         private
 
-          def create_channel( _ )
+          def create_channel(_)
             state = super
-            state[:thread] = channel_thread( state )
+            state[:thread] = channel_thread(state)
             state[:queue]  = Queue.new
             state
           end
 
-          def channel_thread( state )
+          def channel_thread(state)
             Thread.new do
-              dispatch_channel( state )
+              dispatch_channel(state)
             end
           end
-
       end
     end
   end

@@ -2,7 +2,6 @@ require "scorpion"
 
 module Shamu
   module Services
-
     # ...
     #
     # ## Well Known Methos
@@ -57,29 +56,28 @@ module Shamu
     #     end
     #     ```
     class Service
-
       # Support dependency injection for related services.
       include Scorpion::Object
 
       def inspect
-        result = "<#{ self.class.name }:0x#{ object_id.to_s( 16 ) }"
+        result = "<#{self.class.name}:0x#{object_id.to_s(16)}"
         self.class.injected_attributes.map do |attr|
-          result << " #{ attr.name }=#{ send( attr.name ).inspect }"
+          result << " #{attr.name}=#{send(attr.name).inspect}"
         end
         result << ">"
         result
       end
 
-      def pretty_print( pp )
-        pp.object_address_group( self ) do
-          pretty_print_custom( pp )
-          pp.seplist( self.class.injected_attributes, -> { pp.text "," } ) do |attr|
-            pp.breakable " "
-            pp.group( 1 ) do
-              pp.text attr.name.to_s
-              pp.text ":"
-              pp.breakable " "
-              pp.pp send( attr.name )
+      def pretty_print(pp)
+        pp.object_address_group(self) do
+          pretty_print_custom(pp)
+          pp.seplist(self.class.injected_attributes, -> { pp.text(",") }) do |attr|
+            pp.breakable(" ")
+            pp.group(1) do
+              pp.text(attr.name.to_s)
+              pp.text(":")
+              pp.breakable(" ")
+              pp.pp(send(attr.name))
             end
           end
         end
@@ -87,16 +85,15 @@ module Shamu
 
       private
 
-        def pretty_print_custom( pp )
-        end
+        def pretty_print_custom(pp); end
 
         # Maps a single record to an entity. Requires a `build_entities` method
         # that maps an enumerable set of records to entities.
         #
         # @param [Object] record to map.
         # @return [Entity] the mapped entity.
-        def build_entity( record )
-          mapped = build_entities( [ record ] )
+        def build_entity(record)
+          mapped = build_entities([record])
           mapped && mapped.first
         end
 
@@ -117,27 +114,27 @@ module Shamu
         #     transform to an {Entities::Entity}.
         # @yieldreturn [Entities::Entity]
         # @return [Entities::List]
-        def entity_list( records, &transformer )
-          return Entities::List.new [] unless records
+        def entity_list(records, &transformer)
+          return Entities::List.new([]) unless records
 
           unless transformer
-            unless respond_to?( :build_entities, true )
-              fail "Either provide a block or add a private method `def build_entities( records )` to #{ self.class.name }." # rubocop:disable Metrics/LineLength
+            unless respond_to?(:build_entities, true)
+              raise("Either provide a block or add a private method `def build_entities( records )` to #{self.class.name}.")
             end
 
-            transformer ||= method( :build_entities )
+            transformer ||= method(:build_entities)
           end
 
-          build_entity_list build_records_transform( records, &transformer )
+          build_entity_list(build_records_transform(records, &transformer))
         end
 
-          def build_records_transform( records, &transformer )
-            LazyTransform.new( records, &transformer )
-          end
+        def build_records_transform(records, &transformer)
+          LazyTransform.new(records, &transformer)
+        end
 
-          def build_entity_list( source )
-            Entities::List.new source
-          end
+        def build_entity_list(source)
+          Entities::List.new(source)
+        end
 
         # @!visibility public
         # Match a list of records with the ids used to look up those records.
@@ -183,40 +180,40 @@ module Shamu
         #   end
         #
         #
-        def entity_lookup_list( records, ids, null_class, match: :id, coerce: :not_set, &transformer )
-          matcher = entity_lookup_list_matcher( match )
-          coerce  = coerce_method( coerce, match )
-          ids     = ids.map( &coerce ) if coerce
+        def entity_lookup_list(records, ids, null_class, match: :id, coerce: :not_set, &transformer)
+          matcher = entity_lookup_list_matcher(match)
+          coerce  = coerce_method(coerce, match)
+          ids     = ids.map(&coerce) if coerce
 
-          list = entity_list records, &transformer
+          list = entity_list(records, &transformer)
           matched = ids.map do |id|
-            list.find { |e| matcher.call( e ) == id } || scorpion.fetch( null_class, id: id )
+            list.find { |e| matcher.call(e) == id } || scorpion.fetch(null_class, id: id)
           end
 
-          build_entity_list matched
+          build_entity_list(matched)
         end
 
-          ID_MATCHER = ->( record ) { record && record.id }
+        ID_MATCHER = ->(record) { record && record.id }
 
-          def entity_lookup_list_matcher( match )
-            if !match.is_a?( Symbol ) && match.respond_to?( :call )
-              match
-            elsif match == :id
-              ID_MATCHER
-            else
-              @@matcher_proc_cache ||= Hash.new do |hash, key| # rubocop:disable Style/ClassVars
-                hash[ key ] = ->( record ) { record && record.send( key ) }
-              end
-
-              @@matcher_proc_cache[ match ]
+        def entity_lookup_list_matcher(match)
+          if !match.is_a?(Symbol) && match.respond_to?(:call)
+            match
+          elsif match == :id
+            ID_MATCHER
+          else
+            @@matcher_proc_cache ||= Hash.new do |hash, key| # rubocop:disable Style/ClassVars
+              hash[key] = ->(record) { record && record.send(key) }
             end
-          end
 
-          def coerce_method( coerce, match )
-            return coerce unless coerce == :not_set
-
-            :to_model_id if match.is_a?( Symbol ) && match =~ /(^|_)ids?$/
+            @@matcher_proc_cache[match]
           end
+        end
+
+        def coerce_method(coerce, match)
+          return coerce unless coerce == :not_set
+
+          :to_model_id if match.is_a?(Symbol) && match =~ /(^|_)ids?$/
+        end
 
         # @!visibility public
         #
@@ -241,15 +238,15 @@ module Shamu
         #       find_by_lookup( id )
         #     end
         #   end
-        def find_by_lookup( id )
-          entity = lookup( id ).first
-          not_found!( id ) unless entity.present?
+        def find_by_lookup(id)
+          entity = lookup(id).first
+          not_found!(id) unless entity.present?
           entity
         end
 
         # @exception [Shamu::NotFoundError]
-        def not_found!( id = :not_set )
-          raise Shamu::NotFoundError, id: id
+        def not_found!(id = :not_set)
+          raise Shamu::NotFoundError.new(id: id)
         end
 
         # @!visibility public
@@ -275,19 +272,19 @@ module Shamu
         #
         #     scorpion.fetch UserEntity, { record: record, owner: owner }
         #   end
-        def lookup_association( id, service, cache, &block )
+        def lookup_association(id, service, cache)
           return unless id
 
-          cache.fetch( id ) || begin
-            if block_given? && ( ids = yield )
-              service.lookup( *ids ).map do |entity|
-                cache.add( entity.id, entity )
+          cache.fetch(id) || begin
+            if block_given? && (ids = yield)
+              service.lookup(*ids).map do |entity|
+                cache.add(entity.id, entity)
               end
 
-              cache.fetch( id )
+              cache.fetch(id)
             else
-              association = service.lookup( id ).first
-              cache.add( association.id, association )
+              association = service.lookup(id).first
+              cache.add(association.id, association)
             end
           end
         end
@@ -309,10 +306,10 @@ module Shamu
         # @param [Integer] id of the resource.
         # @param [Class] entity_class of the resource.
         # @return [LazyAssociation<Entity>]
-        def lazy_association( id, entity_class, &block )
+        def lazy_association(id, entity_class, &block)
           return nil if id.nil?
 
-          LazyAssociation.class_for( entity_class ).new( id, &block )
+          LazyAssociation.class_for(entity_class).new(id, &block)
         end
 
         # @!visibility public
@@ -329,14 +326,14 @@ module Shamu
         #     to the same type (eg :to_i). If not set, automatically uses :to_i
         #     if key is an 'id' attribute.
         # @return [Entities::IdentityCache]
-        def cache_for( dependency_service = nil, key: :id, entity: nil, coerce: :not_set )
-          coerce = coerce_method( coerce, key )
+        def cache_for(dependency_service = nil, key: :id, entity: nil, coerce: :not_set)
+          coerce = coerce_method(coerce, key)
           entity ||= dependency_service
-          entity = entity.entity_class if entity.respond_to?( :entity_class )
+          entity = entity.entity_class if entity.respond_to?(:entity_class)
 
-          cache_key        = [ entity, key, coerce ]
+          cache_key        = [entity, key, coerce]
           @entity_caches ||= {}
-          @entity_caches[ cache_key ] ||= scorpion.fetch( Entities::IdentityCache, coerce )
+          @entity_caches[cache_key] ||= scorpion.fetch(Entities::IdentityCache, coerce)
         end
 
         # @!visibility public
@@ -357,32 +354,32 @@ module Shamu
         #       entity_lookup_list( Models::User.where( id: missing_ids ), missing_ids, UserEntity::Missing )
         #     end
         #   end
-        def cached_lookup( ids, match: :id, coerce: :not_set, entity: nil, &lookup )
-          coerce      = coerce_method( coerce, match )
-          ids         = ids.map( &coerce ) if coerce
-          cache       = cache_for( key: match, coerce: coerce, entity: entity )
-          missing_ids = cache.uncached_keys( ids )
+        def cached_lookup(ids, match: :id, coerce: :not_set, entity: nil, &lookup)
+          coerce      = coerce_method(coerce, match)
+          ids         = ids.map(&coerce) if coerce
+          cache       = cache_for(key: match, coerce: coerce, entity: entity)
+          missing_ids = cache.uncached_keys(ids)
 
-          cache_entities( cache, match, missing_ids, &lookup ) if missing_ids.any?
+          cache_entities(cache, match, missing_ids, &lookup) if missing_ids.any?
 
-          entities = ids.map { |id| cache.fetch( id ) || fail( Shamu::NotFoundError ) }
-          Entities::List.new( entities )
+          entities = ids.map { |id| cache.fetch(id) || raise(Shamu::NotFoundError) }
+          Entities::List.new(entities)
         end
 
-          def cache_entities( cache, match, missing_ids, &lookup )
-            matcher = entity_lookup_list_matcher( match )
-            if list = yield( missing_ids )
-              list.each do |e|
-                if e.empty?
-                  # For NullEntitty, the id for a custom field or matcher will
-                  # still always be assigned to the entity id.
-                  cache.add( e.id, e )
-                else
-                  cache.add( matcher.call( e ), e )
-                end
+        def cache_entities(cache, match, missing_ids)
+          matcher = entity_lookup_list_matcher(match)
+          if list = yield(missing_ids)
+            list.each do |e|
+              if e.empty?
+                # For NullEntitty, the id for a custom field or matcher will
+                # still always be assigned to the entity id.
+                cache.add(e.id, e)
+              else
+                cache.add(matcher.call(e), e)
               end
             end
           end
+        end
 
         # @!visbility public
         #
@@ -390,13 +387,12 @@ module Shamu
         # is updated to reflect the new entity state.
         #
         # @param [Entity] entity in the new modified state.
-        def recache_entity( entity, match: :id )
-          matcher = entity_lookup_list_matcher( match )
-          cache = cache_for( key: match )
+        def recache_entity(entity, match: :id)
+          matcher = entity_lookup_list_matcher(match)
+          cache = cache_for(key: match)
 
-          cache.add( matcher.call( entity ), entity )
+          cache.add(matcher.call(entity), entity)
         end
-
     end
   end
 end

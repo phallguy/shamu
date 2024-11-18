@@ -1,10 +1,8 @@
 module Shamu
   module Security
-
     # Additional context and resources to consider when resolving the roles
     # that a {Principal} should be granted.
     class Context
-
       def initialize
         @providers = Hash.new([])
       end

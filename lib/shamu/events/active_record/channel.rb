@@ -1,10 +1,8 @@
 module Shamu
   module Events
     module ActiveRecord
-
       # Registry of event channels.
       class Channel < ::ActiveRecord::Base
-
         self.table_name = "shamu_event_channels"
 
         # ============================================================================
@@ -23,13 +21,12 @@ module Shamu
 
         # @!attribute
         # @return [ActiveRecord::Relation] messages posted to the given channel.
-        scope :by_name, ->( name ) {
-          where( name: name )
+        scope :by_name, lambda { |name|
+          where(name: name)
         }
 
         #
         # @!endgroup Scope
-
       end
     end
   end

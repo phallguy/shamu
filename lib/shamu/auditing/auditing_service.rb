@@ -1,6 +1,5 @@
 module Shamu
   module Auditing
-
     # Records audit {Transaction transactions} to record change requests made to
     # a {Services::Service} that includes auditing {Support}.
     #
@@ -11,18 +10,16 @@ module Shamu
     # > interface, create a proxy AuditingService that has it's own
     # > {Security::Policy} but delegates the actual reading and writing.
     class AuditingService < Services::Service
-
-      def self.create( scorpion, *args )
-        scorpion.fetch Shamu::Auditing::NullAuditingService, *args
+      def self.create(scorpion, *args)
+        scorpion.fetch(Shamu::Auditing::NullAuditingService, *args)
       end
 
       # Records an auditable event in persistent storage.
       # @param [Transaction] transaction
       # @return [Result] indicates if logging was successful
-      def commit( transaction )
-        fail NotImplementedError
+      def commit(transaction)
+        raise(NotImplementedError)
       end
-
     end
   end
 end

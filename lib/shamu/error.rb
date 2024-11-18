@@ -1,17 +1,16 @@
 require "i18n"
 
 module Shamu
-
   # A generic error class for problems in the shamu library.
   class Error < StandardError
     private
 
       def translation_scope
-        [ :shamu, :errors ]
+        %i[shamu errors]
       end
 
-      def translate( key, **args )
-        I18n.translate key, args.merge( scope: translation_scope )
+      def translate(key, **args)
+        I18n.t(key, **args, scope: translation_scope)
       end
   end
 
@@ -20,7 +19,11 @@ module Shamu
     attr_reader :id
     attr_reader :resource
 
-    def initialize( message = :not_found, id: :not_set, resource: :not_set )
+    def initialize(message = :not_found, id: :not_set, resource: :not_set)
+      if message.is_a?(Hash) && id == :not_set
+        message, id = :not_found, message[:id]
+      end
+
       @id = id
       @resource = resource
 
@@ -39,14 +42,14 @@ module Shamu
           end
       end
 
-      super translate( message, id: id, resource: resource )
+      super(translate(message, id: id, resource: resource))
     end
   end
 
   # The method is not implemented.
   class NotImplementedError < Error
-    def initialize( message = :not_implemented )
-      super translate( message )
+    def initialize(message = :not_implemented)
+      super(translate(message))
     end
   end
 end

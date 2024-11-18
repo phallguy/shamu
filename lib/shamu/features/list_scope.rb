@@ -1,9 +1,7 @@
 module Shamu
   module Features
-
     # Select the features to be listed.
     class ListScope < Entities::ListScope
-
       # ============================================================================
       # @!group Attributes
       #
@@ -24,7 +22,6 @@ module Shamu
 
       #
       # @!endgroup Attributes
-
     end
   end
 end

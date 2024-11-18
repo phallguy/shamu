@@ -1,7 +1,6 @@
 module Shamu
   module Entities
     class ListScope
-
       # Include paging parsing and attributes. Adds the following attributes
       # to the list scope:
       #
@@ -15,7 +14,6 @@ module Shamu
       # scope.per_page # => 25
       # ```
       module Dates
-
         # ============================================================================
         # @!group Attributes
         #
@@ -35,22 +33,21 @@ module Shamu
         #
         # @!endgroup Attributes
 
-        def self.included( base )
+        def self.included(base)
           super
 
-          coerce = Time.instance_method( :to_time ) ? :to_time : nil
+          coerce = Time.instance_method(:to_time) ? :to_time : nil
 
-          base.attribute :since, coerce: coerce, default: -> { default_since }
-          base.attribute :default_since, coerce: coerce, serialize: false
-          base.attribute :until, coerce: coerce, default: -> { default_until }
-          base.attribute :default_until, coerce: coerce, serialize: false
+          base.attribute(:since, coerce: coerce, default: -> { default_since })
+          base.attribute(:default_since, coerce: coerce, serialize: false)
+          base.attribute(:until, coerce: coerce, default: -> { default_until })
+          base.attribute(:default_until, coerce: coerce, serialize: false)
         end
 
         # @return [Boolean] true if the scope is dated.
         def dated?
           !!self.since || !!self.until # rubocop:disable Style/RedundantSelf
         end
-
       end
     end
   end

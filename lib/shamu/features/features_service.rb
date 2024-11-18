@@ -1,6 +1,5 @@
 module Shamu
   module Features
-
     # ...
     class FeaturesService < Services::Service
       include Security::Support
@@ -41,7 +40,7 @@ module Shamu
       # @!method initialize( config_path )
       # @param
       # @return [FeaturesService]
-      def initialize( config_path = nil )
+      def initialize(config_path = nil)
         @config_path = config_path || self.class.default_config_path
 
         super()
@@ -51,23 +50,23 @@ module Shamu
       #
       # @param [String] name of the feature.
       # @return [Boolean] true if the feature is enabled.
-      def enabled?( name )
+      def enabled?(name)
         context = build_context
 
         if toggle = toggles[name]
-          resolve_known( toggle, context )
+          resolve_known(toggle, context)
         else
-          resolve_unknown( name )
+          resolve_unknown(name)
         end
       end
 
       # List all the known toggles with the given prefix.
       # @param [String] name prefix
       # @return [Hash] the known toggles.
-      def list( prefix = nil )
+      def list(prefix = nil)
         if prefix.present?
           toggles.each_with_object({}) do |(name, toggle), result|
-            next unless name.start_with?( prefix )
+            next unless name.start_with?(prefix)
 
             result[name] = toggle
           end
@@ -81,96 +80,90 @@ module Shamu
         attr_reader :config_path
 
         def toggles
-          @toggles ||= begin
-            if File.exist?( config_path )
-              if ::Rails.env.development?
-                require "listen"
-                listener = Listen.to File.dirname( config_path ), only: File.basename( config_path ) do
-                  @toggles = Toggle.load( config_path )
-                end
-                listener.start
-              end
+          @toggles ||= if File.exist?(config_path)
+                         if ::Rails.env.development?
+                           require "listen"
+                           listener = Listen.to(File.dirname(config_path), only: File.basename(config_path)) do
+                             @toggles = Toggle.load(config_path)
+                           end
+                           listener.start
+                         end
 
-              Toggle.load( config_path )
-            else
-              logger.warn "Feature configuration file does not exist: #{ config_path }"
-              {}
-            end
-          end
+                         Toggle.load(config_path)
+                       else
+                         logger.warn("Feature configuration file does not exist: #{config_path}")
+                         {}
+                       end
         end
 
-        def resolve_unknown( name )
-          logger.info "The '#{ name }' feature toggle has not been configured. Add to #{ config_path }."
+        def resolve_unknown(name)
+          logger.info("The '#{name}' feature toggle has not been configured. Add to #{config_path}.")
           false
         end
 
-        def resolve_known( toggle, context )
-          fail RetiredToggleError.new( toggle ) if toggle.retired?( context ) # rubocop:disable Style/RaiseArgs
+        def resolve_known(toggle, context)
+          raise(RetiredToggleError.new(toggle)) if toggle.retired?(context)
 
-          store_value = resolve_store_toggle( toggle )
+          store_value = resolve_store_toggle(toggle)
           return store_value unless store_value.nil?
 
-          resolve_toggle( toggle, context )
+          resolve_toggle(toggle, context)
         end
 
         def build_context
-          Features::Context.new self,
+          Features::Context.new(self,
                                 scorpion: scorpion,
                                 user_id: security_principal.user_id,
-                                roles: roles_service.roles_for( security_principal.user_id, security_context )
+                                roles: roles_service.roles_for(security_principal.user_id, security_context))
         end
 
-        def resolve_toggle( toggle, context )
-          toggle.enabled?( context ).tap do |result|
-            persist_sticky( toggle.name, result ) if context.sticky?
+        def resolve_toggle(toggle, context)
+          toggle.enabled?(context).tap do |result|
+            persist_sticky(toggle.name, result) if context.sticky?
           end
         end
 
-        def resolve_store_toggle( toggle )
+        def resolve_store_toggle(toggle)
           # session_store is for sticky overrides
-          sticky_overrides.fetch( toggle.name ) do
+          sticky_overrides.fetch(toggle.name) do
             # env_store is for host and service header overrides
-            env_store.fetch( toggle.name )
+            env_store.fetch(toggle.name)
           end
         end
 
-        def persist_sticky( name, result )
-          sticky_overrides[ name ] = result
-          session_store.set( SESSION_KEY, toggle_codec.pack( sticky_overrides ) )
+        def persist_sticky(name, result)
+          sticky_overrides[name] = result
+          session_store.set(SESSION_KEY, toggle_codec.pack(sticky_overrides))
         end
 
         def sticky_overrides
-          @sticky_overrides ||= begin
-            if token = session_store.fetch( SESSION_KEY )
-              toggle_codec.unpack( token )
-            else
-              {}
+          @sticky_overrides ||= if token = session_store.fetch(SESSION_KEY)
+                                  toggle_codec.unpack(token)
+                                else
+                                  {}
+                                end
+        end
+
+        class << self
+          # Looks for a config/features.yml or features.yml in the current
+          # directory. Use {#ddefault_config_path=} to manually set the default
+          # config file.
+          #
+          # @return [String] the default path to load toggle information from.
+          def default_config_path
+            @default_config_path ||= begin
+              path = File.expand_path("config/features.yml")
+              path = File.expand_path("features.yml") unless File.exist?(path)
+              path
             end
           end
-        end
 
-
-      class << self
-        # Looks for a config/features.yml or features.yml in the current
-        # directory. Use {#ddefault_config_path=} to manually set the default
-        # config file.
-        #
-        # @return [String] the default path to load toggle information from.
-        def default_config_path
-          @default_config_path ||= begin
-            path = File.expand_path( "config/features.yml" )
-            path = File.expand_path( "features.yml" ) unless File.exist?( path )
-            path
+          # @param [String] path of the default config file.
+          # @return [String]
+          def default_config_path=(path)
+            @default_config_path = path
           end
         end
-
-        # @param [String] path of the default config file.
-        # @return [String]
-        def default_config_path=( path ) # rubocop:disable Style/TrivialAccessors
-          @default_config_path = path
-        end
-      end
-
     end
   end
 end

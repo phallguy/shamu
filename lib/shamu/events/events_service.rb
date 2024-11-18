@@ -2,7 +2,6 @@ require "multi_json"
 
 module Shamu
   module Events
-
     # The {EventsService} handles receiving messages ({#publish}) and
     # dispatching them to all registered subscribers ({#subscriber}). The actual
     # delivery and message transport is defined by the concrete implementations
@@ -35,7 +34,6 @@ module Shamu
     # end
     # ```
     class EventsService < Services::Service
-
       # Prepare the default event service implementation to use. The default
       # event service can be overridden when setting up the scorpion.
       #
@@ -47,8 +45,8 @@ module Shamu
       #   end
       #
       # @return [EventsService]
-      def self.create( scorpion, *args, &block )
-        @events_service ||= scorpion.fetch InMemory::Service # rubocop:disable Naming/MemoizedInstanceVariableName
+      def self.create(scorpion, *_args)
+        @events_service ||= scorpion.fetch(InMemory::Service) # rubocop:disable Naming/MemoizedInstanceVariableName
       end
 
       # Publish a well-defined {Message} to a known channel so that any client
@@ -61,8 +59,8 @@ module Shamu
       # @param [String] channel to publish to.
       # @param [Message] message to publish.
       # @return [void]
-      def publish( channel, message )
-        fail NotImplementedError
+      def publish(channel, message)
+        raise(NotImplementedError)
       end
 
       # Subscribe to receive notifications of events on the named channel. Any
@@ -73,8 +71,8 @@ module Shamu
       # @yield (message)
       # @yieldparam [Message] message
       # @return [void]
-      def subscribe( channel, &callback )
-        fail NotImplementedError
+      def subscribe(channel, &callback)
+        raise(NotImplementedError)
       end
 
       # Subscribe to the given channels from one service and forward them to
@@ -84,10 +82,10 @@ module Shamu
       # @param [EventsService] to the service to forward to.
       # @param [Array<String>] the channels to forwar.
       # @return [void]
-      def self.bridge( from, to, *channels )
-        Array( channels ).each do |channel|
-          from.subscribe( channel ) do |message|
-            to.publish channel, message
+      def self.bridge(from, to, *channels)
+        Array(channels).each do |channel|
+          from.subscribe(channel) do |message|
+            to.publish(channel, message)
           end
         end
       end
@@ -101,10 +99,11 @@ module Shamu
         #
         # @param [Message] message to serializer.
         # @return [String] the serialized message.
-        def serialize( message )
-          MultiJson.dump \
+        def serialize(message)
+          MultiJson.dump( \
             class: message.class.name,
             attributes: message.to_attributes
+          )
         end
 
         # @!visibility public
@@ -113,24 +112,23 @@ module Shamu
         #
         # @param [String] raw data.
         # @return [Message] the deserialized message.
-        def deserialize( raw )
-          hash = MultiJson.load( raw )
+        def deserialize(raw)
+          hash = MultiJson.load(raw)
           message_class = hash["class"].constantize
-          scorpion.fetch message_class, hash["attributes"]
+          scorpion.fetch(message_class, hash["attributes"])
         end
 
-        def fetch_channel( name )
+        def fetch_channel(name)
           channels[name] || begin
             mutex.synchronize do
-              channels[ name ] ||= create_channel( name )
+              channels[name] ||= create_channel(name)
             end
           end
         end
 
-        def create_channel( name )
-          fail NotImplementedError, "Implement `def create_channel( name )` in #{ self.class.name }"
+        def create_channel(name)
+          raise(NotImplementedError, "Implement `def create_channel( name )` in #{self.class.name}")
         end
-
     end
   end
 end

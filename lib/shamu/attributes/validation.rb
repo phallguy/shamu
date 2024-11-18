@@ -2,7 +2,6 @@ require "active_model"
 
 module Shamu
   module Attributes
-
     # Defines an interface for entities that report validation failures with
     # respect to their attributes.
     module Validation
@@ -11,8 +10,8 @@ module Shamu
       included do |base|
         raise "Must include Shamu::Attributes first." unless base < Shamu::Attributes
 
-        base.include( ::ActiveModel::Validations )
-        base.include( Validation::Overrides )
+        base.include(::ActiveModel::Validations)
+        base.include(Validation::Overrides)
       end
 
       # @return [Boolean] if the object is free from validation errors. Must
@@ -27,7 +26,6 @@ module Shamu
       end
 
       class_methods do
-
         # Adds validation options to {Attributes::DSL#attribute}. Any option not
         # recognized by one of the Attributes mixins will be used as validation
         # arguments for the given attribute.
@@ -42,19 +40,19 @@ module Shamu
         #   # Results in
         #   attribute :email
         #   validates :email, presence: true
-        def attribute( name, *args, **options, &block )
+        def attribute(name, *args, **options, &block)
           super
 
           validation_options = options.each_with_object({}) do |(key, value), opts|
-            next if attribute_option_keys.include?( key )
+            next if attribute_option_keys.include?(key)
 
-            validator = "#{ key.to_s.camelize }Validator"
-            if Shamu::Attributes::Validators.const_defined?( validator.to_sym )
-              key = "shamu/attributes/validators/#{ key }"
+            validator = "#{key.to_s.camelize}Validator"
+            if Shamu::Attributes::Validators.const_defined?(validator.to_sym)
+              key = "shamu/attributes/validators/#{key}"
             end
-            opts[ key ] = value
+            opts[key] = value
           end
-          validates name, validation_options if validation_options.any?
+          validates(name, **validation_options) if validation_options.any?
         end
       end
 
@@ -76,13 +74,12 @@ module Shamu
 
         private
 
-          def assign_attribute!( * )
+          def assign_attribute!(*)
             # If any attribute changes we should re-run the validations
             @validated = false
             super
           end
       end
-
     end
   end
 end

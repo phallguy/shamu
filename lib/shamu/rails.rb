@@ -1,8 +1,8 @@
 module Shamu
-
   # Rails integration.
   module Rails
     require "shamu/rails/entity"
+    require "shamu/active_record"
     require "shamu/rails/controller"
     require "shamu/rails/features"
     require "shamu/rails/railtie"

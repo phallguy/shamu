@@ -1,7 +1,6 @@
 module Shamu
   module Events
     module ActiveRecord
-
       # Store events in a database using ActiveRecord persistence layer.
       #
       # ## Runner IDS
@@ -22,7 +21,7 @@ module Shamu
           return if @ensure_records
 
           @ensure_records = true
-          Migration.new.migrate( :up )
+          Migration.new.migrate(:up)
         end
 
         def initialize
@@ -34,14 +33,14 @@ module Shamu
         end
 
         # (see EventsService#publish)
-        def publish( channel, message )
-          channel_id = fetch_channel( channel )[:id]
-          Message.create! channel_id: channel_id, message: serialize( message )
+        def publish(channel, message)
+          channel_id = fetch_channel(channel)[:id]
+          Message.create!(channel_id: channel_id, message: serialize(message))
         end
 
         # (see EventsService#subscribe)
-        def subscribe( channel, &callback )
-          state = fetch_channel( channel )
+        def subscribe(channel, &callback)
+          state = fetch_channel(channel)
           mutex.synchronize do
             state[:subscribers] << callback
           end
@@ -61,32 +60,32 @@ module Shamu
         #
         # @return [Hash<String,Integer>] the number of messages actually
         #     dispatched on each channel.
-        def dispatch( runner_id, *names, limit: nil )
-          fail UnknownRunnerError unless runner_id.present?
+        def dispatch(runner_id, *names, limit: nil)
+          raise(UnknownRunnerError) unless runner_id.present?
 
           names = channels.keys unless channels.present?
 
-          names.each_with_object( {} ) do |name, dispatched|
-            state = fetch_channel( name )
-            dispatched[name] = dispatch_channel( state, "#{ runner_id }::#{ name }", limit )
+          names.each_with_object({}) do |name, dispatched|
+            state = fetch_channel(name)
+            dispatched[name] = dispatch_channel(state, "#{runner_id}::#{name}", limit)
           end
         end
 
         # (see ChannelStats#channel_stats)
         # @param [String] runner_id if provided, only show stats for the given runner.
-        def channel_stats( name, runner_id: nil )
-          channel = fetch_channel( name )
-          queue   = Message.where( channel_id: channel[:id] )
+        def channel_stats(name, runner_id: nil)
+          channel = fetch_channel(name)
+          queue   = Message.where(channel_id: channel[:id])
 
-          if runner_id && ( runner = create_runner( runner_id ) )
-            queue = queue.where( Message.arel_table[ :id ].gt( runner.last_processed_id ) ) if runner.last_processed_id
+          if runner_id && (runner = create_runner(runner_id))
+            queue = queue.where(Message.arel_table[:id].gt(runner.last_processed_id)) if runner.last_processed_id
           end
 
           {
             name: name,
             subscribers_count: channel[:subscribers].size,
             dispatching: channel[:dispatching],
-            queue_size: queue.count
+            queue_size: queue.count,
           }
         end
 
@@ -95,78 +94,77 @@ module Shamu
           attr_reader :channels
           attr_reader :mutex
 
-          def create_channel( name )
+          def create_channel(name)
             {
-              id: create_named_channel( name ).id,
-              subscribers: []
+              id: create_named_channel(name).id,
+              subscribers: [],
             }
           end
 
-          def dispatch_channel( state, runner_id, limit )
+          def dispatch_channel(state, runner_id, limit)
             mutex.synchronize do
               return if state[:dispatching]
 
-              state[ :dispatching ] = true
+              state[:dispatching] = true
             end
 
-            dispatch_messages( state, runner_id, limit )
+            dispatch_messages(state, runner_id, limit)
           ensure
             mutex.synchronize do
-              state[ :dispatching ] = false
+              state[:dispatching] = false
             end
           end
 
-          def dispatch_messages( state, runner_id, limit )
+          def dispatch_messages(state, runner_id, limit)
             last_message = nil
             count = 0
 
-            pending_messages( state, runner_id, limit ).each do |record|
+            pending_messages(state, runner_id, limit).each do |record|
               last_message = record
-              message      = deserialize( record.message )
+              message      = deserialize(record.message)
 
               count += 1
 
-              state[ :subscribers ].each do |subscriber|
-                subscriber.call( message )
+              state[:subscribers].each do |subscriber|
+                subscriber.call(message)
               end
             end
 
-            bookmark_runner( runner_id, last_message )
+            bookmark_runner(runner_id, last_message)
 
             count
           end
 
-          def bookmark_runner( runner_id, last_message )
+          def bookmark_runner(runner_id, last_message)
             return unless last_message
 
-            runner = create_runner( runner_id )
-            runner.update! last_processed_id: last_message.id, last_processed_at: Time.now.utc
+            runner = create_runner(runner_id)
+            runner.update!(last_processed_id: last_message.id, last_processed_at: Time.now.utc)
           end
 
-          def pending_messages( state, runner_id, limit )
-            messages = Message.where( channel_id: state[:id] )
-                              .limit( limit )
-            runner   = create_runner( runner_id )
+          def pending_messages(state, runner_id, limit)
+            messages = Message.where(channel_id: state[:id])
+                              .limit(limit)
+            runner   = create_runner(runner_id)
 
             if runner.last_processed_id
-              messages = messages.where( Message.arel_table[:id].gt( runner.last_processed_id ) )
+              messages = messages.where(Message.arel_table[:id].gt(runner.last_processed_id))
             end
 
             messages
           end
 
-          def create_runner( runner_id )
-            Runner.transaction( requires_new: true ) do
-              Runner.first_or_create!( id: runner_id )
+          def create_runner(runner_id)
+            Runner.transaction(requires_new: true) do
+              Runner.first_or_create!(id: runner_id)
             end
           end
 
-          def create_named_channel( name )
-            Channel.transaction( requires_new: true ) do
-              Channel.first_or_create!( name: name )
+          def create_named_channel(name)
+            Channel.transaction(requires_new: true) do
+              Channel.first_or_create!(name: name)
             end
           end
-
       end
     end
   end

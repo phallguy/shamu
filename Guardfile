@@ -1,6 +1,6 @@
-guard :rubocop, all_on_start: false, cli: [ "--display-cop-names", "--display-style-guide" ] do
-  watch( /lib\/.*\.rb$/ )
-  watch( /spec\/.*\.rb$/ )
+guard :rubocop, all_on_start: false, cli: ["--display-cop-names", "--display-style-guide"] do
+  watch(%r{lib/.*\.rb$})
+  watch(%r{spec/.*\.rb$})
 end
 
 guard :rspec, cmd: "bundle exec rspec" do

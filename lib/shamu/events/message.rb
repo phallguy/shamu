@@ -1,6 +1,5 @@
 module Shamu
   module Events
-
     # The event {Message} consists of a set of well-defined attributes
     # describing a single discrete event in the system and associated meta-data
     # needed by subscribers to process the message.
@@ -22,13 +21,12 @@ module Shamu
 
       # @!attribute
       # @return [String] the ID for the message. Automatically generated UUID
-        attribute :id
+      attribute :id
 
       #
       # @!endgroup Attributes
 
-
-      def initialize( * )
+      def initialize(*)
         super
 
         @id ||= SecureRandom.uuid

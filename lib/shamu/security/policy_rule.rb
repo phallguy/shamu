@@ -1,10 +1,8 @@
 module Shamu
   module Security
-
     # A rule capturing the permitted actions and resources for {Policy}
     # permissions.
     class PolicyRule
-
       # ============================================================================
       # @!group Attributes
       #
@@ -12,12 +10,12 @@ module Shamu
       # @!attribute
       # @return [Object] the value to return as the result of a {Policy#permit?}
       #     call if the rule matches the request.
-        attr_reader :result
+      attr_reader :result
 
       #
       # @!endgroup Attributes
 
-      def initialize( actions, resource, result, block )
+      def initialize(actions, resource, result, block)
         @actions  = actions
         @resource = resource
         @result   = result
@@ -32,13 +30,13 @@ module Shamu
       # @param [Object] additional context offered to {Policy#permit?}.
       #
       # @return [Boolean] true if the rule is a match.
-      def match?( action, resource, additional_context )
-        return true  if actions.include? :any
-        return false unless actions.include? action
-        return false unless resource_match?( resource )
+      def match?(action, resource, additional_context)
+        return true  if actions.include?(:any)
+        return false unless actions.include?(action)
+        return false unless resource_match?(resource)
 
         if block
-          block.call( resource, additional_context )
+          block.call(resource, additional_context)
         else
           true
         end
@@ -50,14 +48,13 @@ module Shamu
         attr_reader :resource
         attr_reader :block
 
-        def resource_match?( candidate )
+        def resource_match?(candidate)
           return true if resource == candidate
-          return true if resource.is_a?( Module ) && candidate.is_a?( resource )
+          return true if resource.is_a?(Module) && candidate.is_a?(resource)
 
           # Allow 'doubles' to match in specs
-          true if defined?( RSpec::Mocks::Double ) && candidate.is_a?( RSpec::Mocks::Double )
+          true if defined?(RSpec::Mocks::Double) && candidate.is_a?(RSpec::Mocks::Double)
         end
-
     end
   end
 end

@@ -1,5 +1,4 @@
 module Shamu
-
   # {include:file:lib/shamu/auditing/README.md}
   module Auditing
     require "shamu/auditing/auditing_service"

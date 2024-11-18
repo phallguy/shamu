@@ -1,23 +1,20 @@
 module Shamu
   module Features
-
     # A configured feature toggle.
     class Toggle < Entities::Entity
-
       TYPES = [
-        "release",    # Feature is expected to become permanent and is used to
-                      #  decouple deployment from production release. Relatively
-                      #  short lived.
-        "ops",        # Controlled by operations as a kill-switch or tuning
-                      #   option. Cohorts are typically not dynamic and apply to
-                      #   all users.
+        "release", # Feature is expected to become permanent and is used to
+        #  decouple deployment from production release. Relatively
+        #  short lived.
+        "ops", # Controlled by operations as a kill-switch or tuning
+        #   option. Cohorts are typically not dynamic and apply to
+        #   all users.
         "experiment", # Used to explore the efficacy of an option by testing it
-                      #   on a subset of the total users.
-        "segment",    # Long-lived toggle used to control access to a feature
-                      #   based on some sort of user segmentation (e.g. dogfood,
-                      #   internal, premium, etc.).
+        #   on a subset of the total users.
+        "segment", # Long-lived toggle used to control access to a feature
+        #   based on some sort of user segmentation (e.g. dogfood,
+        #   internal, premium, etc.).
       ].freeze
-
 
       # ============================================================================
       # @!group Attributes
@@ -51,8 +48,8 @@ module Shamu
       # @return [Array<Selector>] selectors used to match environment conditions
       #     to determine if the flag should be enabled.
       attribute :selectors do
-        Array( select ).map do |config|
-          Selector.new( self, config )
+        Array(select).map do |config|
+          Selector.new(self, config)
         end
       end
 
@@ -64,24 +61,24 @@ module Shamu
 
       # @param [Context] context the feature evaluation context.
       # @return [Boolean] true if the toggle should be enabled.
-      def enabled?( context )
-        if selector = matching_selector( context )
+      def enabled?(context)
+        if selector = matching_selector(context)
           !selector.reject
         end
       end
 
       # @param [Context] context the feature evaluation context.
       # @return [Boolean] true if the toggle is retired and should be always on.
-      def retired?( context )
+      def retired?(context)
         !retire_at || context.time > retire_at
       end
 
-      def initialize( attributes )
+      def initialize(attributes)
         unless attributes["retire_at"]
-          fail ArgumentError, "Must provide a retire_at attribute for '#{ attributes[ 'name' ] }' toggle."
+          raise(ArgumentError, "Must provide a retire_at attribute for '#{attributes['name']}' toggle.")
         end
-        unless TYPES.include?( attributes["type"] )
-          fail ArgumentError, "Type must be one of #{ TYPES } for '#{ attributes[ 'name' ] }' toggle."
+        unless TYPES.include?(attributes["type"])
+          raise(ArgumentError, "Type must be one of #{TYPES} for '#{attributes['name']}' toggle.")
         end
 
         super
@@ -89,66 +86,64 @@ module Shamu
 
       private
 
-        def matching_selector( context )
-          selectors.find { |s| s.match?( context ) }
+        def matching_selector(context)
+          selectors.find { |s| s.match?(context) }
         end
 
-      class << self
+        class << self
+          # Loads all the toggles from the YAML file at the given path.
+          #
+          # @param [String] path.
+          # @return [Hash<String,Toggle>] of toggles by name.
+          def load(path)
+            toggles = {}
+            load_from_path(path, toggles, ParsingState.new(nil, nil))
 
-        # Loads all the toggles from the YAML file at the given path.
-        #
-        # @param [String] path.
-        # @return [Hash<String,Toggle>] of toggles by name.
-        def load( path )
-          toggles = {}
-          load_from_path( path, toggles, ParsingState.new( nil, nil ) )
-
-          toggles
-        end
-
-        private
-
-          def load_from_path( path, toggles, state )
-            path = File.expand_path( path, state.file_path )
-            File.open( path, "r" ) do |file|
-              yaml = YAML.load( file.read ) # rubocop:disable  Security/YAMLLoad
-              parse_node( yaml, toggles, ParsingState.new( state.name, File.dirname( path ) ) )
-            end
+            toggles
           end
 
-          def parse_node( node, toggles, state )
-            if toggle?( node )
-              params = node.merge!( "name" => state.name )
-              toggles[state.name] = Toggle.new( params )
-            else
-              parse_child_nodes( node, toggles, state )
-            end
-          end
+          private
 
-          def parse_child_nodes( node, toggles, state )
-            node.each do |key, child|
-              if key == "import"
-                load_from_path( child, toggles, state )
-              else
-                child_state = ParsingState.new( [ state.name, key ].compact.join( "/" ), state.file_path )
-                parse_node( child, toggles, child_state )
+            def load_from_path(path, toggles, state)
+              path = File.expand_path(path, state.file_path)
+              File.open(path, "r") do |file|
+                yaml = YAML.safe_load(file.read, permitted_classes: [Date, Time])
+                parse_node(yaml, toggles, ParsingState.new(state.name, File.dirname(path)))
               end
             end
-          end
 
-          TOGGLE_KEYS = %w( description retire_at type select ).freeze
+            def parse_node(node, toggles, state)
+              if toggle?(node)
+                params = node.merge!("name" => state.name)
+                toggles[state.name] = Toggle.new(params)
+              else
+                parse_child_nodes(node, toggles, state)
+              end
+            end
 
-          # Determines if the yaml entry with the given key is a toggle, or if
-          # it's children themselves may be toggles.
-          def toggle?( node )
-            return unless node.is_a? Hash
+            def parse_child_nodes(node, toggles, state)
+              node.each do |key, child|
+                if key == "import"
+                  load_from_path(child, toggles, state)
+                else
+                  child_state = ParsingState.new([state.name, key].compact.join("/"), state.file_path)
+                  parse_node(child, toggles, child_state)
+                end
+              end
+            end
 
-            node.keys.all? { |k| TOGGLE_KEYS.include?( k ) }
-          end
+            TOGGLE_KEYS = %w[description retire_at type select].freeze
 
-      end
+            # Determines if the yaml entry with the given key is a toggle, or if
+            # it's children themselves may be toggles.
+            def toggle?(node)
+              return unless node.is_a?(Hash)
 
-      ParsingState = Struct.new( :name, :file_path )
+              node.keys.all? { |k| TOGGLE_KEYS.include?(k) }
+            end
+        end
+
+        ParsingState = Struct.new(:name, :file_path)
     end
   end
 end

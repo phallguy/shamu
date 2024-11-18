@@ -2,7 +2,6 @@ require "active_support/concern"
 
 module Shamu
   module Attributes
-
     # Automatically trim whitespace from strings and treat empty strings as
     # nil.
     module TrimStrings
@@ -14,78 +13,75 @@ module Shamu
 
       private
 
-          def trim_string( value, style )
-            return value unless value.is_a?( String )
+        def trim_string(value, style)
+          return value unless value.is_a?(String)
 
-            case style
-            when :left  then value.lstrip
-            when :right then value.rstrip
-            when :both  then value.strip
-            when :none  then value
-            else raise ArgumentError, "#{ style } is not a valid trim style"
-            end
+          case style
+          when :left  then value.lstrip
+          when :right then value.rstrip
+          when :both  then value.strip
+          when :none  then value
+          else raise ArgumentError, "#{style} is not a valid trim style"
           end
-
-      class_methods do
-
-        # Define a new attribute for the class.
-        #
-        # @param (see Projection::DSL#attribute)
-        # @param [Symbol] trim how to trim the string. One of `:left`,
-        # `:right`, `:both`, `true`.
-        # @param [Boolean] nilify_blanks treat blank strings as nil values.
-        #
-        # @return [void]
-        #
-        # @example
-        #
-        #   class Params
-        #     include Shamu::Attributes
-        #     include Shamu::Attributes::Assignment
-        #
-        #     attribute :label, trim: true
-        #   end
-        def attribute( name, *args, **options, &block )
-          super
         end
 
-        private
-
-          def define_attribute_assignment( name, trim: nil, nilify_blanks: true, ** )
+        class_methods do
+          # Define a new attribute for the class.
+          #
+          # @param (see Projection::DSL#attribute)
+          # @param [Symbol] trim how to trim the string. One of `:left`,
+          # `:right`, `:both`, `true`.
+          # @param [Boolean] nilify_blanks treat blank strings as nil values.
+          #
+          # @return [void]
+          #
+          # @example
+          #
+          #   class Params
+          #     include Shamu::Attributes
+          #     include Shamu::Attributes::Assignment
+          #
+          #     attribute :label, trim: true
+          #   end
+          def attribute(name, *args, **options, &block)
             super
+          end
 
-            trim =
-              case trim
-              when :left, :right then trim
-              when true then :both
-              when nil, false then :none
-              else raise ArgumentError, "#{ style } is not a valid trim style"
-              end
+          private
 
-            body = []
-            body << "value = trim_string( value, :#{ trim } )" if trim != :none
-            body << "value = nil if value.is_a?( String ) && value.blank?" if nilify_blanks
+            def define_attribute_assignment(name, trim: nil, nilify_blanks: true, **)
+              super
 
-            if body.present?
-              mod = Module.new do
-                module_eval <<-RUBY, __FILE__, __LINE__ + 1
-                  private def clean_#{ name }_attribute( value )
-                    #{ body.join( $/ ) }
+              trim =
+                case trim
+                when :left, :right then trim
+                when true then :both
+                when nil, false then :none
+                else raise ArgumentError, "#{style} is not a valid trim style"
+                end
+
+              body = []
+              body << "value = trim_string( value, :#{trim} )" if trim != :none
+              body << "value = nil if value.is_a?( String ) && value.blank?" if nilify_blanks
+
+              if body.present?
+                mod = Module.new do
+                  module_eval <<-RUBY, __FILE__, __LINE__ + 1
+                  private def clean_#{name}_attribute( value )
+                    #{body.join($/)}
                     super value
                   end
-                RUBY
+                  RUBY
+                end
+
+                include(mod)
               end
-
-              include mod
             end
-          end
 
-          def attribute_option_keys
-            super + [ :trim, :nilify_blanks ]
-          end
-
-      end
-
+            def attribute_option_keys
+              super + %i[trim nilify_blanks]
+            end
+        end
     end
   end
 end

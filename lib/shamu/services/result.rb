@@ -1,12 +1,10 @@
 module Shamu
   module Services
-
     # The result of a {Service} {Request} capturing the validation errors
     # recorded while processing the request and the resulting
     # {Services::Entities::Entity} and {Request} used.
     class Result
       extend ActiveModel::Translation
-
 
       # ============================================================================
       # @!group Attributes
@@ -54,15 +52,15 @@ module Shamu
       #   the first {Request} object found in the `values`.
       # @param [Entities::Entity] entity submitted to the service. If :not_set,
       #   uses the first {Entity} object found in the `values`.
-      def initialize( *values, request: :not_set, entity: :not_set ) # rubocop:disable Metrics/PerceivedComplexity
+      def initialize(*values, request: :not_set, entity: :not_set)
         @values = values
         @value  = values.first
 
         values.each do |source|
-          request = source if request == :not_set && source.is_a?( Services::Request )
-          entity  = source if entity == :not_set && source.is_a?( Entities::Entity )
+          request = source if request == :not_set && source.is_a?(Services::Request)
+          entity  = source if entity == :not_set && source.is_a?(Entities::Entity)
 
-          append_error_source source
+          append_error_source(source)
         end
 
         unless request == :not_set
@@ -71,12 +69,12 @@ module Shamu
           request && request.valid?
 
           @request = request
-          append_error_source request
+          append_error_source(request)
         end
 
         unless entity == :not_set
           @entity = entity
-          append_error_source entity
+          append_error_source(entity)
         end
       end
 
@@ -88,12 +86,12 @@ module Shamu
       # @return [ActiveModel::Errors] errors gathered from all the validation sources.
       #     Typically the {#request} and {#entity}.
       def errors
-        @errors ||= ActiveModel::Errors.new( self )
+        @errors ||= ActiveModel::Errors.new(self)
       end
 
       # Delegate model_name to request/entity
       def model_name
-        ( request && request.model_name ) || ( entity && entity.model_name ) || ActiveModel::Name.new( self, nil, "Request" ) # rubocop:disable Metrics/LineLength
+        (request && request.model_name) || (entity && entity.model_name) || ActiveModel::Name.new(self, nil, "Request")
       end
 
       # @return [self]
@@ -105,79 +103,77 @@ module Shamu
       end
 
       # Joins a dependency's result to the result of the request.
-      def join( result )
+      def join(result)
         nested_results << result
-        append_error_source result
+        append_error_source(result)
       end
 
       # @return [Result] the value coerced to a {Result}.
-      def self.coerce( value, **args )
-        if value.is_a?( Result )
+      def self.coerce(value, **args)
+        if value.is_a?(Result)
           value
         else
-          Result.new( *Array.wrap( value ), **args )
+          Result.new(*Array.wrap(value), **args)
         end
       end
 
       # @return [String] debug friendly string
-      def inspect # rubocop:disable Metrics/AbcSize
-        result = "#<#{ self.class } valid: #{ valid? }"
-        result << ", errors: #{ errors.inspect }" if errors.any?
-        result << ", entity: #{ entity.inspect }" if entity
-        result << ", value: #{ value.inspect }"   if value && value != entity
-        result << ", values: #{ values.inspect }" if values.length > 1
+      def inspect
+        result = "#<#{self.class} valid: #{valid?}"
+        result << ", errors: #{errors.inspect}" if errors.any?
+        result << ", entity: #{entity.inspect}" if entity
+        result << ", value: #{value.inspect}"   if value && value != entity
+        result << ", values: #{values.inspect}" if values.length > 1
         result << ">"
         result
       end
 
       # @return [String] even friendlier debug string.
-      def pretty_print( pp ) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
-        pp.object_address_group( self ) do
-          pp.breakable " "
-          pp.text "valid: "
-          pp.pp valid?
+      def pretty_print(pp)
+        pp.object_address_group(self) do
+          pp.breakable(" ")
+          pp.text("valid: ")
+          pp.pp(valid?)
 
           if errors.any?
             pp.comma_breakable
-            pp.text "errors:"
-            pp.breakable " "
-            pp.pp errors
+            pp.text("errors:")
+            pp.breakable(" ")
+            pp.pp(errors)
           end
 
           if entity
             pp.comma_breakable
-            pp.text "entity:"
-            pp.breakable " "
-            pp.pp entity
+            pp.text("entity:")
+            pp.breakable(" ")
+            pp.pp(entity)
           end
 
           if !value.nil? && value != entity
             pp.comma_breakable
-            pp.text "value:"
-            pp.breakable " "
-            pp.pp value
+            pp.text("value:")
+            pp.breakable(" ")
+            pp.pp(value)
           end
 
           if values.length > 1
             pp.comma_breakable
-            pp.text "values:"
-            pp.breakable " "
-            pp.pp values - [ value ]
+            pp.text("values:")
+            pp.breakable(" ")
+            pp.pp(values - [value])
           end
         end
       end
 
-
       private
 
-        def append_error_source( source )
-          return unless source.respond_to?( :errors )
+        def append_error_source(source)
+          return unless source.respond_to?(:errors)
 
           source.errors.each do |err|
-            errors.add err.attribute, err.message unless errors[err.attribute].include? err.message
+            errors.add(err.attribute, err.message) unless errors[err.attribute].include?(err.message)
           end
         end
-
     end
   end
 end

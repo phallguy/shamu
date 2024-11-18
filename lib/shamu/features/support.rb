@@ -1,12 +1,10 @@
 module Shamu
   module Features
-
     # Add feature togggle support to an object.
     module Support
       extend ActiveSupport::Concern
 
       included do
-
         # ============================================================================
         # @!group Dependencies
         #
@@ -18,7 +16,6 @@ module Shamu
 
         #
         # @!endgroup Dependencies
-
       end
 
       private
@@ -33,8 +30,8 @@ module Shamu
         # @yield Yields if the feature is enabled.
         # @yieldreturn the result of the block or nil if the feature wasn't
         #     enabled.
-        def when_feature( feature, override: nil, &block )
-          yield if override.nil? ? feature_enabled?( feature ) : override
+        def when_feature(feature, override: nil)
+          yield if override.nil? ? feature_enabled?(feature) : override
         end
 
         # @!visibility public
@@ -43,8 +40,8 @@ module Shamu
         #
         # @param [Symbol] feature name of the feature to check.
         # @return [Boolean] true if the feature has been toggled on.
-        def feature_enabled?( feature )
-          features_service.enabled?( feature )
+        def feature_enabled?(feature)
+          features_service.enabled?(feature)
         end
     end
   end

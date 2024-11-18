@@ -1,6 +1,5 @@
 module Shamu
   module Attributes
-
     # Automatically add camelCase aliases for all attributes.
     module CamelCase
       extend ActiveSupport::Concern
@@ -10,12 +9,11 @@ module Shamu
       end
 
       class_methods do
-        def attribute( name, *args, **options, &block )
-          options[ :as ] ||= name.to_s.camelize( :lower ).to_sym
+        def attribute(name, *args, **options, &block)
+          options[:as] ||= name.to_s.camelize(:lower).to_sym
           super
         end
       end
-
     end
   end
 end

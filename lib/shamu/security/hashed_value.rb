@@ -2,7 +2,6 @@ require "openssl"
 
 module Shamu
   module Security
-
     # Adds support for hashing and verifying a string value.
     #
     # ```ruby
@@ -28,7 +27,6 @@ module Shamu
     # codec.restore "example"         # => nil
     # ```
     module HashedValue
-
       private
 
         # @!visiblity public
@@ -39,15 +37,15 @@ module Shamu
         #
         # @param [String] string to hash.
         # @return [String] packed string with hash and original value.
-        def hash_value( string )
+        def hash_value(string)
           return nil unless string
 
-          "#{ hash_digest( string ) }$#{ string }"
+          "#{hash_digest(string)}$#{string}"
         end
 
-        def hash_digest( string )
-          alg = OpenSSL::Digest::SHA1.new
-          OpenSSL::HMAC.hexdigest( alg, private_key, string )
+        def hash_digest(string)
+          alg = OpenSSL::Digest.new("SHA1")
+          OpenSSL::HMAC.hexdigest(alg, private_key, string)
         end
 
         # @!visiblity public
@@ -56,14 +54,14 @@ module Shamu
         #
         # @param [String] hashed value returned from {#hash_value}.
         # @return [String] the original value.
-        def verify_hash( hashed )
+        def verify_hash(hashed)
           return unless hashed
           return if hashed.length < 41
 
-          mac     = hashed[ 0...40 ]
-          toggles = hashed[ 41..-1 ]
+          mac     = hashed[0...40]
+          toggles = hashed[41..-1]
 
-          return unless hash_digest( toggles ) == mac
+          return unless hash_digest(toggles) == mac
 
           toggles
         end

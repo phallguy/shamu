@@ -8,22 +8,22 @@ module ActiveRecordSpec
     extend ::Shamu::Entities::ActiveRecord
     include ::Shamu::Entities::ActiveRecordSoftDestroy
 
-    scope :by_name, ->( name ) { where( name: name ) }
-    scope :by_label, ->( label ) { where( label: label ) }
+    scope :by_name, ->(name) { where(name: name) }
+    scope :by_label, ->(label) { where(label: label) }
   end
 
   class FavoriteMigration < ::ActiveRecord::Migration[5.2]
     def self.up
-      create_table :favorites do |t|
-        t.string :name
-        t.string :label
+      create_table(:favorites) do |t|
+        t.string(:name)
+        t.string(:label)
 
-        t.datetime :destroyed_at
+        t.datetime(:destroyed_at)
       end
     end
 
     def self.down
-      drop_table :favorites
+      drop_table(:favorites)
     end
   end
 

@@ -1,9 +1,7 @@
 module Shamu
   module Events
-
     # Indicates that an {EventsService} supports reporting channel activity states.
     module ChannelStats
-
       # Gets stats for the given `channel`.
       #
       # #### Stats Included in the results.
@@ -15,8 +13,8 @@ module Shamu
       #
       # @param [String] name  of the channel
       # @return [Hash] stats.
-      def channel_stats( name )
-        fail NotImplementedError
+      def channel_stats(name)
+        raise(NotImplementedError)
       end
     end
   end

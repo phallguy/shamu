@@ -1,7 +1,6 @@
 module Shamu
   module Entities
     class ListScope
-
       # Include sorting parameters and parsing.
       #
       # ```
@@ -19,7 +18,6 @@ module Shamu
       # scope.sort_by   #=> { first_name: :asc, last_name: :asc }
       # ```
       module Sorting
-
         # ============================================================================
         # @!group Attributes
         #
@@ -39,15 +37,15 @@ module Shamu
         #
         # @!endgroup Attributes
 
-        def self.included( base )
+        def self.included(base)
           super
 
-          base.attribute :default_sort_by, as: :default_order,
-                                           coerce: ->( *values ) { parse_sort_by( values ) }
+          base.attribute(:default_sort_by, as: :default_order,
+                                           coerce: ->(*values) { parse_sort_by(values) })
 
-          base.attribute :sort_by, as: :order,
-                                   coerce: ->( *values ) { parse_sort_by( values ) },
-                                   default: -> { default_sort_by }
+          base.attribute(:sort_by, as: :order,
+                                   coerce: ->(*values) { parse_sort_by(values) },
+                                   default: -> { default_sort_by })
         end
 
         # @return [Boolean] true if the scope is paged.
@@ -60,8 +58,8 @@ module Shamu
         def sort_by_resolved
           return sort_by unless reverse_sort?
 
-          sort_by.each_with_object( {} ) do |( attribute, direction ), resolved|
-            resolved[ attribute ] = direction == :asc ? :desc : :asc
+          sort_by.each_with_object({}) do |(attribute, direction), resolved|
+            resolved[attribute] = direction == :asc ? :desc : :asc
           end
         end
 
@@ -76,24 +74,23 @@ module Shamu
             self.sort_by = { id: :asc } unless sort_by_set?
           end
 
-          def parse_sort_by( arguments )
-            Array( arguments ).each_with_object( {} ) do |arg, sorted|
+          def parse_sort_by(arguments)
+            Array(arguments).each_with_object({}) do |arg, sorted|
               case arg
-              when Array then sorted.merge!( parse_sort_by( arg ) )
+              when Array then sorted.merge!(parse_sort_by(arg))
               when Hash
                 arg.each do |attr, direction|
                   case direction
                   when :asc, :desc, "asc", "desc" then sorted[attr] = direction.to_sym
-                  when Array, Hash                then sorted[attr] = parse_sort_by( direction )
-                  else                                 fail ArgumentError
+                  when Array, Hash                then sorted[attr] = parse_sort_by(direction)
+                  else                                 raise(ArgumentError)
                   end
                 end
               when String, Symbol then sorted[arg.to_sym] = :asc
-              else                     fail ArgumentError
+              else                     raise(ArgumentError)
               end
             end
           end
-
       end
     end
   end

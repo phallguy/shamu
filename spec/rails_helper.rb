@@ -2,7 +2,7 @@ require "spec_helper"
 
 require "combustion"
 
-Combustion.initialize! :action_controller do
+Combustion.initialize!(:action_controller) do
   require "shamu/rails"
 end
 

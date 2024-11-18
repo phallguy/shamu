@@ -8,7 +8,7 @@ module Shamu
       source_root File.expand_path("templates", __dir__)
 
       def copy_application_presenter_file
-        copy_file "application_presenter.rb", "app/presenters/application_presenter.rb"
+        copy_file("application_presenter.rb", "app/presenters/application_presenter.rb")
       end
     end
   end
