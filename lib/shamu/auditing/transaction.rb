@@ -90,7 +90,7 @@ module Shamu
           end
 
           if principal.present?
-            model.user_id_chain = principal.user_id_chain
+            model.principal_id_chain = principal.principal_id_chain
             model.ip_address = principal.remote_ip if model.respond_to?(:ip_address=)
           end
         end

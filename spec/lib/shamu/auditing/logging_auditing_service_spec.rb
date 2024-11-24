@@ -7,7 +7,7 @@ describe Shamu::Auditing::LoggingAuditingService do
     expect(service.logger).to(receive(:unknown))
 
     transaction = Shamu::Auditing::Transaction.new( \
-      principal: Shamu::Security::Principal.new(user_id: 1),
+      principal: Shamu::Security::Principal.new(principal_id: 1),
       action: :change,
       params: { name: "Mr Penguin" }
     )
@@ -24,7 +24,7 @@ describe Shamu::Auditing::LoggingAuditingService do
     end
 
     transaction = Shamu::Auditing::Transaction.new( \
-      principal: Shamu::Security::Principal.new(user_id: 1),
+      principal: Shamu::Security::Principal.new(principal_id: 1),
       action: :change,
       params: { name: "Mr Penguin", password: "I'm a secret" }
     )

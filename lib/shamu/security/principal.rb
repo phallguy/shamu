@@ -9,7 +9,7 @@ module Shamu
       # @!attribute
       # @return [Object] id of the currently authenticated user. May be cached,
       #     for example bu via persistent cookie. See {#elevated}.
-      attr_reader :user_id
+      attr_reader :principal_id
 
       # @!attribute
       # @return [Principal] the super principal when a user or service is
@@ -34,31 +34,31 @@ module Shamu
 
       # @return [Array<Object>] all of the user ids in the security principal
       #  chain, starting from the root.
-      attr_reader :user_id_chain
+      attr_reader :principal_id_chain
 
       #
       # @!endgroup Attributes
 
-      def initialize(user_id: nil, super_principal: nil, remote_ip: nil, elevated: false, scopes: nil)
-        @user_id         = user_id
+      def initialize(principal_id: nil, super_principal: nil, remote_ip: nil, elevated: false, scopes: nil)
+        @principal_id = principal_id
         @super_principal = super_principal
         @remote_ip       = remote_ip
         @elevated        = elevated
         @scopes          = scopes && scopes.freeze
-        @user_id_chain =
+        @principal_id_chain =
           begin
-            user_ids = []
+            principal_ids = []
             principal = self
             while principal
-              user_ids << principal.user_id
+              principal_ids << principal.principal_id
               principal = principal.super_principal
             end
 
-            user_ids.reverse.freeze
+            principal_ids.reverse.freeze
           end
       end
 
-      # @return [Boolean] true if the [#user_id] is being impersonated.
+      # @return [Boolean] true if the [#principal_id] is being impersonated.
       def impersonated?
         !!super_principal
       end
@@ -66,10 +66,10 @@ module Shamu
       # Create a new impersonation {Principal}, cloning relevant principal to the
       # new instance.
       #
-      # @param [Object] user_id of the user to impersonate.
+      # @param [Object] principal_id of the user to impersonate.
       # @return [Principal] the new principal.
-      def impersonate(user_id)
-        self.class.new(user_id: user_id, super_principal: self, remote_ip: remote_ip, elevated: elevated)
+      def impersonate(principal_id)
+        self.class.new(principal_id: principal_id, super_principal: self, remote_ip: remote_ip, elevated: elevated)
       end
 
       # @return [Boolean] true if the principal was offered by one service to
@@ -88,12 +88,12 @@ module Shamu
       # @return [Boolean] true if there is no user associated with the
       # principal.
       def anonymous?
-        !user_id
+        !principal_id
       end
 
       def inspect
         result = "<#{self.class.name}:0x#{object_id.to_s(16)}"
-        %i[user_id scopes elevated remote_ip super_principal].map do |name|
+        %i[principal_id scopes elevated remote_ip super_principal].map do |name|
           value = send(name)
           result << " #{name}=#{send(name).inspect}" if value
         end
@@ -102,7 +102,7 @@ module Shamu
       end
 
       def pretty_print(pp)
-        attributes = %i[user_id scopes elevated remote_ip super_principal]
+        attributes = %i[principal_id scopes elevated remote_ip super_principal]
         attributes = attributes.reject! { |a| send(a).nil? }
 
         pp.object_address_group(self) do
@@ -124,7 +124,7 @@ module Shamu
       def pretty_print_custom(pp); end
 
       def to_h
-        result = { user_id: user_id }
+        result = { principal_id: principal_id }
 
         result[:remote_ip] = remote_ip if remote_ip.present?
         result[:elevated]  = true if elevated

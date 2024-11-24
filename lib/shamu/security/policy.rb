@@ -23,7 +23,7 @@ module Shamu
     #       end
     #   end
     #
-    #   principal = Shamu::Security::Principal.new( user_id: user.id )
+    #   principal = Shamu::Security::Principal.new( principal_id: user.id )
     #   policy = UserPolicy.new(
     #     principal: principal,
     #     roles: roles_service.roles_for( principal )
@@ -55,16 +55,16 @@ module Shamu
       # @!attribute
       # @return [Array<Integer>] additional user ids that the {#principal} may
       # act on behalf of.
-      attr_reader :related_user_ids
+      attr_reader :related_principal_ids
 
       #
       # @!endgroup Dependencies
 
-      def initialize(principal: nil, context: nil, roles: nil, related_user_ids: nil)
+      def initialize(principal: nil, context: nil, roles: nil, related_principal_ids: nil)
         @principal        = principal || Principal.new
         @context          = context || Context.new
         @roles            = roles || []
-        @related_user_ids = Array.wrap(related_user_ids)
+        @related_principal_ids = Array.wrap(related_principal_ids)
       end
 
       # Authorize the given `action` on the given resource. If it is not
@@ -151,7 +151,7 @@ module Shamu
         def principal_roles
           @principal_roles ||= begin
             expanded = self.class.expand_roles(*roles)
-            expanded << :authenticated if principal.user_id && self.class.role_defined?(:authenticated)
+            expanded << :authenticated if principal.principal_id && self.class.role_defined?(:authenticated)
             expanded.select do |role|
               principal.scoped?(role)
             end
@@ -164,21 +164,21 @@ module Shamu
         # @return [Boolean] true if the given id is one of the authorized user
         # ids on the principal.
         def is_principal?(id)
-          principal.try(:user_id) == id || related_user_ids.include?(id)
+          principal.try(:principal_id) == id || related_principal_ids.include?(id)
         end
 
         # @!visibility public
         #
         # @return [Array<Integer>] the ids of the {#principal} and the
-        # {#related_user_ids} that the policy can use to refine access to
+        # {#related_principal_ids} that the policy can use to refine access to
         # entities.
-        def principal_user_ids
-          @principal_user_ids ||= [principal.try(:user_id), related_user_ids].flatten.compact
+        def principal_principal_ids
+          @principal_principal_ids ||= [principal.try(:principal_id), related_principal_ids].flatten.compact
         end
 
         # @return [Boolean] true if {#principal} has authenticated.
         def authenticated?
-          principal.try(:user_id)
+          principal.try(:principal_id)
         end
 
         # @return [Boolean] true if the {#principal} has not authenticated.
@@ -244,7 +244,7 @@ module Shamu
         #   permit :read, UserEntity
         #   permit :show, :dashboard
         #   permit :update, UserEntity do |user|
-        #     user.id == principal.user_id
+        #     user.id == principal.principal_id
         #   end
         #   permit :destroy, UserEntity do |user, additional_context|
         #     in_role?( :admin ) && additional_context[:custom_data] == :safe
@@ -333,7 +333,7 @@ module Shamu
         #   resource UserEntity do
         #     permit :read
         #     permit :update do |user|
-        #       user.id == principal.user_id
+        #       user.id == principal.principal_id
         #     end
         #
         #     permit :chop, OtherKindOfEntity

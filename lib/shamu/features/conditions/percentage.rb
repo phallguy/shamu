@@ -7,8 +7,8 @@ module Shamu
       class Percentage < Conditions::Condition
         # (see Condition#match?)
         def match?(context)
-          if context.user_id
-            (user_id_hash(context.user_id) ^ toggle_crc) % 100 < percentage
+          if context.principal_id
+            (principal_id_hash(context.principal_id) ^ toggle_crc) % 100 < percentage
           else
             context.sticky!
             Random.rand(100) < percentage
@@ -21,11 +21,11 @@ module Shamu
             @percentage ||= [config.to_i, 100].min
           end
 
-          def user_id_hash(user_id)
-            if user_id.is_a?(Numeric)
-              user_id
+          def principal_id_hash(principal_id)
+            if principal_id.is_a?(Numeric)
+              principal_id
             else
-              user_id.sub("-", "").to_i(16)
+              principal_id.sub("-", "").to_i(16)
             end
           end
 

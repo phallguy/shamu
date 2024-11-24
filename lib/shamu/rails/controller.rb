@@ -37,7 +37,7 @@ module Shamu
       private
 
         # The currently logged in user. Must respond to #id when logged in.
-        def current_user_id; end
+        def current_principal_id; end
 
         # @!visibility public
         #
@@ -76,7 +76,7 @@ module Shamu
         # @return [Shamu::Security::Principal]
         def security_principal
           @security_principal ||= Shamu::Security::Principal.new( \
-            user_id: current_user_id,
+            principal_id: current_principal_id,
             remote_ip: remote_ip,
             elevated: session_elevated?
           )

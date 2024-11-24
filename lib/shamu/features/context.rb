@@ -29,7 +29,7 @@ module Shamu
 
       # @!attribute
       # @return [Integer,String] id of the current user - either an Integer, or a UUID.
-      attribute :user_id
+      attribute :principal_id
 
       # @!attribute
       # @return [Scorpion] used to dynamically look up dependencies by

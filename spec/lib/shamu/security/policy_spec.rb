@@ -41,13 +41,13 @@ describe Shamu::Security::Policy do
 
   describe "#in_role?" do
     it "is true for :authenticated when principal is signed in" do
-      allow(policy.principal).to(receive(:user_id).and_return(1))
+      allow(policy.principal).to(receive(:principal_id).and_return(1))
 
       expect(policy.in_role?(:authenticated)).to(be_truthy)
     end
 
     it "is false for :authenticated when principal is anonymous" do
-      allow(policy.principal).to(receive(:user_id).and_return(nil))
+      allow(policy.principal).to(receive(:principal_id).and_return(nil))
 
       expect(policy.in_role?(:authenticated)).to(be_falsy)
     end

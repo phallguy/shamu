@@ -42,10 +42,10 @@ describe Shamu::Rails::Controller, type: :controller do
     end
 
     it "gets security context from current_user" do
-      expect(controller).to(receive(:current_user_id).at_least(:once).and_return(945))
+      expect(controller).to(receive(:current_principal_id).at_least(:once).and_return(945))
 
       expect(controller).to(receive(:show)) do
-        expect(scorpion.fetch(Shamu::Security::Principal).user_id).to(eq(945))
+        expect(scorpion.fetch(Shamu::Security::Principal).principal_id).to(eq(945))
         controller.render(plain: "")
       end
 

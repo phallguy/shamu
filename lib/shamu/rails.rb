@@ -1,6 +1,7 @@
 module Shamu
   # Rails integration.
   module Rails
+    require "scorpion/rails"
     require "shamu/rails/entity"
     require "shamu/active_record"
     require "shamu/rails/controller"

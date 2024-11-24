@@ -16,13 +16,13 @@ module Shamu
     #   include NullEntity
     # end
     #
-    # user = user_service.lookup( real_user_id )
+    # user = user_service.lookup( real_principal_id )
     # user       # => UserEntity
     # user.name  # => "Shamu"
     # user.email # => "start@seaworld.com"
     # user.id    # => 5
     #
-    # user = user_service.lookup( unknown_user_id )
+    # user = user_service.lookup( unknown_principal_id )
     # user       # => NullUserEntity
     # user.name  # => "Unknown User"
     # user.email # => nil

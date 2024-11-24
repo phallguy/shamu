@@ -166,7 +166,7 @@ describe Shamu::Attributes::Assignment do
           attribute :updated_at
           attribute :expire_on
 
-          attribute :user_id
+          attribute :principal_id
           attribute :tag_ids
           attribute :id
         end
@@ -191,7 +191,7 @@ describe Shamu::Attributes::Assignment do
         value = double
         expect(value).to(receive(:to_model_id))
 
-        instance.user_id = value
+        instance.principal_id = value
       end
 
       it "coerces id to a model id" do

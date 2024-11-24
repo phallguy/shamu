@@ -11,34 +11,34 @@ describe Shamu::Features::Conditions::Percentage do
   it "matches integer user id" do
     condition = scorpion.new(Shamu::Features::Conditions::Percentage, 5, toggle)
 
-    expect(context).to(receive(:user_id).at_least(:once).and_return(55))
+    expect(context).to(receive(:principal_id).at_least(:once).and_return(55))
     expect(condition.match?(context)).to(be_truthy)
   end
 
   it "matches same user id when percentage grows" do
     condition = scorpion.new(Shamu::Features::Conditions::Percentage, 15, toggle)
 
-    expect(context).to(receive(:user_id).at_least(:once).and_return(55))
+    expect(context).to(receive(:principal_id).at_least(:once).and_return(55))
     expect(condition.match?(context)).to(be_truthy)
   end
 
   it "excludes integer user id" do
     condition = scorpion.new(Shamu::Features::Conditions::Percentage, 5, toggle)
 
-    expect(context).to(receive(:user_id).at_least(:once).and_return(111))
+    expect(context).to(receive(:principal_id).at_least(:once).and_return(111))
     expect(condition.match?(context)).to(be_falsy)
   end
 
   it "matches uuid user id" do
     condition = scorpion.new(Shamu::Features::Conditions::Percentage, 23, toggle)
 
-    expect(context).to(receive(:user_id).at_least(:once).and_return("45561ca3-5bf9-4f3a-9b4f-89a15ea0e387"))
+    expect(context).to(receive(:principal_id).at_least(:once).and_return("45561ca3-5bf9-4f3a-9b4f-89a15ea0e387"))
     expect(condition.match?(context)).to(be_truthy)
   end
 
-  context "when no user_id" do
+  context "when no principal_id" do
     before(:each) do
-      allow(context).to(receive(:user_id).and_return(nil))
+      allow(context).to(receive(:principal_id).and_return(nil))
       allow(context).to(receive(:sticky!))
     end
 

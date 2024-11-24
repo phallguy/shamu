@@ -3,7 +3,7 @@ module Shamu
     # ...
     class DelegatePrincipal < Principal
       # (see Principal#impersonate)
-      def impersonate(_user_id)
+      def impersonate(_principal_id)
         raise(NoPolicyImpersonationError)
       end
 
