@@ -25,6 +25,10 @@ module Shamu
       # @param [Object] value. Must be a primitive (String, Number, Hash, Array).
       # @return [value]
       def set(key, value)
+        set_with_ttl(key, value)
+      end
+
+      def set_with_ttl(key, value, ttl = nil)
         raise(NotImplementedError)
       end
 

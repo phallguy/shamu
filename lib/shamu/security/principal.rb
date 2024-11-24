@@ -45,16 +45,17 @@ module Shamu
         @remote_ip       = remote_ip
         @elevated        = elevated
         @scopes          = scopes && scopes.freeze
-        @user_id_chain ||= begin
-          user_ids = []
-          principal = self
-          while principal
-            user_ids << principal.user_id
-            principal = principal.super_principal
-          end
+        @user_id_chain =
+          begin
+            user_ids = []
+            principal = self
+            while principal
+              user_ids << principal.user_id
+              principal = principal.super_principal
+            end
 
-          user_ids.reverse.freeze
-        end
+            user_ids.reverse.freeze
+          end
       end
 
       # @return [Boolean] true if the [#user_id] is being impersonated.
@@ -121,6 +122,16 @@ module Shamu
       end
 
       def pretty_print_custom(pp); end
+
+      def to_h
+        result = { user_id: user_id }
+
+        result[:remote_ip] = remote_ip if remote_ip.present?
+        result[:elevated]  = true if elevated
+        result[:scopes]    = scopes if scopes.present?
+        result[:super]     = super_principal.to_h if super_principal
+        result
+      end
     end
   end
 end

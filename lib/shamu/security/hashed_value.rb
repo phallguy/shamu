@@ -29,7 +29,7 @@ module Shamu
     module HashedValue
       private
 
-        # @!visiblity public
+        # @!visibility public
         # @return [String] the private key used to sign the hashes.
         attr_reader :private_key
 
@@ -48,7 +48,7 @@ module Shamu
           OpenSSL::HMAC.hexdigest(alg, private_key, string)
         end
 
-        # @!visiblity public
+        # @!visibility public
         #
         # Verify that the hashed value has not been modified.
         #
@@ -59,7 +59,7 @@ module Shamu
           return if hashed.length < 41
 
           mac     = hashed[0...40]
-          toggles = hashed[41..-1]
+          toggles = hashed[41..]
 
           return unless hash_digest(toggles) == mac
 

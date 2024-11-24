@@ -44,6 +44,12 @@ module Shamu
       end
     end
 
+    class CredentialsExpiredError < Error
+      def initialize(message = :token_expired)
+        super
+      end
+    end
+
     # Security has been included but has not been completely set up.
     class IncompleteSetupError < Error
       def initialize(message = :incomplete_setup)

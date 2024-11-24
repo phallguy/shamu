@@ -34,7 +34,21 @@ module Shamu
     # ```
     # @return [String]
     def self.private_key
-      @private_key ||= ENV[ENV_PRIVATE_KEY] || raise("No private key configured. Set Shamu::Security.private_key or add an the #{ENV_PRIVATE_KEY} environment variable to the host.")
+      @private_key ||=
+        begin
+          key = ENV[ENV_PRIVATE_KEY].presence
+
+          if defined? ::Rails
+            key ||= ::Rails.application.credentials[:private_key].presence
+            key ||= ::Rails.application.credentials[:secret_key_base].presence
+          end
+
+          if key.blank?
+            raise("No private key configured. Set Shamu::Security.private_key or add an the #{ENV_PRIVATE_KEY} environment variable to the host.")
+          end
+
+          key
+        end
     end
 
     # @param [String] key to use.

@@ -4,6 +4,7 @@ I18n.load_path += Dir[File.expand_path("shamu/locale/*.yml", __dir__)]
 
 # {include:file:README.md}
 module Shamu
+
   require "shamu/version"
   require "shamu/error"
   require "shamu/attributes"
@@ -19,5 +20,5 @@ module Shamu
   require "shamu/to_model_id_extension"
   require "shamu/to_bool_extension"
 
-  require "shamu/rails" if defined? Rails
+  require "shamu/rails" if defined? ::Rails
 end

@@ -67,7 +67,16 @@ module Shamu
 
       # (see SessionStore#set)
       def set(key, value)
-        cookies.set(key, value: hash_value(value), secure: true, max_age: TTL)
+        value =
+          if value.is_a?(Hash)
+            value.merge(value: hash_value(value[:value]))
+          else
+            {
+              value: hash_value(value),
+            }
+          end
+
+        cookies.set(key, secure: true, max_age: TTL, **value)
       end
 
       # (see SessionStore#delete)

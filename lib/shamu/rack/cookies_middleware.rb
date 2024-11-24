@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "scorpion/rack"
 
 module Shamu
@@ -7,12 +9,15 @@ module Shamu
     class CookiesMiddleware
       include Scorpion::Rack
 
+      ENV_KEY = "shamu.cookies"
+
       def initialize(app)
         @app = app
       end
 
       def call(env)
-        cookies = Shamu::Rack::Cookies.new(env)
+        cookies = env[ENV_KEY]
+        cookies ||= Shamu::Rack::Cookies.new(env)
         scorpion(env).hunt_for(Shamu::Rack::Cookies, return: cookies)
 
         status, headers, body = @app.call(env)
