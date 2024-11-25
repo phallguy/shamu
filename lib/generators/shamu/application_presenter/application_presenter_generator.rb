@@ -1,9 +1,10 @@
 require "generators/rspec"
+require "rails/generators/named_base"
 
 module Shamu
   module Generators
     # @!visibility private
-    class ApplicationPresenterGenerator < ::Rails::Generators::Base
+    class ApplicationPresenterGenerator < ::Rails::Generators::NamedBase
       desc "Generate the default application presenter"
       source_root File.expand_path("templates", __dir__)
 

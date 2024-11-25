@@ -1,0 +1,15 @@
+# frozen_string_literal: true
+
+<% module_namespacing do -%>
+class <%= service_class_name %> < ::Shamu::Services::Service
+  include Shamu::Services::ActiveRecordCrud
+  include Shamu::Services::RequestSupport
+
+  resource <%= entity_class_name %>, <%= model_class_name %>
+
+  define_create
+  define_update
+  define_destroy
+  define_finders
+end
+<% end %>
