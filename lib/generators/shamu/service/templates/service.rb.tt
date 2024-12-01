@@ -1,0 +1,7 @@
+# frozen_string_literal: true
+
+<% module_namespacing do -%>
+class <%= service_class_name %> < ::Shamu::Services::Service
+  include Shamu::Services::RequestSupport
+end
+<% end %>

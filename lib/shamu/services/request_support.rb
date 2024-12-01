@@ -115,6 +115,7 @@ module Shamu
           [id, params]
         end
 
+
         # Static methods added to {RequestSupport}
         class_methods do
           # (see #request_class)

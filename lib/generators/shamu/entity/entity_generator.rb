@@ -24,23 +24,30 @@ module Shamu
       class_option :service, type: :boolean, default: true
       class_option :request, type: :boolean
       class_option :model, type: :boolean, default: true
+      class_option :list, type: :boolean, default: true
 
       argument :attributes, type: :array, default: [], banner: "field[:type][:index] field[:type][:index]"
 
       hook_for :orm, in: :rails, as: :model do |instance, generator|
-        generator.all_commands.each do |cmd, _|
+        generator.all_commands.each_key do |cmd|
           next if cmd == "create_model_file"
           next if cmd == "create_module_file"
 
-          instance.invoke(generator, cmd)
+          name = instance.name.split("/")
+          name.shift
+          name = name.join("/")
+          instance.invoke(generator, cmd, [name, instance.attributes.map(&:to_s)])
         end
       end
 
       hook_for :test_framework, as: :model do |instance, generator|
-        generator.all_commands.each do |cmd, _|
+        generator.all_commands.each_key do |cmd|
           next if cmd == "create_test_file"
 
-          instance.invoke(generator, cmd)
+          name = instance.name.split("/")
+          name.shift
+          name = name.join("/")
+          instance.invoke(generator, cmd, [name, instance.attributes.map(&:to_s)])
         end
       end
 
@@ -63,7 +70,7 @@ module Shamu
       def create_model_test_file
         return if skip_model? || skip_test_framework?
 
-        template("unit_test.rb", File.join("test/services", class_path, "models", "#{file_name}_test.rb"))
+        template("model_test.rb", File.join("test/services", class_path, "models", "#{file_name}_test.rb"))
       end
 
       def create_request_file
@@ -88,6 +95,18 @@ module Shamu
         return if skip_service? || skip_test_framework?
 
         template("service_test.rb", File.join("test/services", class_path, "#{file_name}_service_test.rb"))
+      end
+
+      def create_list_scope_file
+        return if skip_list?
+
+        template("list_scope.rb", File.join("app/services", class_path, "#{file_name}_list_scope.rb"))
+      end
+
+      def create_list_scope_test_file
+        return if skip_list? || skip_test_framework?
+
+        template("list_scope_test.rb", File.join("test/services", class_path, "#{file_name}_list_scope_test.rb"))
       end
 
       private
@@ -122,6 +141,10 @@ module Shamu
           !test_framework
         end
 
+        def skip_list?
+          !options[:list] || skip_service?
+        end
+
         def test_framework
           options[:test_framework]
         end
@@ -131,15 +154,19 @@ module Shamu
         end
 
         def entity_class_name
-          (class_path + ["#{file_name}Entity"]).map!(&:camelize).join("::")
+          (class_path + ["#{file_name.camelize}Entity"]).map!(&:camelize).join("::")
         end
 
         def request_class_name
-          (class_path + ["#{file_name}Request"]).map!(&:camelize).join("::")
+          (class_path + ["#{file_name.camelize}Request"]).map!(&:camelize).join("::")
         end
 
         def service_class_name
-          (class_path + ["#{file_name}Service"]).map!(&:camelize).join("::")
+          (class_path + ["#{file_name.camelize}Service"]).map!(&:camelize).join("::")
+        end
+
+        def list_scope_class_name
+          (class_path + ["#{file_name.camelize}ListScope"]).map!(&:camelize).join("::")
         end
     end
   end

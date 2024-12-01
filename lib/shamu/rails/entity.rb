@@ -8,7 +8,10 @@ module Shamu
       private
 
         def fetch_entity(service, param)
-          service.find(params[param]) if params.key?(param)
+          if params.key?(param)
+            id = Shamu::Attributes::HashedId::Value.new(params[param])
+            service.find(id)
+          end
         end
 
         def fetch_entities(service, param)

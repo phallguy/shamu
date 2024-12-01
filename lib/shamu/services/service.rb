@@ -272,7 +272,7 @@ module Shamu
         #
         #     scorpion.fetch UserEntity, { record: record, owner: owner }
         #   end
-        def lookup_association(id, service, cache)
+        def lookup_association(id, service, cache = cache_for(service.class))
           return unless id
 
           cache.fetch(id) || begin

@@ -2,11 +2,15 @@ module Shamu
   module Sessions
     # Exposes a persistent key/value store to track state across multiple
     # requests.
-    module SessionStore
+    module Cookies
       def self.create(scorpion, *args, &block)
-        return scorpion.fetch(Shamu::Sessions::CookieStore, *args, &block) if defined? Rack
+        if defined? Shamu::Rails::Cookies
+          return scorpion.fetch(Shamu::Rails::Cookies, *args, &block)
+        elsif defined? ::Rack
+          return scorpion.fetch(Shamu::Rack::Cookies, *args, &block)
+        end
 
-        raise("Configure a Shamu::Sessions::SessionStore in your scorpion setup.")
+        raise("Configure a Shamu::Sessions::CookiesStore in your scorpion setup.")
       end
 
       # Fetch the value with the given key from the store. If they key does not
@@ -15,7 +19,13 @@ module Shamu
       # @param [String] key
       # @yieldreturn The calculated value of the key.
       # @return [Object]
-      def fetch(key, &block)
+      def get(key)
+        raise(NotImplementedError)
+      end
+
+      # @param [String] name
+      # @return [Boolean] true if the cookie has been set.
+      def key?(name)
         raise(NotImplementedError)
       end
 

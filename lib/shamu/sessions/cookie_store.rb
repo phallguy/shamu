@@ -31,7 +31,6 @@ module Shamu
     # ```
     class CookieStore < Services::Service
       include Sessions::SessionStore
-      include Shamu::Security::HashedValue
 
       # How long cookies should be kept.
       TTL = (30 * 24 * 60 * 60)
@@ -42,7 +41,7 @@ module Shamu
 
       # @!attribute
       # @return [Shamu::Rack::Cookies]
-      attr_dependency :cookies, Shamu::Rack::Cookies
+      attr_dependency :cookies, Shamu::Sessions::Cookies
 
       #
       # @!endgroup Dependencies
@@ -59,7 +58,7 @@ module Shamu
       # (see SessionStore#fetch)
       def fetch(key)
         if cookies.key?(key)
-          verify_hash(cookies.get(key))
+          cookies.get(key)
         elsif block_given?
           yield
         end
@@ -69,10 +68,10 @@ module Shamu
       def set(key, value)
         value =
           if value.is_a?(Hash)
-            value.merge(value: hash_value(value[:value]))
+            value.merge(value: value[:value])
           else
             {
-              value: hash_value(value),
+              value: value,
             }
           end
 

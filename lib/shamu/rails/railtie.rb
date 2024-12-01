@@ -35,8 +35,11 @@ module Shamu
       end
 
       initializer "shamu.insert_middleware" do |app|
-        app.config.middleware.use(Scorpion::Rack::Middleware)
-        app.config.middleware.use(Shamu::Rack::CookiesMiddleware)
+        if defined? ::ActionDispatch
+          app.config.middleware.insert_after(ActionDispatch::Cookies, Shamu::Rails::CookiesMiddleware)
+        else
+          app.config.middleware.use(Shamu::Rack::CookiesMiddleware)
+        end
         app.config.middleware.use(Shamu::Rack::QueryParamsMiddleware)
       end
     end

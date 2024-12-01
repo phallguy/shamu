@@ -44,7 +44,7 @@ module Shamu
         @super_principal = super_principal
         @remote_ip       = remote_ip
         @elevated        = elevated
-        @scopes          = scopes && scopes.freeze
+        @scopes          = scopes && Array(scopes).sort.freeze
         @principal_id_chain =
           begin
             principal_ids = []

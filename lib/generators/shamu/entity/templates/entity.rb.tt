@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
 <% module_namespacing do -%>
-class <%= class_name %>Entity < ::Shamu::Entities::Entity
+class <%= entity_class_name %> < ::Shamu::Entities::Entity
   model :record
-
+  
+  attribute :id, on: :record
 <% attributes.each do |attribute| -%>
   attribute :<%= attribute.name %>, on: :record
 <% end %>

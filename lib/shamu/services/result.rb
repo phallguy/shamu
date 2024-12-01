@@ -36,6 +36,13 @@ module Shamu
         value
       end
 
+      # @return [Array<Object>] the values of the service call.
+      # @raise [ServiceRequestFailedError] if the result was not valid.
+      def values!
+        valid!
+        values
+      end
+
       # @return [Array<Result>] results from calling dependent services that
       # may have caused the request to fail.
       def nested_results
@@ -86,7 +93,7 @@ module Shamu
       # @return [ActiveModel::Errors] errors gathered from all the validation sources.
       #     Typically the {#request} and {#entity}.
       def errors
-        @errors ||= ActiveModel::Errors.new(self)
+        @errors ||= ActiveModel::Errors.new(request || self)
       end
 
       # Delegate model_name to request/entity

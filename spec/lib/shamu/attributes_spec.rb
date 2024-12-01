@@ -55,8 +55,6 @@ describe Shamu::Attributes do
 
     expect(klass.new).to(respond_to(:query))
   end
-
-  describe "#set?" do
     it "is true if the attribute has been set" do
       expect(klass.new(name: "Set")).to(be_set(:name))
     end

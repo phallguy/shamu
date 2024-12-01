@@ -195,6 +195,15 @@ module Shamu
             end
           end
 
+          def service_class
+            @service_class ||=
+              begin
+                "#{model_name.name}Service".constantize
+              rescue StandardError
+                "#{model_name.name.deconstantize}Service".constantize
+              end
+          end
+
           # Define custom default attributes for a {NullEntity} for this class.
           # @return [Class] the {NullEntity} class for the entity.
           #

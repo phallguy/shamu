@@ -124,7 +124,7 @@ module Shamu
             end
 
             def define_attribute_coercion(mod, name, coerce)
-              coerce = cource_method(name, coerce)
+              coerce = coerce_method(name, coerce)
 
               if coerce.is_a?(Class)
                 mod.send(:define_method, :"coerce_#{name}_value") do |value|
@@ -149,7 +149,7 @@ module Shamu
               RUBY
             end
 
-            def cource_method(name, coerce)
+            def coerce_method(name, coerce)
               if coerce == :smart
                 case name
                 when /_at$/, /_on$/ then method(:coerce_time_like_value)

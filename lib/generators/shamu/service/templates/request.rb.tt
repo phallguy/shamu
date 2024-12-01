@@ -1,11 +1,8 @@
 # frozen_string_literal: true
 
 <% module_namespacing do -%>
-module <%= request_class_name %>
+module <%= class_name %>Request 
   class Change < ::Shamu::Services::Request
-  <% attributes.each do |attribute| -%>
-    attribute :<%= attribute.name %>
-  <% end %>
   end
 
   class Create < Change

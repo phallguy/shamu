@@ -3,7 +3,7 @@
 require "scorpion/rack"
 
 module Shamu
-  module Rack
+  module Rails
     # Expose a {Cookies} hash to any service that wants to use session specific
     # storage.
     class CookiesMiddleware
@@ -16,12 +16,14 @@ module Shamu
       end
 
       def call(env)
-        cookies = env[ENV_KEY] ||= Shamu::Rack::Cookies.new(env)
-        scorpion(env).hunt_for(Shamu::Rack::Cookies, return: cookies)
+        cookies = env[ENV_KEY] ||=
+          begin
+            request = ActionDispatch::Request.new(env)
+            Shamu::Rails::Cookies.new(request)
+          end
+        scorpion(env).hunt_for(Shamu::Rails::Cookies, return: cookies)
 
-        status, headers, body = @app.call(env)
-
-        [status, cookies.apply!(headers), body]
+        @app.call(env)
       end
     end
   end

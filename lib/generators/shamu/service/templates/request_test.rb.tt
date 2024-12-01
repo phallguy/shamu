@@ -4,8 +4,8 @@ require "test_helper"
 
 <% module_namespacing do -%>
 class <%= request_class_name %>Test < ActiveSupport::TestCase
-  test "the truth" do
-    assert nil
-  end
+  # test "the truth" do
+  #   assert true
+  # end
 end
 <% end %>

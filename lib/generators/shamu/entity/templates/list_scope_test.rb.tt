@@ -3,7 +3,7 @@
 require "test_helper"
 
 <% module_namespacing do -%>
-class <%= entity_class_name %>Test < ActiveSupport::TestCase
+class <%= list_scope_class_name %>Test < ActiveSupport::TestCase
   test "the truth" do
     assert nil
   end

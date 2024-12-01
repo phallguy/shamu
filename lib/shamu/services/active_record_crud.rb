@@ -56,7 +56,7 @@ module Shamu
         end
 
         def entity_class
-          self.class.model_class
+          self.class.entity_class
         end
 
         def transform_ids(ids)
@@ -430,6 +430,16 @@ module Shamu
               records = authorize_relation(:read, records, scope)
 
               redact_entities(entity_list(records))
+            end
+
+            define_find_by
+          end
+
+          def define_find_by
+            define_method(:find_by) do |params = nil|
+              entity = list(params).first
+              not_found! if entity.blank?
+              entity
             end
           end
 

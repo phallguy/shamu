@@ -18,7 +18,7 @@ module Shamu
         # ActionController::API does not have #helper_method
         if respond_to?(:helper_method)
           helper_method :permit?
-          helper_method :current_user
+          helper_method :security_principal
         end
 
         # In `included` block so that it overrides Scorpion controller method.
@@ -118,7 +118,7 @@ module Shamu
           # @return [name]
           def service(name, contract, lazy: true, **options)
             services << name
-            attr_dependency(name, contract, **options.merge(private: true, lazy: lazy))
+            attr_dependency(name, contract, **options, private: true, lazy: lazy)
             name
           end
         end

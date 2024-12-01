@@ -30,7 +30,7 @@ module Shamu
     # ```
     module NullEntity
       # Attributes to automatically format as "Unknown {Entity Class Name}"
-      AUTO_FORMATTED_ATTRIBUTES = %i[name title label].freeze
+      AUTO_FORMATTED_ATTRIBUTES = %i[name title label handle].freeze
 
       # @return [nil]
       # Prevent rails url helpers from generating URLs for the entity.

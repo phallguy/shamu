@@ -48,7 +48,7 @@ module Shamu
         if respond_to?(:id)
           !!id
         else
-          raise(NotImplementedError, "override persisted? in #{self.class.name}")
+          false
         end
       end
 
@@ -97,71 +97,94 @@ module Shamu
         self
       end
 
-      class << self
-        # Coerces a hash or params object to a proper {Request} object.
-        # @param [Object] params to be coerced.
-        # @return [Request] the coerced request.
-        def coerce(params)
-          if params.is_a?(self)
-            params
-          elsif params.respond_to?(:to_h) || params.respond_to?(:to_attributes)
-            new(params)
-          elsif params.nil?
-            new
+      # Indicates the request was unable to complete and the adds an error if provided.
+      #
+      # @return [Result]
+      def reject(*args)
+        if args.present?
+          errors.add(*args)
+        end
+
+        Shamu::Services::Result.new(request: self)
+      end
+
+      private
+
+        def resolve_attributes(attributes)
+          resolved = super
+
+          if resolved.key?(model_name.param_key)
+            resolved[model_name.param_key]
           else
-            raise ArgumentError
+            resolved
           end
         end
 
-        # Coerces the given params object and raises an ArgumentError if any of
-        # the parameters are invalid.
-        # @param (see .coerce)
-        # @return (see .coerce)
-        def coerce!(params)
-          coerced = coerce(params)
-          raise ArgumentError unless coerced.valid?
-
-          coerced
-        end
-
-        REQUEST_ACTION_PATTERN = /(Create|Update|New|Change|Delete)?(Request)?$/
-
-        # @return [ActiveModel::Name] used by url_helpers or form_helpers etc.
-        #   when generating model specific names for this request.
-        def model_name
-          @model_name ||= begin
-            base_name = name || ""
-            parts     = reduce_model_name_parts(base_name.split("::"))
-            parts     = ["Request"] if parts.empty?
-            base_name = parts.join("::")
-
-            ::ActiveModel::Name.new(self, nil, base_name)
+        class << self
+          # Coerces a hash or params object to a proper {Request} object.
+          # @param [Object] params to be coerced.
+          # @return [Request] the coerced request.
+          def coerce(params)
+            if params.is_a?(self)
+              params
+            elsif params.respond_to?(:to_h) || params.respond_to?(:to_attributes)
+              new(params)
+            elsif params.nil?
+              new
+            else
+              raise ArgumentError
+            end
           end
-        end
 
-        private
+          # Coerces the given params object and raises an ArgumentError if any of
+          # the parameters are invalid.
+          # @param (see .coerce)
+          # @return (see .coerce)
+          def coerce!(params)
+            coerced = coerce(params)
+            raise ArgumentError unless coerced.valid?
 
-          def reduce_model_name_parts(parts)
-            while last = parts.last
-              if last == "Request"
-                parts[-1] = parts[-2].singularize
+            coerced
+          end
+
+          REQUEST_ACTION_PATTERN = /(Create|Update|New|Change|Delete)?(Request)?$/
+
+          # @return [ActiveModel::Name] used by url_helpers or form_helpers etc.
+          #   when generating model specific names for this request.
+          def model_name
+            @model_name ||= begin
+              base_name = name || ""
+              parts     = reduce_model_name_parts(base_name.split("::"))
+              parts     = ["Request"] if parts.empty?
+              base_name = parts.join("::")
+
+              ::ActiveModel::Name.new(self, nil, base_name)
+            end
+          end
+
+          private
+
+            def reduce_model_name_parts(parts)
+              while last = parts.last
+                if last == "Request"
+                  parts[-1] = parts[-2].singularize
+                  break
+                end
+
+                last.sub!(REQUEST_ACTION_PATTERN, "")
+                if last.empty?
+                  parts.pop
+                  next
+                end
+
+                last = last.singularize
+                parts[-1] = last
                 break
               end
 
-              last.sub!(REQUEST_ACTION_PATTERN, "")
-              if last.empty?
-                parts.pop
-                next
-              end
-
-              last = last.singularize
-              parts[-1] = last
-              break
+              parts
             end
-
-            parts
-          end
-      end
+        end
     end
   end
 end

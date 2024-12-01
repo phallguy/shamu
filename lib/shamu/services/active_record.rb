@@ -59,7 +59,7 @@ module Shamu
           if relation.respond_to?(:by_list_scope)
             relation.by_list_scope(list_scope)
           else
-            raise("Can't scope a #{relation.klass}. Add `scope :by_list_scope, ->(list_scope) { ... }` or extend Shamu::Entities::ActiveRecord.")
+            raise("Can't scope a #{relation.klass}. Add `scope :by_list_scope, ->(list_scope) { ... }` or include Shamu::Entities::ActiveRecord.")
           end
         end
 

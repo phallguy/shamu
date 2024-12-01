@@ -2,7 +2,7 @@
 
 <% module_namespacing do -%>
 class <%= model_class_name %> < ApplicationRecord
-  extend ::Shamu::Entities::ActiveRecord
+  include ::Shamu::Entities::ActiveRecord
 <% attributes.select(&:reference?).each do |attribute| -%>
 belongs_to :<%= attribute.name %><%= ", polymorphic: true" if attribute.polymorphic? %>
 <% end -%>
