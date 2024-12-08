@@ -69,6 +69,32 @@ module Shamu
           secure_services.any? { |s| s.permit?(*args) }
         end
 
+        # Explicitly authorize the specific action on the given resource and raise an error early if
+        # access isn't permitted.
+        #
+        # See {Security::Policy#permit?} for details.
+        #
+        # @return resource
+        def authorize!(action, resource, additional_context = nil, policy_class: nil)
+          if policy_class
+            policy = policy_class.new(
+              principal: security_principal,
+              context: security_context,
+              roles: respond_to?(:roles_service) ? roles_service.roles_for(security_principal, security_context) : [],
+            )
+            return resource if policy.permit?(action, resource, additional_context)
+          else
+            return resource if permit?(action, resource, additional_context)
+          end
+
+          raise Security::AccessDeniedError.new(
+            action: action,
+            resource: resource,
+            additional_context: additional_context,
+            principal: security_principal
+          )
+        end
+
         # @!visibility public
         #
         # Gets the security principal for the current request.
@@ -82,6 +108,10 @@ module Shamu
           )
         end
 
+        def security_context
+          @security_context ||= Shamu::Security::Context.new
+        end
+
         # @!visibility public
         #
         # @return [String] the IP address that the request originated from.
@@ -91,7 +121,7 @@ module Shamu
 
         # @!visibility public
         #
-        # Override to indicate if the user has offerred their credentials this
+        # Override to indicate if the user has offered their credentials this
         # session rather than just using a 'remember me' style token
         #
         # @return [Boolean] true if the session has been elevated.
@@ -120,6 +150,22 @@ module Shamu
             services << name
             attr_dependency(name, contract, **options, private: true, lazy: lazy)
             name
+          end
+
+          # Authorize standard CRUD actions with their shamu equivalent actions
+          def authorize_crud!(resource, policy_class: nil)
+            before_action do
+              action =
+                case action_name
+                when "show"  then :read
+                when "index" then :list
+                when "edit"  then :update
+                when "new"   then :create
+                else
+                  action_name.to_sym
+                end
+              authorize!(action, resource, policy_class: policy_class)
+            end
           end
         end
     end

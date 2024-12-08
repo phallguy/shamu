@@ -34,13 +34,38 @@ module Shamu
       #
       # @!endgroup Attributes
 
-      def initialize(_message = :access_denied, action: nil, resource: nil, principal: nil, additional_context: nil)
+      def initialize(message = :access_denied, action: nil, resource: nil, principal: nil, additional_context: nil)
         @action             = action
         @resource           = resource
         @principal          = principal
         @additional_context = additional_context
 
-        super(translate(:access_denied, action: action, resource: resource))
+        super(translate(message, action: action, resource: resource))
+      end
+
+      def inspect
+        str = StringIO.new
+        PP.pp(self, str)
+
+        str.string
+      end
+
+      def pretty_inspect(pp)
+        pretty_print(pp)
+      end
+
+      def pretty_print(pp)
+        pp.object_address_group(self) do
+          pp.seplist(%i[message resource action]) do |attr|
+            pp.breakable(" ")
+            pp.group(1) do
+              pp.text(attr.to_s)
+              pp.text(":")
+              pp.breakable(" ")
+              pp.pp(send(attr.name))
+            end
+          end
+        end
       end
     end
 

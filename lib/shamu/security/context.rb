@@ -4,7 +4,7 @@ module Shamu
     # that a {Principal} should be granted.
     class Context
       def initialize
-        @providers = Hash.new([])
+        @providers = {}
       end
 
       # Overridden in the application specific context for a request to return
@@ -15,7 +15,10 @@ module Shamu
       # allows the upstream service to declare which business the request
       # should be resolved with.
       def entity_ids(domain)
-        @providers[domain].map do |block|
+        entity_providers = @providers[domain]
+        return [] unless entity_providers.present?
+
+        entity_providers.map do |block|
           block.call(domain)
         end.flatten.compact
       end
@@ -23,7 +26,8 @@ module Shamu
       # Register a hook that can be used to provide the list of entity ids for
       # the given domain.
       def provide(domain, &block)
-        @providers[domain] << block
+        entity_providers = @providers[domain] ||= []
+        entity_providers << block
       end
     end
   end

@@ -427,7 +427,7 @@ module Shamu
                   scope_relation(default_scope, scope)
                 end
 
-              records = authorize_relation(:read, records, scope)
+              records = authorize_relation(:list, records, scope)
 
               redact_entities(entity_list(records))
             end

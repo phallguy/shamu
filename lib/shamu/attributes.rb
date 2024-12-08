@@ -80,7 +80,7 @@ module Shamu
 
     # @return [Hash] the assigned attributes as a hash for JSON serialization.
     def as_json(options = {})
-      to_attributes(options.slice(:only, :except)).as_json
+      to_attributes(**options.slice(:only, :except)).as_json
     end
 
     # @return [String] JSON encoded version of the assigned attributes.

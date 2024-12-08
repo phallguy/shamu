@@ -19,12 +19,14 @@ module Shamu
       check_class_collision suffix: "Entity"
       check_class_collision suffix: "Request"
       check_class_collision suffix: "Service"
+      check_class_collision suffix: "RolesService"
 
       class_option :migration, type: :boolean, default: true
       class_option :service, type: :boolean, default: true
       class_option :request, type: :boolean
       class_option :model, type: :boolean, default: true
       class_option :list, type: :boolean, default: true
+      class_option :security, type: :boolean
 
       argument :attributes, type: :array, default: [], banner: "field[:type][:index] field[:type][:index]"
 
@@ -109,6 +111,12 @@ module Shamu
         template("list_scope_test.rb", File.join("test/services", class_path, "#{file_name}_list_scope_test.rb"))
       end
 
+      def create_policy_file
+        return if skip_security?
+
+        template("policy.rb", File.join("app/services", class_path, "#{file_name}_policy.rb"))
+      end
+
       private
 
         def skip_service?
@@ -137,6 +145,16 @@ module Shamu
           options[:model]
         end
 
+        def skip_security?
+          return skip_service? if security.nil?
+
+          !security
+        end
+
+        def security
+          options[:security]
+        end
+
         def skip_test_framework?
           !test_framework
         end
@@ -163,6 +181,22 @@ module Shamu
 
         def service_class_name
           (class_path + ["#{file_name.camelize}Service"]).map!(&:camelize).join("::")
+        end
+
+        def roles_service_class_name
+          (class_path + ["#{file_name.camelize}RolesService"]).map!(&:camelize).join("::")
+        end
+
+        def policy_class_name
+          (class_path + ["#{file_name.camelize}Policy"]).map!(&:camelize).join("::")
+        end
+
+        def policy_base_class_name
+          if skip_model?
+            "Shamu::Security::Policy"
+          else
+            "Shamu::Security::ActiveRecordPolicy"
+          end
         end
 
         def list_scope_class_name

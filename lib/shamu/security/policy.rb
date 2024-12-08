@@ -76,11 +76,12 @@ module Shamu
       def authorize!(action, resource, additional_context = nil)
         return resource if permit?(action, resource, additional_context) == :yes
 
-        raise(Security::AccessDeniedError,
-              action: action,
-              resource: resource,
-              additional_context: additional_context,
-              principal: principal)
+        raise Security::AccessDeniedError.new(
+          action: action,
+          resource: resource,
+          additional_context: additional_context,
+          principal: principal
+        )
       end
 
       # Determines if the given `action` may be performed on the given
@@ -145,13 +146,13 @@ module Shamu
         # @return [Boolean] true if the {#principal} has been granted one of the
         #     given roles.
         def in_role?(*roles)
-          (principal_roles & roles).any?
+          principal_roles.intersect?(roles)
         end
 
         def principal_roles
           @principal_roles ||= begin
             expanded = self.class.expand_roles(*roles)
-            expanded << :authenticated if principal.principal_id && self.class.role_defined?(:authenticated)
+            expanded << :authenticated if !principal.anonymous? && self.class.role_defined?(:authenticated)
             expanded.select do |role|
               principal.scoped?(role)
             end

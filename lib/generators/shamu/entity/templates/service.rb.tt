@@ -4,6 +4,11 @@
 class <%= service_class_name %> < ::Shamu::Services::Service
   include Shamu::Services::ActiveRecordCrud
   include Shamu::Services::RequestSupport
+  <% unless skip_security? %>
+  include Shamu::Security::Support
+
+  policy_class <%= policy_class_name %>
+  <% end %>
 
   resource <%= entity_class_name %>, <%= model_class_name %>
 

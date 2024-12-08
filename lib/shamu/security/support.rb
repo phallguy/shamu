@@ -27,7 +27,7 @@ module Shamu
       included do
         attr_dependency :security_principal, Security::Principal unless method_defined?(:security_principal)
         attr_dependency :security_context, Security::Context unless method_defined?(:security_context)
-        attr_dependency :roles_service, Security::RolesService
+        attr_dependency :roles_service, Security::RolesService unless method_defined?(:roles_service)
       end
 
       # @return [Policy] the security {Policy} for the service.

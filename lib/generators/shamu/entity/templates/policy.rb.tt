@@ -1,0 +1,36 @@
+# frozen_string_literal: true
+
+<% module_namespacing do -%>
+class <%= policy_class_name %> < <%= policy_base_class_name %>
+  role :super
+  role :authenticated, implicit: true
+
+  private
+    
+    def authenticated_permissions
+      resource(<%= entity_class_name %>) do
+        # permit(:view)
+      end
+
+      <% unless skip_model? %>
+      refine(:read, <%= model_class_name %>) do |records, additional_context|
+        records
+      end
+
+      refine(:list, <%= model_class_name %>) do |records, additional_context|
+        next records if in_role?(:super)
+
+        records
+      end
+      <% end %>
+    end
+
+    def anonymous_permissions
+      <% unless skip_model? %>
+      refine(:view, <%= model_class_name %>) do |records, additional_context|
+        records.none
+      end
+      <% end %>
+    end
+end
+<% end %>

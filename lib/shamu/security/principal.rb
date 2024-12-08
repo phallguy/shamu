@@ -50,7 +50,7 @@ module Shamu
             principal_ids = []
             principal = self
             while principal
-              principal_ids << principal.principal_id
+              principal_ids << principal.principal_id if principal.principal_id.present?
               principal = principal.super_principal
             end
 
@@ -93,7 +93,7 @@ module Shamu
 
       def inspect
         result = "<#{self.class.name}:0x#{object_id.to_s(16)}"
-        %i[principal_id scopes elevated remote_ip super_principal].map do |name|
+        inspectable_attributes.map do |name|
           value = send(name)
           result << " #{name}=#{send(name).inspect}" if value
         end
@@ -102,7 +102,7 @@ module Shamu
       end
 
       def pretty_print(pp)
-        attributes = %i[principal_id scopes elevated remote_ip super_principal]
+        attributes = inspectable_attributes
         attributes = attributes.reject! { |a| send(a).nil? }
 
         pp.object_address_group(self) do
@@ -122,6 +122,10 @@ module Shamu
       end
 
       def pretty_print_custom(pp); end
+
+      def inspectable_attributes
+        %i[principal_id scopes elevated remote_ip super_principal]
+      end
 
       def to_h
         result = { principal_id: principal_id }

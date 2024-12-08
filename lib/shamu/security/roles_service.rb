@@ -17,6 +17,10 @@ module Shamu
         []
       end
 
+      def roles_service
+        self
+      end
+
       # Default {RolesService} always returns an empty set.
       class EmptyRolesService
         include RolesService

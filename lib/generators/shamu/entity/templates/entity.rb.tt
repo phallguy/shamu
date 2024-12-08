@@ -2,6 +2,8 @@
 
 <% module_namespacing do -%>
 class <%= entity_class_name %> < ::Shamu::Entities::Entity
+  include Shamu::Attributes::HashedId
+
   model :record
   
   attribute :id, on: :record
