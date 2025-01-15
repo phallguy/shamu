@@ -108,7 +108,13 @@ module Shamu
           #     not being modified in an :update request.
           def entity(entity_class, through: nil, as: nil, list: nil, only: nil, except: nil, param: :id, list_param: nil, action: nil, param_key: nil)
             as      ||= entity_as_name(entity_class)
-            through ||= :"#{as.to_s.pluralize}_service"
+            through ||=
+              if respond_to?(:"#{as.to_s.pluralize}_service")
+                :"#{as.to_s.pluralize}_service"
+              else
+                :"#{as}_service"
+              end
+
             list    ||= as.to_s.pluralize.to_sym
 
             define_entity_method(as, through, param)

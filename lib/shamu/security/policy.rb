@@ -74,7 +74,9 @@ module Shamu
       # @return [resource]
       # @raise [AccessDeniedError] if not permitted.
       def authorize!(action, resource, additional_context = nil)
-        return resource if permit?(action, resource, additional_context) == :yes
+        permitted = permit?(action, resource, additional_context)
+        return resource if permitted == :yes
+        return resource if permitted == :maybe && principal.elevated?
 
         raise Security::AccessDeniedError.new(
           action: action,

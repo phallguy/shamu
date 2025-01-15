@@ -27,6 +27,10 @@ module Shamu
       include Shamu::Attributes::TrimStrings
       include Shamu::Attributes::Validation
 
+      def to_model
+        self
+      end
+
       # Applies the attributes of the request to the given model. Only handles
       # scalar attributes. For more complex associations, override in a custom
       # {Request} class.
@@ -102,7 +106,11 @@ module Shamu
       # @return [Result]
       def reject(*args)
         if args.present?
-          errors.add(*args)
+          if args.first.is_a?(StandardError)
+            errors.add(:base, args.first.message)
+          else
+            errors.add(*args)
+          end
         end
 
         Shamu::Services::Result.new(request: self)
@@ -156,9 +164,13 @@ module Shamu
               base_name = name || ""
               parts     = reduce_model_name_parts(base_name.split("::"))
               parts     = ["Request"] if parts.empty?
+              namespace =
+                if parts.length > 1 && parts[0] == parts[1].pluralize
+                  parts.shift
+                end
               base_name = parts.join("::")
 
-              ::ActiveModel::Name.new(self, nil, base_name)
+              ::ActiveModel::Name.new(self, namespace&.constantize, base_name)
             end
           end
 

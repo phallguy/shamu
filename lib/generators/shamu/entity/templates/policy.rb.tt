@@ -2,7 +2,7 @@
 
 <% module_namespacing do -%>
 class <%= policy_class_name %> < <%= policy_base_class_name %>
-  role :super
+  role :superuser
   role :authenticated, implicit: true
 
   private
@@ -18,7 +18,7 @@ class <%= policy_class_name %> < <%= policy_base_class_name %>
       end
 
       refine(:list, <%= model_class_name %>) do |records, additional_context|
-        next records if in_role?(:super)
+        next records if in_role?(:superuser)
 
         records
       end

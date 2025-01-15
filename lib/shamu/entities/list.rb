@@ -88,6 +88,10 @@ module Shamu
         self
       end
 
+      def self.empty
+        new([])
+      end
+
       private
 
         attr_reader :raw_entities

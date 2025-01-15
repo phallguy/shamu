@@ -125,6 +125,15 @@ module Shamu
           redact_entities(entities)
         end
 
+        def handle_active_record_error(error, request)
+          case error
+          when ::ActiveRecord::RecordNotUnique
+            request.reject(:base, :unique_constraint)
+          else
+            raise error
+          end
+        end
+
         class_methods do
           # Declare the entity and resource classes used by the service.
           #
@@ -203,6 +212,8 @@ module Shamu
                 next record unless record.save
 
                 redact_entity(build_entity(record))
+              rescue ::ActiveRecord::ActiveRecordError => e
+                handle_active_record_error(e, request)
               end
             end
           end
@@ -231,6 +242,10 @@ module Shamu
                 request.assign_attributes(backfill_attributes)
                 next unless request.valid?
 
+                if defined? security_context
+                  security_context.provide(:entity) { entity.id }
+                end
+
                 authorize!(method, entity, request)
 
                 request.apply_to(record)
@@ -243,6 +258,8 @@ module Shamu
                 next record unless record.save
 
                 redact_entity(build_entity(record))
+              rescue ::ActiveRecord::ActiveRecordError => e
+                handle_active_record_error(e, request)
               end
             end
           end
@@ -273,6 +290,11 @@ module Shamu
               with_request(params, klass) do |request, *args|
                 if record = send(lookup_name, request)
                   entity = build_entity(record)
+
+                  if defined? security_context
+                    security_context.provide(:entity) { entity.id }
+                  end
+
                   authorize!(method, entity, request)
 
                   request.apply_to(record)
@@ -289,6 +311,8 @@ module Shamu
                 next record unless record.save
 
                 redact_entity(build_entity(record))
+              rescue ::ActiveRecord::ActiveRecordError => e
+                handle_active_record_error(e, request)
               end
             end
           end
@@ -313,6 +337,11 @@ module Shamu
               with_request(params, klass) do |request, *args|
                 record = default_scope.find(request.id)
                 entity = build_entity(record)
+
+                if defined? security_context
+                  security_context.provide(:entity) { entity.id }
+                end
+
                 authorize!(method, entity, request)
 
                 if block_given?
@@ -323,6 +352,8 @@ module Shamu
                 next record unless record.destroy
 
                 entity
+              rescue ::ActiveRecord::ActiveRecordError => e
+                handle_active_record_error(e, request)
               end
             end
           end
@@ -360,7 +391,13 @@ module Shamu
               define_method(:find) do |id|
                 wrap_not_found do
                   record = _find_block(id)
-                  redact_entity(authorize!(:read, build_entity(record)))
+                  entity = build_entity(record)
+
+                  if defined? security_context
+                    security_context.provide(:entity) { entity.id }
+                  end
+
+                  redact_entity(authorize!(:read, entity))
                 end
               end
             else
@@ -463,8 +500,7 @@ module Shamu
             else
               define_method(:build_entities) do |records|
                 records.map do |record|
-                  entity = scorpion.fetch(entity_class, record: record)
-                  authorize!(:read, entity)
+                  scorpion.fetch(entity_class, record: record)
                 end
               end
             end

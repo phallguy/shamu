@@ -189,9 +189,13 @@ module Shamu
               base_name = name.sub(/(::)?Entity$/, "")
               parts     = base_name.split("::")
               parts[-1] = parts[-1].singularize
+              namespace =
+                if parts.length > 1 && parts[0] == parts[1].pluralize
+                  parts.shift
+                end
               base_name = parts.join("::")
 
-              ::ActiveModel::Name.new(self, nil, base_name)
+              ::ActiveModel::Name.new(self, namespace&.constantize, base_name)
             end
           end
 

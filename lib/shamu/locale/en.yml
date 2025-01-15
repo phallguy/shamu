@@ -51,3 +51,5 @@ en:
           attributes:
             base:
               canceled: Request was canceled
+      messages:
+        unique_constraint: Duplicate record or data
