@@ -52,4 +52,10 @@ module Shamu
       super(translate(message))
     end
   end
+
+  class InvalidOptionError < Error
+    def initialize(message = :invalid_option)
+      super(translate(message))
+    end
+  end
 end

@@ -4,7 +4,7 @@ I18n.load_path += Dir[File.expand_path("shamu/locale/*.yml", __dir__)]
 
 # {include:file:README.md}
 module Shamu
-
+  require "shamu/scorpion"
   require "shamu/version"
   require "shamu/error"
   require "shamu/attributes"

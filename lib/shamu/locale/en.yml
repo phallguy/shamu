@@ -6,6 +6,7 @@ en:
       not_found_with_id: The resource with id %{id} was not found.
       resource_not_found: The %{resource} was not found.
       not_implemented: The method has not been implemented.
+      delegate_security_must_be_lazy: Delegated security dependencies must be lazy.
 
     warnings:
 
