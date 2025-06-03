@@ -19,6 +19,8 @@ module Shamu
   require "shamu/json_api"
   require "shamu/to_model_id_extension"
   require "shamu/to_bool_extension"
+  require "shamu/extensions/composite_name"
+  require "shamu/extensions/inspectable"
 
   require "shamu/rails" if defined? ::Rails
 end
