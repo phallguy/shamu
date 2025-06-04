@@ -11,7 +11,7 @@ module Shamu
 
       def pretty_print(pp)
         attributes = inspectable_attributes
-        attributes = attributes.reject! do |a|
+        attributes.reject! do |a|
           send(a).nil?
         rescue StandardError
           true
