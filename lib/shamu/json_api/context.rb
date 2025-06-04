@@ -3,6 +3,8 @@ module Shamu
     class Context
       include Scorpion::Object
 
+      attr_dependency :logger, Shamu::Logger, lazy: true
+
       # @param [Hash<Symbol,Array>] fields explicitly declare the attributes and
       #     resources that should be included in the response. The hash consists
       #     of a keys of the resource types and values as an array of fields to
@@ -170,7 +172,8 @@ module Shamu
 
           namespaces.each do |namespace|
             return "#{namespace}::#{name}".constantize
-          rescue NameError
+          rescue NameError => e
+            logger.error(e)
           end
 
           nil
