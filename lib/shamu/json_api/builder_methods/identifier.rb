@@ -35,9 +35,16 @@ module Shamu
           def add_identifier(output, type, id = :not_set)
             output[:type] = @type = json_type(type)
 
-            output[:id] =
+            raw_id =
               if id == :not_set
-                type.id.to_s if type.respond_to?(:id)
+                type.id if type.respond_to?(:id)
+              else
+                id
+              end
+
+            output[:id] =
+              if raw_id.respond_to?(:to_param)
+                id.to_param
               else
                 id.to_s
               end
