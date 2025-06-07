@@ -79,10 +79,10 @@ module Shamu
           append_error_source(request)
         end
 
-        unless entity == :not_set
-          @entity = entity
-          append_error_source(entity)
-        end
+        return if entity == :not_set
+
+        @entity = entity
+        append_error_source(entity)
       end
 
       # @return [Boolean] true if there were not recorded errors.
@@ -104,7 +104,7 @@ module Shamu
       # @return [self]
       # @raise [ServiceRequestFailedError] if the result was not valid.
       def valid!
-        raise ServiceRequestFailedError, self unless valid?
+        raise(ServiceRequestFailedError, self) unless valid?
 
         self
       end
@@ -178,7 +178,7 @@ module Shamu
           return unless source.respond_to?(:errors)
 
           source.errors.each do |err|
-            errors.add(err.attribute, err.message) unless errors[err.attribute].include?(err.message)
+            errors.add(err.attribute, err.type) unless errors[err.attribute].include?(err.message)
           end
         end
     end
